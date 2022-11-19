@@ -73,7 +73,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hInstance      = hInstance;
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_POPCORN));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = CreateSolidBrush(RGB(15, 63, 31));
+    //wcex.hbrBackground  = CreateSolidBrush(RGB(58, 58, 58)); // цвет фона игры
+    wcex.hbrBackground = CreateSolidBrush(RGB(6, 30, 82)); // цвет фона игры
     wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_POPCORN);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -95,18 +96,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
 
-	Init();
+   Init();
 
-	RECT window_rect;
-	window_rect.left = 0;
-	window_rect.top = 0;
-	window_rect.right = 320 * 3;
-	window_rect.bottom = 200 * 3;
+   RECT window_rect;
+   window_rect.left = 0;
+   window_rect.top = 0;
+   window_rect.right = 320 * 3;
+   window_rect.bottom = 200 * 3;
 
-	AdjustWindowRect(&window_rect, WS_OVERLAPPEDWINDOW, TRUE);
+   AdjustWindowRect(&window_rect, WS_OVERLAPPEDWINDOW, TRUE);
 
-	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		0, 0, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top, nullptr, nullptr, hInstance, nullptr);
+   // hWnd - условно номер окна
+   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+      0, 0, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top, nullptr, nullptr, hInstance, nullptr);
 
    if (hWnd == 0)
       return FALSE;
@@ -155,7 +157,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
-				Draw_Frame(hdc);
+            Draw_Frame(hdc);
             EndPaint(hWnd, &ps);
         }
         break;
