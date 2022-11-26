@@ -3,6 +3,8 @@
 #define _USE_MATH_DEFINES // объ€вл€ет им€ как существующее
 #include <cmath>
 
+#include "Border.h"
+
 //------------------------------------------------------------------------------------------------------------
 // Global Variables:
 const int Timer_ID = WM_USER + 1;
@@ -57,6 +59,8 @@ private:
 class ALevel
 {
 public:
+	ALevel();
+
 	void Init();
 	void Draw(HDC hdc, RECT &paint_area);
 	void Check_Level_Brick_Hit(int &next_y_pos, double &ball_direction);
@@ -101,9 +105,9 @@ public:
 	static const int Y_Pos = 185;
 
 private:
-	RECT Platform_Rect, Prev_Platform_Rect;
-
 	HPEN Highlight_Pen;
+
+	RECT Platform_Rect, Prev_Platform_Rect;
 
 	int Inner_Width;
 
@@ -111,30 +115,17 @@ private:
 	static const int Circle_Size = 7;
 };
 //------------------------------------------------------------------------------------------------------------
-class AsBorder
-{
-public:
-	void Init();
-	void Draw(HDC hdc, RECT &paint_area, AsEngine *engine);
-
-	HPEN Border_Blue_Pen, Border_White_Pen;
-	HBRUSH Border_Blue_Brush, Border_White_Brush;
-
-private:
-	void Draw_Element(HDC hdc, int x, int y, bool top_border, AsEngine *engine);
-};
-//------------------------------------------------------------------------------------------------------------
 class AsEngine
 {
 public:
+	AsEngine();
+
 	void Init_Engine(HWND hWnd);
 	void Draw_Frame(HDC hdc, RECT &paint_area);
 	int On_Key_Down(EKey_Type key_type);
 	int On_Timer();
 
-	static void Create_Pen_Brush(unsigned char r, unsigned char g, unsigned char b, HPEN &pen, HBRUSH &brush);
-
-	static const int Global_Scale = 3;
+	
 	static const int Max_X_Pos = ALevel::Level_X_Offset + ALevel::Cell_Width * ALevel::Level_Width;
 	static const int Max_Y_Pos = 199 - ABall::Ball_Size;
 	static const int Border_X_Offset = 6;
