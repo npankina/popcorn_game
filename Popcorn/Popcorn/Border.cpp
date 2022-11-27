@@ -1,15 +1,4 @@
-#include "Border.h"
-
-//Config
-//------------------------------------------------------------------------------------------------------------
-void AsConfig::Create_Pen_Brush(unsigned char r, unsigned char g, unsigned char b, HPEN &pen, HBRUSH &brush)
-{
-	pen = CreatePen(PS_SOLID, 0, RGB(r, g, b));
-	brush = CreateSolidBrush(RGB(r, g, b));
-}
-//------------------------------------------------------------------------------------------------------------
-
-
+п»ї#include "Border.h"
 
 // AsBorder
 //------------------------------------------------------------------------------------------------------------
@@ -24,25 +13,25 @@ void AsBorder::Init()
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw(HDC hdc, RECT &paint_area, HPEN bg_pen, HBRUSH bg_brush)
-{// Отрисовка рамки уровня
+{// РћС‚СЂРёСЃРѕРІРєР° СЂР°РјРєРё СѓСЂРѕРІРЅСЏ
 
- // 1. линия слева
+ // 1. Р»РёРЅРёСЏ СЃР»РµРІР°
 	for (int i = 0; i < 50; i++)
 		Draw_Element(hdc, 2, 1 + i * 4, false, bg_pen, bg_brush);
 
-	// 2. линия справа
+	// 2. Р»РёРЅРёСЏ СЃРїСЂР°РІР°
 	for (int i = 0; i < 50; i++)
 		Draw_Element(hdc, 201, 1 + i * 4, false, bg_pen, bg_brush);
 
-	// 3. линия сверху
+	// 3. Р»РёРЅРёСЏ СЃРІРµСЂС…Сѓ
 	for (int i = 0; i < 50; i++)
 		Draw_Element(hdc, 3 + i * 4, 0, true, bg_pen, bg_brush);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border, HPEN bg_pen, HBRUSH bg_brush)
-{// Рисует элемент рамки уровня
+{// Р РёСЃСѓРµС‚ СЌР»РµРјРµРЅС‚ СЂР°РјРєРё СѓСЂРѕРІРЅСЏ
 
- // Вывод основной линии
+ // Р’С‹РІРѕРґ РѕСЃРЅРѕРІРЅРѕР№ Р»РёРЅРёРё
 	SelectObject(hdc, Border_Blue_Pen);
 	SelectObject(hdc, Border_Blue_Brush);
 
@@ -52,7 +41,7 @@ void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border, HPEN bg_pen,
 		Rectangle(hdc, (x + 1) * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + 4) * AsConfig::Global_Scale, (y + 4) * AsConfig::Global_Scale);
 
 
-	// Вывод белой линии
+	// Р’С‹РІРѕРґ Р±РµР»РѕР№ Р»РёРЅРёРё
 	SelectObject(hdc, Border_White_Pen);
 	SelectObject(hdc, Border_White_Brush);
 
@@ -61,7 +50,7 @@ void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border, HPEN bg_pen,
 	else
 		Rectangle(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + 1) * AsConfig::Global_Scale, (y + 4) * AsConfig::Global_Scale);
 
-	// Черная точка
+	// Р§РµСЂРЅР°СЏ С‚РѕС‡РєР°
 	SelectObject(hdc, bg_pen);
 	SelectObject(hdc, bg_brush);
 

@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include "resource.h"
-#include "Engine.h" // вся функциональность движка
+#include "Engine.h" // РІСЃСЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕСЃС‚СЊ РґРІРёР¶РєР°
