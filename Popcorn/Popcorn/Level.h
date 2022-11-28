@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Config.h"
+#include "Active_Brick.h"
 
 #define _USE_MATH_DEFINES // объявляет имя как существующее
 #include <cmath>
@@ -24,11 +25,14 @@ public:
 	ALevel();
 
 	void Init();
-	void Draw(HDC hdc, RECT &paint_area);
+	void Draw(HWND hwnd,HDC hdc, RECT &paint_area);
 	void Check_Level_Brick_Hit(int &next_y_pos, double &ball_direction);
+
+	AActive_Brick Active_Brick;
 
 	HPEN Brick_Red_Pen, Brick_Blue_Pen;
 	HBRUSH Brick_Red_Brush, Brick_Blue_Brush;
+
 
 private:
 	void Set_Brick_Letter_Color(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush);
@@ -39,7 +43,6 @@ private:
 	RECT Level_Rect;
 	HPEN Letter_Pen;
 
-	static const int Brick_Width = 15;
-	static const int Brick_Height = 7;
+	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
 };
 //------------------------------------------------------------------------------------------------------------
