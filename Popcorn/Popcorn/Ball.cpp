@@ -12,16 +12,16 @@ void ABall::Init()
 	AsConfig::Create_Pen_Brush(255, 255, 255, Ball_Pen, Ball_Brush);
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Draw(HDC hdc, RECT &paint_area, HPEN bg_pen, HBRUSH bg_brush)
+void ABall::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
-	if ( !(IntersectRect(&intersection_rect, &paint_area, &Ball_Rect)))
+	if ( !IntersectRect(&intersection_rect, &paint_area, &Ball_Rect) )
 		return;
 
 
 	// 1. Очищает фон
-	SelectObject(hdc, bg_pen);
-	SelectObject(hdc, bg_brush);
+	SelectObject(hdc, AsConfig::BG_Pen);
+	SelectObject(hdc, AsConfig::BG_Brush);
 
 	Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right, Prev_Ball_Rect.bottom);
 
@@ -69,7 +69,7 @@ void ABall::Move(HWND hwnd, ALevel *level, int platform_x_pos, int platform_widt
 	}
 
 	// Корректируем позицию при отражении от платформы
-	if (next_y_pos >= platform_y_pos)
+	if (next_y_pos > platform_y_pos)
 	{
 		if (next_x_pos >= platform_x_pos and next_x_pos <= platform_x_pos + platform_width)
 		{
@@ -87,8 +87,8 @@ void ABall::Move(HWND hwnd, ALevel *level, int platform_x_pos, int platform_widt
 
 	Ball_Rect.left = Ball_X_Pos * AsConfig::Global_Scale;
 	Ball_Rect.top = Ball_Y_Pos * AsConfig::Global_Scale;
-	Ball_Rect.right = Ball_Rect.left + AsConfig::Ball_Size * AsConfig::Global_Scale - 1;
-	Ball_Rect.bottom = Ball_Rect.top + AsConfig::Ball_Size * AsConfig::Global_Scale - 1;
+	Ball_Rect.right = Ball_Rect.left + AsConfig::Ball_Size * AsConfig::Global_Scale;
+	Ball_Rect.bottom = Ball_Rect.top + AsConfig::Ball_Size * AsConfig::Global_Scale;
 
 	InvalidateRect(hwnd, &Ball_Rect, FALSE);
 	InvalidateRect(hwnd, &Prev_Ball_Rect, FALSE);

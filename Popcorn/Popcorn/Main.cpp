@@ -6,6 +6,7 @@
 
 #define MAX_LOADSTRING 100
 
+
 // Global Variables:
 AsEngine Engine;
 HINSTANCE hInst;                                // current instance
@@ -22,6 +23,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	// TODO: Place code here.
+	AsConfig::Setup_Colors();
 
 	// Initialize global strings
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -49,11 +53,14 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	return (int)msg.wParam;
 }
 //------------------------------------------------------------------------------------------------------------
+//
 //  FUNCTION: MyRegisterClass()
+//
 //  PURPOSE: Registers the window class.
+//
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-	WNDCLASSEXW wcex;
+	WNDCLASSEXW wcex{};
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
@@ -64,7 +71,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hInstance = hInstance;
 	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_POPCORN));
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = CreateSolidBrush(RGB(6, 30, 82)); // цвет фона игры
+	wcex.hbrBackground = AsConfig::BG_Brush; // цвет фона игры
 	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_POPCORN);
 	wcex.lpszClassName = szWindowClass;
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -72,16 +79,21 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassExW(&wcex);
 }
 //------------------------------------------------------------------------------------------------------------
+//
 //   FUNCTION: InitInstance(HINSTANCE, int)
+//
 //   PURPOSE: Saves instance handle and creates main window
+//
 //   COMMENTS:
+//
 //        In this function, we save the instance handle in a global variable and
 //        create and display the main program window.
+//
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // Store instance handle in our global variable
 
-	RECT window_rect;
+	RECT window_rect{};
 	window_rect.left = 0;
 	window_rect.top = 0;
 	window_rect.right = 320 * 3;
@@ -104,12 +116,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 //------------------------------------------------------------------------------------------------------------
+//
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
+//
 //  PURPOSE: Processes messages for the main window.
 //
 //  WM_COMMAND  - process the application menu
 //  WM_PAINT    - Paint the main window
 //  WM_DESTROY  - post a quit message and return
+//
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
