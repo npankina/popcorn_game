@@ -15,7 +15,7 @@ void ABall::Init()
 void ABall::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
-	if ( !IntersectRect(&intersection_rect, &paint_area, &Ball_Rect) )
+	if ( !(IntersectRect(&intersection_rect, &paint_area, &Ball_Rect)))
 		return;
 
 
@@ -69,7 +69,7 @@ void ABall::Move(HWND hwnd, ALevel *level, int platform_x_pos, int platform_widt
 	}
 
 	// Корректируем позицию при отражении от платформы
-	if (next_y_pos > platform_y_pos)
+	if (next_y_pos >= platform_y_pos)
 	{
 		if (next_x_pos >= platform_x_pos and next_x_pos <= platform_x_pos + platform_width)
 		{
@@ -87,8 +87,8 @@ void ABall::Move(HWND hwnd, ALevel *level, int platform_x_pos, int platform_widt
 
 	Ball_Rect.left = Ball_X_Pos * AsConfig::Global_Scale;
 	Ball_Rect.top = Ball_Y_Pos * AsConfig::Global_Scale;
-	Ball_Rect.right = Ball_Rect.left + AsConfig::Ball_Size * AsConfig::Global_Scale;
-	Ball_Rect.bottom = Ball_Rect.top + AsConfig::Ball_Size * AsConfig::Global_Scale;
+	Ball_Rect.right = Ball_Rect.left + AsConfig::Ball_Size * AsConfig::Global_Scale - 1;
+	Ball_Rect.bottom = Ball_Rect.top + AsConfig::Ball_Size * AsConfig::Global_Scale - 1;
 
 	InvalidateRect(hwnd, &Ball_Rect, FALSE);
 	InvalidateRect(hwnd, &Prev_Ball_Rect, FALSE);

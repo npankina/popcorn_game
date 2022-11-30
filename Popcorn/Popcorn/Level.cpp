@@ -42,10 +42,22 @@ void ALevel::Init()
 	Level_Rect.bottom = (Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height) * AsConfig::Global_Scale;
 }
 //------------------------------------------------------------------------------------------------------------
+void ALevel::Draw(HWND hwnd, HDC hdc, RECT &paint_area)
+{// Вывод всех кирпичей уровня
 
+	int i, j;
+	RECT intersection_rect;
 
+	if ( !IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
+		return;
 
+	for (i = 0; i < AsConfig::Level_Height; i++)
+		for (j = 0; j < AsConfig::Level_Width; j++)
+			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (EBrick_Type)Level_01[i][j]);
 
+	Active_Brick.Draw(hdc, paint_area);
+}
+//------------------------------------------------------------------------------------------------------------
 void ALevel::Check_Level_Brick_Hit(int &next_y_pos, double &ball_direction)
 {// Корректируем позицию при отражении от платформы
 	int brick_y_pos = AsConfig::Level_Y_Offset + AsConfig::Level_Height * AsConfig::Cell_Height;
@@ -67,55 +79,9 @@ void ALevel::Check_Level_Brick_Hit(int &next_y_pos, double &ball_direction)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-void ALevel::Draw(HWND hwnd, HDC hdc, RECT &paint_area)
-{// Вывод всех кирпичей уровня
-
-	int i, j;
-	RECT intersection_rect;
-
-	if (! IntersectRect(&intersection_rect, &paint_area, &Level_Rect) )
-		return;
-
-	for (i = 0; i < AsConfig::Level_Height; i++)
-		for (j = 0; j < AsConfig::Level_Width; j++)
-			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (EBrick_Type)Level_01[i][j]);
-
-	Active_Brick.Draw(hdc, paint_area);
-}
-//------------------------------------------------------------------------------------------------------------
-void ALevel::Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type)
-{// Вывод "кирпича"
-
-	HPEN pen;
-	HBRUSH brush;
-
-	switch (brick_type)
-	{
-	case EBT_None:
-		return;
-	case EBT_Red:
-		pen = Brick_Red_Pen;
-		brush = Brick_Red_Brush;
-		break;
-	case EBT_Blue:
-		pen = Brick_Blue_Pen;
-		brush = Brick_Blue_Brush;
-		break;
-	default:
-		return;
-	}
-
-	SelectObject(hdc, pen);
-	SelectObject(hdc, brush);
-
-	RoundRect(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + AsConfig::Brick_Width) * AsConfig::Global_Scale, (y + AsConfig::Brick_Height) * AsConfig::Global_Scale, 2 * AsConfig::Global_Scale, 2 * AsConfig::Global_Scale);
-}
-//------------------------------------------------------------------------------------------------------------
-
-
-void ALevel::Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush)
+void ALevel::Set_Brick_Letter_Color(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush)
 {
-	if (is_switch_color)
+	if (is_switch_color) 
 	{
 		front_pen = Brick_Red_Pen;
 		front_brush = Brick_Red_Brush;
@@ -123,7 +89,7 @@ void ALevel::Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRU
 		back_pen = Brick_Blue_Pen;
 		back_brush = Brick_Blue_Brush;
 	}
-	else
+	else 
 	{
 		front_pen = Brick_Blue_Pen;
 		front_brush = Brick_Blue_Brush;
@@ -163,14 +129,14 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y,  EBrick_Type brick_type, E
 		else
 			switch_color = false;
 	}
-	else
+	else 
 	{
 		if (brick_type == EBT_Red)
 			switch_color = true;
 		else
 			switch_color = false;
 	}
-	Set_Brick_Letter_Colors(switch_color, front_pen, front_brush, back_pen, back_brush);
+	Set_Brick_Letter_Color(switch_color, front_pen, front_brush, back_pen, back_brush);
 
 	if (rotation_step == 4 or rotation_step == 12) 
 	{
@@ -225,4 +191,32 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y,  EBrick_Type brick_type, E
 		SetWorldTransform(hdc, &old_xform);
 	}
 }
+//------------------------------------------------------------------------------------------------------------
+void ALevel::Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type)
+{// Вывод "кирпича"
 
+	HPEN pen;
+	HBRUSH brush;
+
+	switch (brick_type)
+	{
+	case EBT_None:
+		return;
+	case EBT_Red:
+		pen = Brick_Red_Pen; 
+		brush = Brick_Red_Brush;
+		break;
+	case EBT_Blue:
+		pen = Brick_Blue_Pen;
+		brush = Brick_Blue_Brush;
+		break;
+	default:
+		return;
+	}
+
+	SelectObject(hdc, pen);
+	SelectObject(hdc, brush);
+
+	RoundRect(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + AsConfig::Brick_Width) * AsConfig::Global_Scale, (y + AsConfig::Brick_Height) * AsConfig::Global_Scale, 2 * AsConfig::Global_Scale, 2 * AsConfig::Global_Scale);
+}
+//------------------------------------------------------------------------------------------------------------

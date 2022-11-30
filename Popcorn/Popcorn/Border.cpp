@@ -3,9 +3,8 @@
 // AsBorder
 //------------------------------------------------------------------------------------------------------------
 AsBorder::AsBorder()
-: Border_Blue_Pen(0), Border_White_Pen(0), Border_Blue_Brush(0), Border_White_Brush(0)
-{
-}
+: Border_Blue_Pen{}, Border_White_Pen{}, Border_Blue_Brush{}, Border_White_Brush{}
+{}
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Init()
 {

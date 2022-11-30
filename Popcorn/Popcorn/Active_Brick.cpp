@@ -10,17 +10,7 @@ AActive_Brick::AActive_Brick(EBrick_Type brick_type)
 : Fade_Step(0), Brick_Type(brick_type), Brick_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
-void AActive_Brick::Act(HWND hwnd)
-{
-	if (Fade_Step < Max_Fade_Step - 1)
-	{
-		++Fade_Step;
-		InvalidateRect(hwnd, &Brick_Rect, FALSE); // FALSE - означает, что не нужно перерисовывать фон
-	}
-}
-//------------------------------------------------------------------------------------------------------------
-
-void AActive_Brick::Draw(HDC hdc, RECT &paint_area)
+void AActive_Brick::Draw(HDC hdc, RECT& paint_area)
 {
 	HPEN pen = 0;
 	HBRUSH brush = 0;
@@ -49,6 +39,15 @@ void AActive_Brick::Draw(HDC hdc, RECT &paint_area)
 	RoundRect(hdc, Brick_Rect.left, Brick_Rect.top, Brick_Rect.right, Brick_Rect.bottom, 2 * AsConfig::Global_Scale, 2 * AsConfig::Global_Scale);
 }
 //------------------------------------------------------------------------------------------------------------
+void AActive_Brick::Act(HWND hwnd)
+{
+	if (Fade_Step < Max_Fade_Step - 1)
+	{
+		++Fade_Step;
+		InvalidateRect(hwnd, &Brick_Rect, FALSE); // FALSE - означает, что не нужно перерисовывать фон
+	}
+}
+//------------------------------------------------------------------------------------------------------------
 void AActive_Brick::Setup_Colors()
 {
 	for (int i = 0; i < Max_Fade_Step; i++)
@@ -67,9 +66,9 @@ void AActive_Brick::Get_Fading_Color(const AColor &color, int step, HPEN &pen, H
 {
 	unsigned char r, g, b;
 
-	r = Get_Fading_Channel(color.R, AsConfig::BG_Color.R, step);
-	g = Get_Fading_Channel(color.G, AsConfig::BG_Color.G, step);
-	b = Get_Fading_Channel(color.B, AsConfig::BG_Color.B, step);
+	r = AActive_Brick::Get_Fading_Channel(color.R, AsConfig::BG_Color.R, step);
+	g = AActive_Brick::Get_Fading_Channel(color.G, AsConfig::BG_Color.G, step);
+	b = AActive_Brick::Get_Fading_Channel(color.B, AsConfig::BG_Color.B, step);
 
 	AsConfig::Create_Pen_Brush(r, g, b, pen, brush);
 

@@ -7,10 +7,10 @@ AsEngine::AsEngine()
 : Hwnd(0)
 {}
 //------------------------------------------------------------------------------------------------------------
-void AsEngine::Init_Engine(HWND hwnd)
+void AsEngine::Init_Engine(HWND hWnd)
 {// Настройка игры при старте
 
-	Hwnd = hwnd;
+	Hwnd = hWnd;
 
 	AActive_Brick::Setup_Colors();
 
@@ -72,9 +72,13 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 //------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Timer()
 {
+	++AsConfig::Current_Timer_Tick;
+
 	Ball.Move(Hwnd, &Level, Platform.X_Pos, Platform.Width);
 
 	Level.Active_Brick.Act(Hwnd);
+	Platform.Act(Hwnd);
+
 
 	return 0;
 }
