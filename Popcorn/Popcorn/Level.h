@@ -2,8 +2,6 @@
 #include "Config.h"
 #include "Active_Brick.h"
 
-#define _USE_MATH_DEFINES // объявляет имя как существующее
-#include <cmath>
 
 //------------------------------------------------------------------------------------------------------------
 enum ELetter_Type

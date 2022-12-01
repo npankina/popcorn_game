@@ -112,4 +112,8 @@
       <Filter>Active_Brick</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="game_development_plan.txt" />
+    <Text Include="To-do_List.txt" />
+  </ItemGroup>
 </Project>

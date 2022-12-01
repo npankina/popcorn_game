@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <Windows.h> // имена переменных Windows
+#define _USE_MATH_DEFINES // объявляет имя как существующее
+#include <cmath>
 
 //------------------------------------------------------------------------------------------------------------
 class AColor
@@ -24,6 +26,7 @@ public:
 	static const AColor BG_Color, Red_Brick_Color, Blue_Brick_Color;
 	static HPEN BG_Pen;
 	static HBRUSH BG_Brush;
+	static HWND Hwnd;
 
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;

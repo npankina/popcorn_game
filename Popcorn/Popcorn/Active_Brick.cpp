@@ -39,12 +39,12 @@ void AActive_Brick::Draw(HDC hdc, RECT& paint_area)
 	RoundRect(hdc, Brick_Rect.left, Brick_Rect.top, Brick_Rect.right, Brick_Rect.bottom, 2 * AsConfig::Global_Scale, 2 * AsConfig::Global_Scale);
 }
 //------------------------------------------------------------------------------------------------------------
-void AActive_Brick::Act(HWND hwnd)
+void AActive_Brick::Act()
 {
 	if (Fade_Step < Max_Fade_Step - 1)
 	{
 		++Fade_Step;
-		InvalidateRect(hwnd, &Brick_Rect, FALSE); // FALSE - означает, что не нужно перерисовывать фон
+		InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE); // FALSE - означает, что не нужно перерисовывать фон
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ void AActive_Brick::Setup_Colors()
 //------------------------------------------------------------------------------------------------------------
 unsigned char AActive_Brick::Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step)
 {
-	return color - step * (color - bg_color) / Max_Fade_Step - 1;
+	return color - step * (color - bg_color) / (Max_Fade_Step - 1);
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick::Get_Fading_Color(const AColor &color, int step, HPEN &pen, HBRUSH &brush)

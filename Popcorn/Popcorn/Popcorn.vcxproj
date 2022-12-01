@@ -160,6 +160,10 @@
     <Image Include="Popcorn.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="game_development_plan.txt" />
+    <Text Include="To-do_List.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
