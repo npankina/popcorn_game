@@ -8,7 +8,13 @@
 //------------------------------------------------------------------------------------------------------------
 // Global Variables:
 const int Timer_ID = WM_USER + 1;
-
+//------------------------------------------------------------------------------------------------------------
+enum EGame_State
+{
+	EGS_Play_Level,
+	EGS_Lost_Ball,
+	EGS_Restart_Level
+};
 //------------------------------------------------------------------------------------------------------------
 enum EKey_Type
 {
@@ -28,6 +34,7 @@ public:
 	int On_Timer();
 
 private:
+	EGame_State Game_State;
 	ABall Ball;
 	ALevel Level;
 	APlatform Platform;

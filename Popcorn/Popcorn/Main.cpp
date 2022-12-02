@@ -159,8 +159,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case VK_LEFT:
 			return Engine.On_Key_Down(EKT_Left);
+
 		case VK_RIGHT:
 			return Engine.On_Key_Down(EKT_Right);
+
 		case VK_SPACE:
 			return Engine.On_Key_Down(EKT_Space);
 		}

@@ -53,6 +53,11 @@ void APlatform::Act()
 	}
 }
 //------------------------------------------------------------------------------------------------------------
+EPlatform_State APlatform::Get_State()
+{
+	return Platform_State;
+}
+//------------------------------------------------------------------------------------------------------------
 void APlatform::Set_State(EPlatform_State new_state)
 {
 	if (Platform_State == new_state)
@@ -115,12 +120,11 @@ void APlatform::Clear_BG(HDC hdc)
 	SelectObject(hdc, AsConfig::BG_Pen);
 	SelectObject(hdc, AsConfig::BG_Brush);
 	Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.top, Prev_Platform_Rect.right, Prev_Platform_Rect.bottom);
-
 }
 //------------------------------------------------------------------------------------------------------------
 void APlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 {
-	RECT intersection_rect;
+	RECT intersection_rect{};
 	int x = X_Pos;
 	int y = AsConfig::Platform_Y_Pos;
 
@@ -147,14 +151,24 @@ void APlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 {
 	int area_width, area_height;
 	int x, y, y_offset;
+	int moved_columns_counter = 0;
+	int max_platform_y;
 	COLORREF pixel;
 	COLORREF bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
 
 	area_width = Width * AsConfig::Global_Scale;
 	area_height = Height * AsConfig::Global_Scale + 1;
 
+	max_platform_y = AsConfig::Max_Y_Pos * AsConfig::Global_Scale + area_height;
+
+
 	for (int i = 0; i < area_width; i++)
 	{
+		if (Meltdown_Platform_Y_Pos[i] > max_platform_y)
+			continue;
+
+		++moved_columns_counter;
+
 		x = Platform_Rect.left + i;
 		y_offset = AsConfig::Rand(Meltdown_Speed) + 1;
 
@@ -174,6 +188,9 @@ void APlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 		}
 		Meltdown_Platform_Y_Pos[i] += y_offset;
 	}
+
+	if (moved_columns_counter == 0) // вся платформа сдвинулась за пределы окна
+		Platform_State = EPS_Missing; 
 }
 //------------------------------------------------------------------------------------------------------------
 void APlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
@@ -183,7 +200,7 @@ void APlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
 	int y = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
 	int roller_size = Circle_Size * AsConfig::Global_Scale;
 	double alpha;
-	XFORM xform, old_xform;
+	XFORM xform{}, old_xform{};
 
 	Clear_BG(hdc);
 
@@ -240,7 +257,7 @@ void APlatform::Draw_Expanding_Roll_In_State(HDC hdc, RECT &paint_area)
 	if (Inner_Width >= Normal_Platform_Inner_Width)
 	{
 		Inner_Width = Normal_Platform_Inner_Width;
-		Platform_State = EPS_Normal;
+		Platform_State = EPS_Ready;
 		Redraw_Platform();
 	}
 }
