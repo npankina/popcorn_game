@@ -22,6 +22,7 @@ public:
 
 
 	static int Current_Timer_Tick;
+	static bool Level_Has_Floor;
 
 	static const AColor BG_Color, Red_Brick_Color, Blue_Brick_Color;
 	static HPEN BG_Pen;

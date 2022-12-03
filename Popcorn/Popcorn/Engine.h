@@ -1,9 +1,8 @@
 ﻿#pragma once
 
 #include "Border.h"
-#include "Ball.h"
+#include "Level.h"
 #include "Platform.h"
-#include "Active_Brick.h"
 
 //------------------------------------------------------------------------------------------------------------
 // Global Variables:

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Config.h"
+#include "Ball.h"
 #include "Active_Brick.h"
 
 
@@ -10,21 +10,20 @@ enum ELetter_Type
 	ELT_O
 };
 //------------------------------------------------------------------------------------------------------------
-class ALevel
+class ALevel : public AHit_Checker
 {
 public:
 	ALevel();
 
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
+
 	void Init();
 	void Draw(HWND hwnd,HDC hdc, RECT &paint_area);
-	void Check_Level_Brick_Hit(double &next_y_pos, double &ball_direction);
 
 	AActive_Brick Active_Brick;
 
 	HPEN Brick_Red_Pen, Brick_Blue_Pen;
 	HBRUSH Brick_Red_Brush, Brick_Blue_Brush;
-
-	bool Has_Floor;
 
 
 private:

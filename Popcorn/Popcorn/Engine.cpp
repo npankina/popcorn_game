@@ -17,9 +17,16 @@ void AsEngine::Init_Engine(HWND hWnd)
 	Level.Init();
 	Border.Init();
 	Platform.Init();
+	Ball.Init();
+
+	ABall::Add_Hit_Checker(&Border);
+	ABall::Add_Hit_Checker(&Level);
+	ABall::Add_Hit_Checker(&Platform);
+
+
 	Platform.Set_State(EPS_Normal);
 	Platform.Redraw_Platform();
-	Ball.Init();
+	
 	Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0); // 20 раз в секунду срабатывает таймер
@@ -88,7 +95,7 @@ int AsEngine::On_Timer()
 	switch(Game_State)
 	{
 	case EGS_Play_Level:
-		Ball.Move(&Level, Platform.X_Pos, Platform.Width);
+		Ball.Move();
 
 		if (Ball.Get_State() == EBS_Lost)
 		{
@@ -113,7 +120,6 @@ int AsEngine::On_Timer()
 			Game_State = EGS_Play_Level;
 			Ball.Set_State(EBS_On_Platform, Platform.X_Pos + Platform.Width / 2);
 		}
-
 		break;
 	}
 

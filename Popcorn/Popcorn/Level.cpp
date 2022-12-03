@@ -26,8 +26,31 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 // ALevel
 //------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
-: Has_Floor(false), Active_Brick(EBT_Red), Brick_Red_Pen(0), Brick_Blue_Pen(0), Brick_Red_Brush(0), Brick_Blue_Brush(0), Level_Rect{}, Letter_Pen{}
+: Active_Brick(EBT_Red), Brick_Red_Pen(0), Brick_Blue_Pen(0), Brick_Red_Brush(0), Brick_Blue_Brush(0), Level_Rect{}, Letter_Pen{}
 {}
+//------------------------------------------------------------------------------------------------------------
+bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+{// Корректируем позицию при отражении от платформы
+
+	int brick_y_pos = AsConfig::Level_Y_Offset + AsConfig::Level_Height * AsConfig::Cell_Height;
+
+	for (int i = AsConfig::Level_Height - 1; i >= 0; i--)
+	{
+		for (int j = 0; j < AsConfig::Level_Width; j++)
+		{
+			if (Level_01[i][j] == 0)
+				continue;
+
+			if (next_y_pos < brick_y_pos)
+			{
+				ball->Ball_Direction = -ball->Ball_Direction;
+				return true;
+			}
+		}
+		brick_y_pos -= AsConfig::Cell_Height;
+	}
+	return false;
+}
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Init()
 {
@@ -56,27 +79,6 @@ void ALevel::Draw(HWND hwnd, HDC hdc, RECT &paint_area)
 			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (EBrick_Type)Level_01[i][j]);
 
 	Active_Brick.Draw(hdc, paint_area);
-}
-//------------------------------------------------------------------------------------------------------------
-void ALevel::Check_Level_Brick_Hit(double &next_y_pos, double &ball_direction)
-{// Корректируем позицию при отражении от платформы
-	int brick_y_pos = AsConfig::Level_Y_Offset + AsConfig::Level_Height * AsConfig::Cell_Height;
-
-	for (int i = AsConfig::Level_Height - 1; i >= 0; i--)
-	{
-		for (int j = 0; j < AsConfig::Level_Width; j++)
-		{
-			if (Level_01[i][j] == 0)
-				continue;
-
-			if (next_y_pos < brick_y_pos)
-			{
-				next_y_pos = brick_y_pos - (next_y_pos - brick_y_pos);
-				ball_direction = -ball_direction;
-			}
-		}
-		brick_y_pos -= AsConfig::Cell_Height;
-	}
 }
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Set_Brick_Letter_Color(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush)
@@ -202,14 +204,17 @@ void ALevel::Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type)
 	{
 	case EBT_None:
 		return;
+
 	case EBT_Red:
 		pen = Brick_Red_Pen; 
 		brush = Brick_Red_Brush;
 		break;
+		
 	case EBT_Blue:
 		pen = Brick_Blue_Pen;
 		brush = Brick_Blue_Brush;
 		break;
+
 	default:
 		return;
 	}

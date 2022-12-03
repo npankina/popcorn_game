@@ -28,6 +28,45 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 		Draw_Element(hdc, 3 + i * 4, 0, true);
 }
 //------------------------------------------------------------------------------------------------------------
+bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+{
+	bool got_hit = false;
+
+	if (next_x_pos - ball->Radius < AsConfig::Border_X_Offset)
+	{
+		ball->Ball_Direction = M_PI - ball->Ball_Direction;
+		got_hit = true;
+	}
+
+	if (next_y_pos - ball->Radius < AsConfig::Border_Y_Offset)
+	{
+		ball->Ball_Direction = -ball->Ball_Direction;
+		got_hit = true;
+	}
+
+	if (next_x_pos + ball->Radius > AsConfig::Max_X_Pos)
+	{
+		ball->Ball_Direction =  M_PI - ball->Ball_Direction;
+		got_hit = true;
+	}
+
+	if (next_y_pos + ball->Radius > AsConfig::Max_Y_Pos)
+	{
+		if (AsConfig::Level_Has_Floor)
+		{
+			ball->Ball_Direction = -ball->Ball_Direction;
+			got_hit = true;
+		}
+		else
+		{
+			if (next_y_pos + ball->Radius > AsConfig::Max_Y_Pos + ball->Radius * 4)
+				ball->Set_State(EBS_Lost, next_x_pos);
+		}
+	}
+
+	return got_hit;
+}
+//------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border)
 {// Рисует элемент рамки уровня
 
