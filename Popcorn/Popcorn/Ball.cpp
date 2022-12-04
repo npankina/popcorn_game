@@ -45,7 +45,6 @@ void ABall::Move()
 {
 	double next_x_pos, next_y_pos;
 	double step_size = 1.0 / AsConfig::Global_Scale;
-	int platform_y_pos = AsConfig::Platform_Y_Pos - AsConfig::Ball_Size;
 	bool got_hit;
 
 	if (Ball_State != EBS_Normal)
@@ -61,10 +60,6 @@ void ABall::Move()
 		next_y_pos = Center_Y_Pos - (Ball_Speed * sin(Ball_Direction)); 
 
 		// коррекция позиции при отражении
-		//got_hit |= border_hit_checker->Check_Hit(next_x_pos, next_y_pos, this);  // от рамки
-		//got_hit |= level_hit_checker->Check_Hit(next_x_pos, next_y_pos, this);  // от кирпичей
-		//got_hit |= platform_hit_checker->Check_Hit(next_x_pos, next_y_pos, this);  // от платформы
-
 		for (int i = 0; i < Hit_Checkers_Count; i++)
 			got_hit |= Hit_Checkers[i]->Check_Hit(next_x_pos, next_y_pos, this);
 
@@ -91,7 +86,7 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 		Center_Y_Pos = Start_Ball_Y_Pos;
 		Ball_Speed = 1.0;
 		Rest_Distance = 0.0;
-		Ball_Direction = M_PI - M_PI_4;
+		Ball_Direction = M_PI_4;
 		Redraw_Ball();
 		break;
 
@@ -106,7 +101,7 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 		Center_Y_Pos = Start_Ball_Y_Pos;
 		Ball_Speed = 0.0;
 		Rest_Distance = 0.0;
-		Ball_Direction = M_PI - M_PI_4;
+		Ball_Direction = M_PI_4;
 		Redraw_Ball();
 		break;
 	}
@@ -117,6 +112,32 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 EBall_State ABall::Get_State()
 {
 	return Ball_State;
+}
+//------------------------------------------------------------------------------------------------------------
+double ABall::Get_Direction()
+{
+	return Ball_Direction;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Set_Direction(double new_derection)
+{
+	const double pi_2 = 2.0 * M_PI;
+
+	while (new_derection > pi_2)
+		new_derection -= pi_2;
+
+	while (new_derection < 0.0)
+		new_derection += pi_2;
+
+	Ball_Direction = new_derection;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Reflect(bool from_horizontal)
+{
+	if (from_horizontal)
+		Set_Direction(-Ball_Direction);
+	else
+		Set_Direction(M_PI - Ball_Direction);
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Redraw_Ball()
