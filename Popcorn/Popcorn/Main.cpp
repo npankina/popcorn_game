@@ -24,6 +24,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
+	// TODO: Place code here.
 	AsConfig::Setup_Colors();
 
 	// Initialize global strings
@@ -52,11 +53,14 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	return (int)msg.wParam;
 }
 //------------------------------------------------------------------------------------------------------------
+//
 //  FUNCTION: MyRegisterClass()
+//
 //  PURPOSE: Registers the window class.
+//
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-	WNDCLASSEXW wcex{};
+	WNDCLASSEXW wcex;
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
@@ -75,16 +79,21 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassExW(&wcex);
 }
 //------------------------------------------------------------------------------------------------------------
+//
 //   FUNCTION: InitInstance(HINSTANCE, int)
+//
 //   PURPOSE: Saves instance handle and creates main window
+//
 //   COMMENTS:
+//
 //        In this function, we save the instance handle in a global variable and
 //        create and display the main program window.
+//
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // Store instance handle in our global variable
 
-	RECT window_rect{};
+	RECT window_rect;
 	window_rect.left = 0;
 	window_rect.top = 0;
 	window_rect.right = 320 * 3;
@@ -92,14 +101,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	AdjustWindowRect(&window_rect, WS_OVERLAPPEDWINDOW, TRUE);
 
-	// hWnd - номер окна
-	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		0, 0, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top, nullptr, nullptr, hInstance, nullptr);
-
-	Engine.Init_Engine(hWnd);
+	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, 0, 0, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top, 0, 0, hInstance, 0);
 
 	if (hWnd == 0)
 		return FALSE;
+
+	Engine.Init_Engine(hWnd);
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -107,24 +114,28 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 //------------------------------------------------------------------------------------------------------------
+//
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
+//
 //  PURPOSE: Processes messages for the main window.
 //
 //  WM_COMMAND  - process the application menu
 //  WM_PAINT    - Paint the main window
 //  WM_DESTROY  - post a quit message and return
 //
+//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId;
-	PAINTSTRUCT ps;
 	HDC hdc;
+	PAINTSTRUCT ps;
+
 
 
 	switch (message)
 	{
 	case WM_COMMAND:
-	{
+
 		wmId = LOWORD(wParam);
 		// Parse the menu selections:
 		switch (wmId)
@@ -138,17 +149,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
-	}
+
 	break;
 
 	case WM_PAINT:
-	{
+
 		hdc = BeginPaint(hWnd, &ps);
 		// TODO: Add any drawing code that uses hdc here...
 		Engine.Draw_Frame(hdc, ps.rcPaint);
 		EndPaint(hWnd, &ps);
-	}
 	break;
+
 
 	case WM_DESTROY:
 		PostQuitMessage(0);

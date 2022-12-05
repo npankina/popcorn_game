@@ -7,10 +7,10 @@ int ABall::Hit_Checkers_Count = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};
 //------------------------------------------------------------------------------------------------------------
 ABall::ABall()
-: Ball_State(EBS_Normal), Ball_Pen(0), Ball_Brush(0), Center_X_Pos(0.0), Center_Y_Pos(0.0), Ball_Speed(0.0), 
-  Rest_Distance(0.0), Ball_Direction(0.0), Ball_Rect{}, Prev_Ball_Rect{}
+	: Ball_State(EBS_Normal), Ball_Pen(0), Ball_Brush(0), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0),
+	Rest_Distance(0.0), Ball_Direction(0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}
 {
-	Set_State(EBS_Normal, 0);
+	//Set_State(EBS_Normal, 0);
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Init()
@@ -22,30 +22,34 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	// 1. Очищает фон
-	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect))
+	// 1. Очищаем фон
+	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) )
 	{
 		SelectObject(hdc, AsConfig::BG_Pen);
 		SelectObject(hdc, AsConfig::BG_Brush);
 
-		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right, Prev_Ball_Rect.bottom);
+		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
 	}
 
-	// 2. Рисует шарик
-	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect))
+	if (Ball_State == EBS_Lost)
+		return;
+
+	// 2. Рисуем шарик
+	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect) )
 	{
 		SelectObject(hdc, Ball_Pen);
 		SelectObject(hdc, Ball_Brush);
 
-		Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right, Ball_Rect.bottom);
+		Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right - 1, Ball_Rect.bottom - 1);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Move()
 {
+	int i;
+	bool got_hit;
 	double next_x_pos, next_y_pos;
 	double step_size = 1.0 / AsConfig::Global_Scale;
-	bool got_hit;
 
 	if (Ball_State != EBS_Normal)
 		return;
@@ -56,35 +60,69 @@ void ABall::Move()
 	while (Rest_Distance >= step_size)
 	{
 		got_hit = false;
-		next_x_pos = Center_X_Pos + (Ball_Speed * cos(Ball_Direction)), 
-		next_y_pos = Center_Y_Pos - (Ball_Speed * sin(Ball_Direction)); 
 
-		// коррекция позиции при отражении
-		for (int i = 0; i < Hit_Checkers_Count; i++)
-			got_hit |= Hit_Checkers[i]->Check_Hit(next_x_pos, next_y_pos, this);
+		next_x_pos = Center_X_Pos + step_size * cos(Ball_Direction);
+		next_y_pos = Center_Y_Pos - step_size * sin(Ball_Direction);
 
+		// Корректируем позицию при отражении:
+		for (i = 0; i < Hit_Checkers_Count; i++)
+			got_hit |= Hit_Checkers[i]->Check_Hit(next_x_pos, next_y_pos, this);  // от рамки
 
-
-		if (!got_hit)
-		{// мяч продолжит движение, если не было столкновения с другими объектами
+		if (! got_hit)
+		{
+			// Мячик продолжит движение, если не взаимодействовал с другими объектами
 			Rest_Distance -= step_size;
 
 			Center_X_Pos = next_x_pos;
 			Center_Y_Pos = next_y_pos;
+
+			if (Testing_Is_Active)
+				Rest_Test_Distance -= step_size;
 		}
 	}
 
 	Redraw_Ball();
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Set_State(EBall_State new_state, int x_pos)
+void ABall::Set_For_Test()
+{
+	Testing_Is_Active = true;
+	Rest_Test_Distance = 30.0;
+
+	Set_State(EBS_Normal, 90 + Test_Iteration, 90);
+	Ball_Direction = M_PI - M_PI_4;
+
+	++Test_Iteration;
+}
+//------------------------------------------------------------------------------------------------------------
+bool ABall::Is_Test_Finished()
+{
+	if (Testing_Is_Active)
+	{
+		if (Rest_Test_Distance <= 0.0)
+		{
+			Testing_Is_Active = false;
+			Set_State(EBS_Lost, 0);
+			return true;
+		}
+	}
+
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+EBall_State ABall::Get_State()
+{
+	return Ball_State;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 {
 	switch (new_state)
 	{
 	case EBS_Normal:
 		Center_X_Pos = x_pos;
-		Center_Y_Pos = Start_Ball_Y_Pos;
-		Ball_Speed = 1.0;
+		Center_Y_Pos = y_pos;
+		Ball_Speed = 3.0;
 		Rest_Distance = 0.0;
 		Ball_Direction = M_PI_4;
 		Redraw_Ball();
@@ -98,7 +136,7 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 
 	case EBS_On_Platform:
 		Center_X_Pos = x_pos;
-		Center_Y_Pos = Start_Ball_Y_Pos;
+		Center_Y_Pos = y_pos;
 		Ball_Speed = 0.0;
 		Rest_Distance = 0.0;
 		Ball_Direction = M_PI_4;
@@ -109,27 +147,22 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 	Ball_State = new_state;
 }
 //------------------------------------------------------------------------------------------------------------
-EBall_State ABall::Get_State()
-{
-	return Ball_State;
-}
-//------------------------------------------------------------------------------------------------------------
 double ABall::Get_Direction()
 {
 	return Ball_Direction;
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Set_Direction(double new_derection)
+void ABall::Set_Direction(double new_direction)
 {
 	const double pi_2 = 2.0 * M_PI;
 
-	while (new_derection > pi_2)
-		new_derection -= pi_2;
+	while (new_direction > pi_2)
+		new_direction -= pi_2;
 
-	while (new_derection < 0.0)
-		new_derection += pi_2;
+	while (new_direction < 0.0)
+		new_direction += pi_2;
 
-	Ball_Direction = new_derection;
+	Ball_Direction = new_direction;
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Reflect(bool from_horizontal)
@@ -140,23 +173,22 @@ void ABall::Reflect(bool from_horizontal)
 		Set_Direction(M_PI - Ball_Direction);
 }
 //------------------------------------------------------------------------------------------------------------
+void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)
+{
+	if (Hit_Checkers_Count >= sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]) )
+		return;
+
+	Hit_Checkers[Hit_Checkers_Count++] = hit_checker;
+}
+//------------------------------------------------------------------------------------------------------------
 void ABall::Redraw_Ball()
 {
 	Ball_Rect.left = (int)((Center_X_Pos - Radius) * AsConfig::Global_Scale);
 	Ball_Rect.top = (int)((Center_Y_Pos - Radius) * AsConfig::Global_Scale);
-	Ball_Rect.right = (int)((Center_X_Pos + Radius) * AsConfig::Global_Scale - 1);
-	Ball_Rect.bottom = (int)((Center_Y_Pos + Radius) * AsConfig::Global_Scale - 1);
+	Ball_Rect.right = (int)((Center_X_Pos + Radius) * AsConfig::Global_Scale);
+	Ball_Rect.bottom = (int)((Center_Y_Pos + Radius) * AsConfig::Global_Scale);
 
-	InvalidateRect(AsConfig::Hwnd, &Ball_Rect, FALSE);
 	InvalidateRect(AsConfig::Hwnd, &Prev_Ball_Rect, FALSE);
-}
-//------------------------------------------------------------------------------------------------------------
-void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)
-{
-	if (Hit_Checkers_Count > sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]))
-		return;
-
-	Hit_Checkers[Hit_Checkers_Count++] = hit_checker;
-
+	InvalidateRect(AsConfig::Hwnd, &Ball_Rect, FALSE);
 }
 //------------------------------------------------------------------------------------------------------------
