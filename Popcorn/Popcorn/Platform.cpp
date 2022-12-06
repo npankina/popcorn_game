@@ -12,9 +12,30 @@ AsPlatform::AsPlatform()
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
-	if (next_y_pos + ball->Radius > AsConfig::Platform_Y_Pos)
-	{
-		if (next_x_pos + ball->Radius >= X_Pos && next_x_pos - ball->Radius <= (double)(X_Pos + Width) )
+	double inner_top_y, inner_low_y;
+	double inner_left_x, inner_right_x; 
+	double reflection_pos;
+
+	if (next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
+		return false;
+
+	inner_top_y = (double)(AsConfig::Platform_Y_Pos - 1); // верхняя грань
+	inner_low_y = (double)(AsConfig::Platform_Y_Pos + Height - 1); // нижняя грань
+	inner_left_x = (double)(X_Pos + Circle_Size - 1);
+	inner_right_x = (double)(X_Pos + Inner_Width - (Circle_Size - 1));
+
+	// проверка отражения мяча от центральной части платформы
+	if (ball->Is_Moving_Up() )
+	{// от нижней грани платформы
+		if (Hit_Circle_On_Line(next_y_pos - inner_low_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
+		{
+			ball->Reflect(true);
+			return true;
+		}
+	}
+	else
+	{ // от верхней грани платформы
+		if (Hit_Circle_On_Line(next_y_pos - inner_top_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
 		{
 			ball->Reflect(true);
 			return true;

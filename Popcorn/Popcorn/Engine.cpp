@@ -3,9 +3,8 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-	: Game_State(EGS_Test_Ball)
-{
-}
+: Game_State(EGS_Play_Level) // EGS_Test_Ball
+{}
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Init_Engine(HWND hwnd)
 {// Настройка игры при старте
@@ -23,9 +22,11 @@ void AsEngine::Init_Engine(HWND hwnd)
 	ABall::Add_Hit_Checker(&Level);
 	ABall::Add_Hit_Checker(&Platform);
 
-	Level.Set_Current_Level(ALevel::Test_Level);
+	//Level.Set_Current_Level(ALevel::Test_Level);
+	Level.Set_Current_Level(ALevel::Level_01);
 
-	//Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
+
+	Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
 
 	Platform.Set_State(EPS_Normal);
 
@@ -47,9 +48,9 @@ void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 	//	Draw_Brick_Letter(hdc, 20 + i * Cell_Width * Global_Scale, 130, EBT_Red, ELT_O, i);
 	//}
 
-	Ball.Draw(hdc, paint_area);
 	Border.Draw(hdc, paint_area);
 	Platform.Draw(hdc, paint_area);
+	Ball.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key_Down(EKey_Type key_type)
