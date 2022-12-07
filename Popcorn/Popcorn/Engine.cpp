@@ -3,7 +3,7 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-: Game_State(EGS_Play_Level) // EGS_Test_Ball
+: Game_State(EGS_Test_Ball) // EGS_Test_Ball EGS_Play_Level
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Init_Engine(HWND hwnd)

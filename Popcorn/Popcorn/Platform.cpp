@@ -3,43 +3,46 @@
 // AsPlatform
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-	: X_Pos(AsConfig::Border_X_Offset), X_Step(AsConfig::Global_Scale * 2), Platform_State(EPS_Normal), Inner_Width(Normal_Platform_Inner_Width),
-	Rolling_Step(0), Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Pen(0), Platform_Circle_Pen(0),
-	Platform_Inner_Pen(0), Platform_Circle_Brush(0), Platform_Inner_Brush(0)
+: X_Pos(AsConfig::Border_X_Offset), X_Step(AsConfig::Global_Scale * 2), Platform_State(EPS_Normal), Inner_Width(Normal_Platform_Inner_Width),
+  Rolling_Step(0), Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Pen(0), Platform_Circle_Pen(0),
+  Platform_Inner_Pen(0), Platform_Circle_Brush(0), Platform_Inner_Brush(0)
 {
 	X_Pos = (AsConfig::Max_X_Pos - Width) / 2;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
+	double inner_left_x, inner_right_x;
 	double inner_top_y, inner_low_y;
-	double inner_left_x, inner_right_x; 
+	double inner_y;
 	double reflection_pos;
 
 	if (next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
 		return false;
 
-	inner_top_y = (double)(AsConfig::Platform_Y_Pos - 1); // верхняя грань
-	inner_low_y = (double)(AsConfig::Platform_Y_Pos + Height - 1); // нижняя грань
+	inner_top_y = (double)(AsConfig::Platform_Y_Pos - 1);
+	inner_low_y = (double)(AsConfig::Platform_Y_Pos + Height - 1);
 	inner_left_x = (double)(X_Pos + Circle_Size - 1);
-	inner_right_x = (double)(X_Pos + Inner_Width - (Circle_Size - 1));
+	inner_right_x = (double)(X_Pos + Width - (Circle_Size - 1) );
 
-	// проверка отражения мяча от центральной части платформы
+
+	// 1. Проверяем отражение от боковых шариков
+	if (Reflect_On_Circle(next_x_pos, next_y_pos, 0.0, ball) )
+		return true;  // От левого
+
+	if (Reflect_On_Circle(next_x_pos, next_y_pos, Width - Circle_Size, ball) )
+		return true;  // От правого
+
+	// 2. Проверяем отражение от центральной части платформы
 	if (ball->Is_Moving_Up() )
-	{// от нижней грани платформы
-		if (Hit_Circle_On_Line(next_y_pos - inner_low_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
-		{
-			ball->Reflect(true);
-			return true;
-		}
-	}
+		inner_y = inner_low_y;  // От нижней грани
 	else
-	{ // от верхней грани платформы
-		if (Hit_Circle_On_Line(next_y_pos - inner_top_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
-		{
-			ball->Reflect(true);
-			return true;
-		}
+		inner_y = inner_top_y;  // От верхней грани
+
+	if (Hit_Circle_On_Line(next_y_pos - inner_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
+	{
+		ball->Reflect(true);
+		return true;
 	}
 
 	return false;
@@ -309,5 +312,53 @@ void AsPlatform::Draw_Expanding_Roll_In_State(HDC hdc, RECT &paint_area)
 		Platform_State = EPS_Ready;
 		Redraw_Platform();
 	}
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsPlatform::Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball)
+{
+	double dx, dy;
+	double platform_ball_x, platform_ball_y, platform_ball_radius;
+	double distance, two_radiuses;
+	double alpha, beta, gamma;
+	double related_ball_direction;
+	const double pi_2 = 2.0 * M_PI;
+
+	platform_ball_radius = (double)Circle_Size / 2.0;
+	platform_ball_x = (double)X_Pos + platform_ball_radius + platform_ball_x_offset;
+	platform_ball_y = (double)AsConfig::Platform_Y_Pos + platform_ball_radius;
+
+	dx = next_x_pos - platform_ball_x;
+	dy = next_y_pos - platform_ball_y;
+
+	distance = sqrt(dx * dx + dy * dy);
+	two_radiuses = platform_ball_radius + ball->Radius;
+
+	if (fabs(distance - two_radiuses) < AsConfig::Moving_Step_Size)
+	{// Мячик коснулся бокового шарика
+
+		beta = atan2(-dy, dx);
+
+		related_ball_direction = ball->Get_Direction();
+		related_ball_direction -= beta;
+
+		if (related_ball_direction > pi_2)
+			related_ball_direction -= pi_2;
+
+		if (related_ball_direction < 0.0)
+			related_ball_direction += pi_2;
+
+
+		if (related_ball_direction > M_PI_2 and related_ball_direction < M_PI + M_PI_2)
+		{
+			alpha = beta + M_PI - ball->Get_Direction();
+			gamma = beta + alpha;
+
+			ball->Set_Direction(gamma);
+
+			return true;
+		}
+	}
+
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------

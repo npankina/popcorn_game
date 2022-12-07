@@ -23,11 +23,12 @@ public:
 
 	static int Current_Timer_Tick;
 	static bool Level_Has_Floor;
-
 	static const AColor BG_Color, Red_Brick_Color, Blue_Brick_Color;
 	static HPEN BG_Pen;
 	static HBRUSH BG_Brush;
 	static HWND Hwnd;
+
+	static const double Moving_Step_Size;
 
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;

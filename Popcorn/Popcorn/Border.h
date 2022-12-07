@@ -13,9 +13,6 @@ public:
 	void Init();
 	void Draw(HDC hdc, RECT &paint_area);
 
-
-
-
 private:
 	void Draw_Element(HDC hdc, int x, int y, bool top_border);
 

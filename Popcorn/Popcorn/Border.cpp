@@ -15,16 +15,18 @@ void AsBorder::Init()
 void AsBorder::Draw(HDC hdc, RECT &paint_area)
 {// Отрисовка рамки уровня
 
- // 1. линия слева
-	for (int i = 0; i < 50; i++)
+	int i;
+
+	// 1. Линия слева
+	for (i = 0; i < 50; i++)
 		Draw_Element(hdc, 2, 1 + i * 4, false);
 
-	// 2. линия справа
-	for (int i = 0; i < 50; i++)
+	// 2. Линия справа
+	for (i = 0; i < 50; i++)
 		Draw_Element(hdc, 201, 1 + i * 4, false);
 
-	// 3. линия сверху
-	for (int i = 0; i < 50; i++)
+	// 3. Линия сверху
+	for (i = 0; i < 50; i++)
 		Draw_Element(hdc, 3 + i * 4, 0, true);
 }
 //------------------------------------------------------------------------------------------------------------

@@ -39,10 +39,12 @@ char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 //------------------------------------------------------------------------------------------------------------
 
 
+
+
 // ALevel
 //------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
-	: Brick_Red_Pen(0), Brick_Blue_Pen(0), Letter_Pen(0), Brick_Red_Brush(0), Brick_Blue_Brush(0), Level_Rect{}
+: Brick_Red_Pen(0), Brick_Blue_Pen(0), Letter_Pen(0), Brick_Red_Brush(0), Brick_Blue_Brush(0), Level_Rect{}
 {
 }
 //------------------------------------------------------------------------------------------------------------
@@ -161,9 +163,10 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 {
 	double direction = ball->Get_Direction();
 
-	// Проверяем попадание в нижнюю грань
+	
 	if (ball->Is_Moving_Up() )
-	{
+	{// Проверяем попадание в нижнюю грань
+
 		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Low_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, reflection_pos) )
 		{// Проверяем возможность отражения вниз
 
@@ -175,6 +178,7 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 	}
 	else
 	{// Проверяем попадание в верхнюю грань
+
 		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Top_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, reflection_pos) )
 		{// Проверяем возможность отражения вверх
 
@@ -189,26 +193,28 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
-{	
-	if ( ! ball->Is_Moving_Left() )
+{
+	double direction = ball->Get_Direction();
+
+	if (! ball->Is_Moving_Left() )
 	{// Проверяем попадание в левую грань
 
 		if (Hit_Circle_On_Line(Current_Brick_Left_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, ball->Radius, reflection_pos) )
 		{// Проверяем возможность отскока влево
 
-			if (level_x > 0 && Current_Level[level_y][level_x - 1] == 0)
+			if (level_x > 0 and Current_Level[level_y][level_x - 1] == 0)
 				return true;
 			else
 				return false;
 		}
-	}		
+	}
 	else
 	{// Проверяем попадание в правую грань
 
 		if (Hit_Circle_On_Line(Current_Brick_Right_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, ball->Radius, reflection_pos) )
 		{// Проверяем возможность отскока вправо
 
-			if (level_x < AsConfig::Level_Width - 1 && Current_Level[level_y][level_x + 1] == 0)
+			if (level_x < AsConfig::Level_Width - 1 and Current_Level[level_y][level_x + 1] == 0)
 				return true;
 			else
 				return false;
