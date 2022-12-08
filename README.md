@@ -5,4 +5,6 @@ Link wikipedia article about game: https://en.wikipedia.org/wiki/PopCorn_(video_
 
 
 This project created to practice development in C++ with educational goal.
-Only for Windows OS
+
+<br>
+Game is only for Windows OS
