@@ -44,7 +44,8 @@ char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 // ALevel
 //------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
-: Brick_Red_Pen(0), Brick_Blue_Pen(0), Letter_Pen(0), Brick_Red_Brush(0), Brick_Blue_Brush(0), Level_Rect{}
+: Brick_Red_Pen(0), Brick_Blue_Pen(0), Letter_Pen(0), Brick_Red_Brush(0), Brick_Blue_Brush(0), Level_Rect{}, 
+  Active_Bricks_Counter(0)
 {
 }
 //------------------------------------------------------------------------------------------------------------
@@ -92,13 +93,14 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 
 			got_vertical_hit = Check_Vertical_Hit(next_x_pos, next_y_pos, j, i, ball, vertical_reflection_pos);
 
-			if (got_horizontal_hit && got_vertical_hit)
+			if (got_horizontal_hit and got_vertical_hit)
 			{
 				if (vertical_reflection_pos < horizontal_reflection_pos)
 					ball->Reflect(true);
 				else
 					ball->Reflect(false);
 
+				Add_Active_Brick(j, i);
 				return true;
 			}
 			else
@@ -106,6 +108,7 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 				if (got_horizontal_hit)
 				{
 					ball->Reflect(false);
+					Add_Active_Brick(j, i);
 					return true;
 				}
 				else
@@ -113,6 +116,7 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 					if (got_vertical_hit)
 					{
 						ball->Reflect(true);
+						Add_Active_Brick(j, i);
 						return true;
 					}
 				}
@@ -136,11 +140,33 @@ void ALevel::Init()
 	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height * AsConfig::Global_Scale;
 
 	memset(Current_Level, 0, sizeof(Current_Level) );
+	memset(Active_Bricks, 0, sizeof(Active_Bricks) );
+
 }
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width])
 {
 	memcpy(Current_Level, level, sizeof(Current_Level) );
+}
+//------------------------------------------------------------------------------------------------------------
+void ALevel::Act()
+{
+	int i;
+
+	for (i = 0; i < Active_Bricks_Counter; i++)
+	{
+		if (Active_Bricks[i] != 0)
+		{
+			Active_Bricks[i]->Act();
+
+			if(Active_Bricks[i]->Is_Finished() )
+			{
+				delete Active_Bricks[i];
+				Active_Bricks[i] = 0;
+			}
+		}
+
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Draw(HDC hdc, RECT &paint_area)
@@ -156,21 +182,25 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 		for (j = 0; j < AsConfig::Level_Width; j++)
 			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (EBrick_Type)Current_Level[i][j]);
 
-	//Active_Brick.Draw(hdc, paint_area);
+	for (i = 0; i < Active_Bricks_Counter; i++)
+	{
+		if (Active_Bricks[i] != 0)
+			Active_Bricks[i]->Draw(hdc, paint_area);
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
 {
 	double direction = ball->Get_Direction();
 
-	
+
 	if (ball->Is_Moving_Up() )
 	{// Проверяем попадание в нижнюю грань
 
 		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Low_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, reflection_pos) )
 		{// Проверяем возможность отражения вниз
 
-			if (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0)
+			if (level_y < AsConfig::Level_Height - 1 and Current_Level[level_y + 1][level_x] == 0)
 				return true;
 			else
 				return false;
@@ -182,7 +212,7 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Top_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, reflection_pos) )
 		{// Проверяем возможность отражения вверх
 
-			if (level_y > 0 && Current_Level[level_y - 1][level_x] == 0)
+			if (level_y > 0 and Current_Level[level_y - 1][level_x] == 0)
 				return true;
 			else
 				return false;
@@ -285,9 +315,9 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, EL
 	int back_part_offset;
 	HPEN front_pen, back_pen;
 	HBRUSH front_brush, back_brush;
-	XFORM xform, old_xform;
+	XFORM xform{}, old_xform{};
 
-	if (!(brick_type == EBT_Blue || brick_type == EBT_Red))
+	if (!(brick_type == EBT_Blue or brick_type == EBT_Red))
 		return;  // Падающие буквы могут быть только от кирпичей такого типа
 
 	// Корректируем шаг вращения и угол поворота
@@ -298,7 +328,7 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, EL
 	else
 		rotation_angle = 2.0 * M_PI / 16.0 * (double)(8 - rotation_step);
 
-	if (rotation_step > 4 && rotation_step <= 12)
+	if (rotation_step > 4 and rotation_step <= 12)
 	{
 		if (brick_type == EBT_Blue)
 			switch_color = true;
@@ -316,7 +346,7 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, EL
 	Set_Brick_Letter_Colors(switch_color, front_pen, front_brush, back_pen, back_brush);
 
 
-	if (rotation_step == 4 || rotation_step == 12)
+	if (rotation_step == 4 or rotation_step == 12)
 	{
 		// Выводим фон
 		SelectObject(hdc, back_pen);
@@ -358,7 +388,7 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, EL
 
 		Rectangle(hdc, 0, -brick_half_height, AsConfig::Brick_Width * AsConfig::Global_Scale, brick_half_height);
 
-		if (rotation_step > 4 && rotation_step <= 12)
+		if (rotation_step > 4 and rotation_step <= 12)
 		{
 			if (letter_type == ELT_O)
 			{
@@ -368,6 +398,43 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, EL
 		}
 
 		SetWorldTransform(hdc, &old_xform);
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void ALevel::Add_Active_Brick(int brick_x, int brick_y)
+{
+	int i;
+	AActive_Brick *active_brick;
+	EBrick_Type brick_type;
+
+	if (Active_Bricks_Counter >= AsConfig::Max_Active_Bricks_Count)
+		return; // когда активных кирпичей слишком много!
+
+	brick_type = (EBrick_Type)Current_Level[brick_y][brick_x];
+
+	switch (brick_type)
+	{
+	case EBT_None:
+		return;
+
+	case EBT_Red:
+	case EBT_Blue:
+		active_brick = new AActive_Brick(brick_type, brick_x, brick_y);
+		break;
+
+	default:
+		return;
+	}
+
+	// Добавляем новый активный кирпич на первое свободное место
+	for (i = 0; i < AsConfig::Max_Active_Bricks_Count; i++)
+	{
+		if (Active_Bricks[i] == 0)
+		{
+			Active_Bricks[i] = active_brick;
+			++Active_Bricks_Counter;
+			break;
+		}
 	}
 }
 //------------------------------------------------------------------------------------------------------------

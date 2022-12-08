@@ -3,7 +3,7 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-: Game_State(EGS_Test_Ball) // EGS_Test_Ball EGS_Play_Level
+: Game_State(EGS_Play_Level) // EGS_Test_Ball EGS_Play_Level
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Init_Engine(HWND hwnd)
@@ -26,7 +26,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Level.Set_Current_Level(ALevel::Level_01);
 
 
-	Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
+	Ball.Set_State(EBS_Normal, (double)(Platform.X_Pos + Platform.Width / 2));
 
 	Platform.Set_State(EPS_Normal);
 
@@ -80,7 +80,7 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 	case EKT_Space:
 		if (Platform.Get_State() == EPS_Ready)
 		{
-			Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
+			Ball.Set_State(EBS_Normal, (double)(Platform.X_Pos + Platform.Width / 2));
 			Platform.Set_State(EPS_Normal);
 		}
 		break;
@@ -128,14 +128,13 @@ int AsEngine::On_Timer()
 		if (Platform.Get_State() == EPS_Ready)
 		{
 			Game_State = EGS_Play_Level;
-			Ball.Set_State(EBS_On_Platform, Platform.X_Pos + Platform.Width / 2);
+			Ball.Set_State(EBS_On_Platform, (double)(Platform.X_Pos + Platform.Width / 2));
 		}
 		break;
 	}
 
 	Platform.Act();
-
-	//Level.Active_Brick.Act();
+	Level.Act();
 
 	//if (AsConfig::Current_Timer_Tick % 10 == 0)
 

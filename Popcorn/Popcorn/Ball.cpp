@@ -19,7 +19,7 @@ bool AHit_Checker::Hit_Circle_On_Line(double y, double next_x_pos, double left_x
 	max_x = next_x_pos + x;
 	min_x = next_x_pos - x;
 
-	if (max_x >= left_x && max_x <= right_x  ||  min_x >= left_x && min_x <= right_x)
+	if (max_x >= left_x and max_x <= right_x  or  min_x >= left_x and min_x <= right_x)
 		return true;
 	else
 		return false;

@@ -20,6 +20,7 @@ public:
 
 	void Init();
 	void Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width]);
+	void Act();
 	void Draw(HDC hdc, RECT &paint_area);
 
 	//AActive_Brick Active_Brick;
@@ -32,6 +33,7 @@ private:
 	void Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type);
 	void Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush);
 	void Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, ELetter_Type letter_type, int rotation_step);
+	void Add_Active_Brick(int brick_x, int brick_y);
 
 	HPEN Brick_Red_Pen, Brick_Blue_Pen, Letter_Pen;
 	HBRUSH Brick_Red_Brush, Brick_Blue_Brush;
@@ -41,5 +43,7 @@ private:
 	double Current_Brick_Top_Y, Current_Brick_Low_Y;
 
 	char Current_Level[AsConfig::Level_Height][AsConfig::Level_Width];
+	int Active_Bricks_Counter;
+	AActive_Brick *Active_Bricks[AsConfig::Max_Active_Bricks_Count];
 };
 //------------------------------------------------------------------------------------------------------------

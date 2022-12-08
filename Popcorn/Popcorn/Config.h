@@ -45,5 +45,6 @@ public:
 	static const int FPS = 20;
 	static const int Brick_Width = 15;
 	static const int Brick_Height = 7;
+	static const int Max_Active_Bricks_Count = 10;
 };
 //------------------------------------------------------------------------------------------------------------
