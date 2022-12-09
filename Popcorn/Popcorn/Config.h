@@ -24,8 +24,8 @@ public:
 	static int Current_Timer_Tick;
 	static bool Level_Has_Floor;
 	static const AColor BG_Color, Red_Brick_Color, Blue_Brick_Color;
-	static HPEN BG_Pen;
-	static HBRUSH BG_Brush;
+	static HPEN BG_Pen, Brick_Red_Pen, Brick_Blue_Pen, Letter_Pen;
+	static HBRUSH BG_Brush, Brick_Red_Brush, Brick_Blue_Brush;
 	static HWND Hwnd;
 
 	static const double Moving_Step_Size;
@@ -46,5 +46,7 @@ public:
 	static const int Brick_Width = 15;
 	static const int Brick_Height = 7;
 	static const int Max_Active_Bricks_Count = 10;
+	static const int Max_Falling_Letters_Count = 10;
+	static const int Hits_Per_Letter = 1; // Вероятность выбить букву из кирпича = 1.0 / Hits_Per_Letter
 };
 //------------------------------------------------------------------------------------------------------------
