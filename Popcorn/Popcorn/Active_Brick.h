@@ -26,8 +26,9 @@ public:
 
 	void Draw(HDC hdc, RECT& paint_area);
 	void Act();
-	static void Setup_Colors();
 	bool Is_Finished();
+
+	static void Setup_Colors();
 
 private:
 	static unsigned char Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step);

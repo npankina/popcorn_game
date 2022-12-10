@@ -15,6 +15,17 @@ AActive_Brick::AActive_Brick(EBrick_Type brick_type, int level_x, int level_y)
 	Brick_Rect.bottom = Brick_Rect.top + AsConfig::Brick_Height * AsConfig::Global_Scale;
 }
 //------------------------------------------------------------------------------------------------------------
+void AActive_Brick::Setup_Colors()
+{
+	int i;
+
+	for (i = 0; i < Max_Fade_Step; i++)
+	{
+		Get_Fading_Color(AsConfig::Red_Brick_Color, i, Fading_Red_Brick_Pens[i], Fading_Red_Brick_Brushes[i]);
+		Get_Fading_Color(AsConfig::Blue_Brick_Color, i, Fading_Blue_Brick_Pens[i], Fading_Blue_Brick_Brushes[i]);
+	}
+}
+//------------------------------------------------------------------------------------------------------------
 void AActive_Brick::Act()
 {
 	if (Fade_Step < Max_Fade_Step - 1)
@@ -50,17 +61,6 @@ void AActive_Brick::Draw(HDC hdc, RECT &paint_area)
 
 
 	RoundRect(hdc, Brick_Rect.left, Brick_Rect.top, Brick_Rect.right, Brick_Rect.bottom, 2 * AsConfig::Global_Scale, 2 * AsConfig::Global_Scale);
-}
-//------------------------------------------------------------------------------------------------------------
-void AActive_Brick::Setup_Colors()
-{
-	int i;
-
-	for (i = 0; i < Max_Fade_Step; i++)
-	{
-		Get_Fading_Color(AsConfig::Red_Brick_Color, i, Fading_Red_Brick_Pens[i], Fading_Red_Brick_Brushes[i]);
-		Get_Fading_Color(AsConfig::Blue_Brick_Color, i, Fading_Blue_Brick_Pens[i], Fading_Blue_Brick_Brushes[i]);
-	}
 }
 //------------------------------------------------------------------------------------------------------------
 bool AActive_Brick::Is_Finished()
