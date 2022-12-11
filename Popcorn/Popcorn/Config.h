@@ -9,6 +9,8 @@ class AColor
 public:
 	AColor(unsigned char r, unsigned char g, unsigned char b);
 
+	int Get_RGB() const;
+
 	unsigned char R, G, B;
 };
 //------------------------------------------------------------------------------------------------------------
@@ -21,6 +23,7 @@ public:
 	static int Rand(int range);
 
 
+	
 	static int Current_Timer_Tick;
 	static bool Level_Has_Floor;
 	static const AColor BG_Color, Red_Brick_Color, Blue_Brick_Color;
