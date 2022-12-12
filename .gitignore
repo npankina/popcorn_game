@@ -35,3 +35,14 @@
 .DS_Store
 */*.txt
 *.txt
+
+# Accompanying files
+DOS_Game/
+Images/
+Popcorn/.vs/
+Popcorn/Debug/
+Popcorn/Popcorn/Debug/
+Popcorn/Popcorn/x64/
+Popcorn/x64/
+Video/
+
