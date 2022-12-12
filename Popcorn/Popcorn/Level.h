@@ -11,14 +11,14 @@ enum ELetter_Type
 	ELT_O
 };
 //------------------------------------------------------------------------------------------------------------
-class AFalling_Letter
+class AFalling_Letter : public AGraphics_Object
 {
 public:
 	AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y);
 
-	void Draw(HDC hdc, RECT& paint_area);
-	void Act();
-	bool Is_Finished();
+	virtual void Act();
+	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual bool Is_Finished();
 
 	bool Got_Hit;
 
@@ -49,6 +49,7 @@ public:
 	void Act();
 	void Draw(HDC hdc, RECT &paint_area);
 
+
 	//AActive_Brick Active_Brick;
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
 	static char Test_Level[AsConfig::Level_Height][AsConfig::Level_Width];
@@ -56,10 +57,13 @@ public:
 private:
 	bool Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos);
 	bool Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos);
-	void Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type);
+	void Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type);
 	void On_Hit(int brick_x, int brick_y);
 	bool Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type);
 	void Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type);
+	void Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count);
+	void Act_Objects(AGraphics_Object **objects_array, int objects_max_count);
+
 
 	RECT Level_Rect;
 
