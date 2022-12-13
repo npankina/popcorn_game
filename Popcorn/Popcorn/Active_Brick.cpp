@@ -54,7 +54,7 @@ void AActive_Brick::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AActive_Brick::Is_Finished()
 {
-	if (Fade_Step >= Max_Fade_Step - 1)
+	if (Fade_Step >= Max_Fade_Step)
 		return true;
 	else
 		return false;
