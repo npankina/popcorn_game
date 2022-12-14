@@ -154,8 +154,8 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 {// Вывод всех кирпичей уровня
 
 	int i, j;
-	RECT intersection_rect;
-	RECT brick_rect;
+	RECT intersection_rect{};
+	RECT brick_rect{};
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect) )
 	{
@@ -177,6 +177,29 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 	}
 
 	Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
+}
+//------------------------------------------------------------------------------------------------------------
+bool ALevel::Get_Next_Falling_letter(int &index, AFalling_Letter **falling_letter)
+{
+	AFalling_Letter *current_letter;
+
+	if (Falling_Letters_Counter < 1)
+		return false;
+
+	if (index < 0 or index >= AsConfig::Max_Falling_Letters_Count)
+		return false;
+
+	while (index < AsConfig::Max_Falling_Letters_Count)
+	{
+		current_letter = Falling_Letters[index++];
+
+		if (current_letter != 0)
+		{
+			*falling_letter = current_letter;
+			return true;
+		}
+	}
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)

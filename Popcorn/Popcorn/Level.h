@@ -15,6 +15,7 @@ public:
 	void Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width]);
 	void Act();
 	void Draw(HDC hdc, RECT &paint_area);
+	bool Get_Next_Falling_letter(int &index, AFalling_Letter **falling_letter);
 
 
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];

@@ -41,7 +41,7 @@ void AActive_Brick::Draw(HDC hdc, RECT &paint_area)
 		brush = Fading_Blue_Brick_Brushes[Fade_Step];
 		break;
 
-	dafault:
+	default:
 		return;
 	}
 

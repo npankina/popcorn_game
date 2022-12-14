@@ -50,6 +50,6 @@ public:
 	static const int Brick_Height = 7;
 	static const int Max_Active_Bricks_Count = 10;
 	static const int Max_Falling_Letters_Count = 10;
-	static const int Hits_Per_Letter = 3; // Вероятность выбить букву из кирпича = 1.0 / Hits_Per_Letter
+	static const int Hits_Per_Letter = 1; // Вероятность выбить букву из кирпича = 1.0 / Hits_Per_Letter
 };
 //------------------------------------------------------------------------------------------------------------

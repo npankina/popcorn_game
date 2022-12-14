@@ -34,8 +34,11 @@ public:
 	void Draw_Frame(HDC hdc, RECT &paint_area);
 	int On_Key_Down(EKey_Type key_type);
 	int On_Timer();
+	void Act();
 
 private:
+	void On_Falling_letter(AFalling_Letter *falling_letter);
+
 	EGame_State Game_State;
 
 	ABall Ball;

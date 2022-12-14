@@ -17,11 +17,12 @@ public:
 	AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y);
 
 	virtual void Act();
-	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
-	bool Got_Hit;
-
+	void Get_Letter_Cell(RECT &rect);
+	void Finalize();
+	
 	const ELetter_Type Letter_Type;
 
 private:
@@ -33,6 +34,9 @@ private:
 	int X, Y;
 	int Rotation_Step;
 	int Next_Rotation_Tick;
+	bool Got_Hit;
+	bool Finished;
+
 
 	static const int Ticks_Per_Step = 4;
 };

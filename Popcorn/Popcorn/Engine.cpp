@@ -45,9 +45,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 {// Отрисовка экрана игры
 
-	int i;
-	COLORREF pixel;
-
+	//int i;
 
 	SetGraphicsMode(hdc, GM_ADVANCED);
 
@@ -150,11 +148,28 @@ int AsEngine::On_Timer()
 		break;
 	}
 
+	Act();
+
+	return 0;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsEngine::Act()
+{
+	int index = 0;
+	AFalling_Letter *falling_letter;
+
 	Platform.Act();
 	Level.Act();
 
-	//if (AsConfig::Current_Timer_Tick % 10 == 0)
-
-	return 0;
+	while (Level.Get_Next_Falling_letter(index, &falling_letter) )
+	{
+		if (Platform.Hit_By(falling_letter) )
+			On_Falling_letter(falling_letter);
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
+{
+	falling_letter->Finalize();
 }
 //------------------------------------------------------------------------------------------------------------
