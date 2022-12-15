@@ -42,7 +42,7 @@ private:
 	EGame_State Game_State;
 
 	ABall Ball;
-	ALevel Level;
+	AsLevel Level;
 	AsPlatform Platform;
 	AsBorder Border;
 };

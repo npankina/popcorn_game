@@ -29,8 +29,8 @@ void AsEngine::Init_Engine(HWND hwnd)
 	ABall::Add_Hit_Checker(&Level);
 	ABall::Add_Hit_Checker(&Platform);
 
-	//Level.Set_Current_Level(ALevel::Test_Level);
-	Level.Set_Current_Level(ALevel::Level_01);
+	//Level.Set_Current_Level(AsLevel::Test_Level);
+	Level.Set_Current_Level(AsLevel::Level_01);
 
 
 	Ball.Set_State(EBS_Normal, (double)(Platform.X_Pos + Platform.Width / 2));

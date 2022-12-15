@@ -3,7 +3,7 @@
 // AFalling_Letter
 //------------------------------------------------------------------------------------------------------------
 AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y)
-: Brick_Type(brick_type), Letter_Type(letter_type), Got_Hit(false), Finished(false), X(x), Y(y), Rotation_Step(2), 
+: Brick_Type(brick_type), Letter_Type(letter_type), Falling_Letter_State(EFLS_Normal), X(x), Y(y), Rotation_Step(2), 
   Next_Rotation_Tick(AsConfig::Current_Timer_Tick + Ticks_Per_Step)
 {
 	Letter_Cell.left = X;
@@ -16,7 +16,7 @@ AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_typ
 //------------------------------------------------------------------------------------------------------------
 void AFalling_Letter::Act()
 {
-	if (Got_Hit or Finished)
+	if (Falling_Letter_State != EFLS_Normal)
 		return;
 
 	if (Letter_Cell.top >= AsConfig::Max_Y_Pos * AsConfig::Global_Scale)
@@ -54,9 +54,9 @@ void AFalling_Letter::Draw(HDC hdc, RECT &paint_area)
 		Rectangle(hdc, Prev_Letter_Cell.left, Prev_Letter_Cell.top, Prev_Letter_Cell.right, Prev_Letter_Cell.bottom);
 	}
 
-	if (Got_Hit)
+	if (Falling_Letter_State == EFLS_Finalising)
 	{
-		Finished = true;
+		Falling_Letter_State = EFLS_Finished;
 		return;
 	}
 
@@ -66,8 +66,7 @@ void AFalling_Letter::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AFalling_Letter::Is_Finished()
 {
-	return Finished;
-	if (Got_Hit or Letter_Cell.top >= AsConfig::Max_Y_Pos * AsConfig::Global_Scale)
+	if (Falling_Letter_State == EFLS_Finished)
 		return true;
 	else
 		return false;
@@ -194,7 +193,7 @@ void AFalling_Letter::Get_Letter_Cell(RECT &rect)
 //------------------------------------------------------------------------------------------------------------
 void AFalling_Letter::Finalize()
 {
-	Got_Hit = true;
+	Falling_Letter_State = EFLS_Finalising;
 	
 	InvalidateRect(AsConfig::Hwnd, &Prev_Letter_Cell, FALSE);
 	InvalidateRect(AsConfig::Hwnd, &Letter_Cell, FALSE);

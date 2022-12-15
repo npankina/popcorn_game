@@ -11,6 +11,13 @@ enum ELetter_Type
 	ELT_O
 };
 //------------------------------------------------------------------------------------------------------------
+enum EFalling_Letter_State
+{
+	EFLS_Normal,
+	EFLS_Finalising, // начинаем удалять объект
+	EFLS_Finished	// можно удалять объект
+};
+//------------------------------------------------------------------------------------------------------------
 class AFalling_Letter : public AGraphics_Object
 {
 public:
@@ -30,13 +37,11 @@ private:
 	void Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush);
 
 	EBrick_Type Brick_Type;
+	EFalling_Letter_State Falling_Letter_State;
 	RECT Letter_Cell, Prev_Letter_Cell;
 	int X, Y;
 	int Rotation_Step;
 	int Next_Rotation_Tick;
-	bool Got_Hit;
-	bool Finished;
-
 
 	static const int Ticks_Per_Step = 4;
 };
