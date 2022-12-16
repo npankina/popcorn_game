@@ -9,7 +9,7 @@ AsPlatform::~AsPlatform()
 }
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-: X_Pos(AsConfig::Border_X_Offset), X_Step(AsConfig::Global_Scale * 2), Platform_State(EPS_Normal), 
+: X_Pos(AsConfig::Border_X_Offset), X_Step(AsConfig::Global_Scale * 2), Platform_State(EPS_Missing), 
   Inner_Width(Normal_Platform_Inner_Width),Rolling_Step(0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0), 
   Normal_Platform_Image(0), Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Pen(0), Platform_Circle_Pen(0),
   Platform_Inner_Pen(0), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Highlight_Pen_Color(255, 255, 255), 
@@ -139,6 +139,7 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 
 	switch (Platform_State)
 	{
+	case EPS_Ready:
 	case EPS_Normal:
 		Draw_Normal_State(hdc, paint_area);
 		break;
@@ -242,7 +243,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	y *= AsConfig::Global_Scale;
 
 
-	if (Normal_Platform_Image == 0)
+	if (Normal_Platform_Image == 0 and Platform_State == EPS_Ready)
 	{
 		Normal_Platform_Image_Width = Width * AsConfig::Global_Scale;
 		Normal_Platform_Image_Height = Height * AsConfig::Global_Scale;
@@ -342,7 +343,7 @@ void AsPlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
 	SelectObject(hdc, AsConfig::BG_Pen);
 	SelectObject(hdc, AsConfig::BG_Brush);
 
-	Rectangle(hdc, -AsConfig::Global_Scale / 2, -roller_size / 2, (AsConfig::Global_Scale / 2) - 1, (roller_size / 2) - 1);
+	Rectangle(hdc, -AsConfig::Global_Scale / 2, -roller_size / 2, AsConfig::Global_Scale / 2, roller_size / 2);
 
 	SetWorldTransform(hdc, &old_xform);
 

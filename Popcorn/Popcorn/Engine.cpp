@@ -3,7 +3,7 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-: Game_State(EGS_Play_Level) // EGS_Test_Ball EGS_Play_Level
+: Game_State(EGS_Lost_Ball) // EGS_Test_Ball EGS_Play_Level , EGS_Play_Level
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Init_Engine(HWND hwnd)
@@ -33,9 +33,8 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Level.Set_Current_Level(AsLevel::Level_01);
 
 
-	Ball.Set_State(EBS_Normal, (double)(Platform.X_Pos + Platform.Width / 2));
-
-	Platform.Set_State(EPS_Normal);
+	//Ball.Set_State(EBS_Normal, (double)(Platform.X_Pos + Platform.Width / 2));
+	//Platform.Set_State(EPS_Normal);
 
 	Platform.Redraw_Platform();
 
