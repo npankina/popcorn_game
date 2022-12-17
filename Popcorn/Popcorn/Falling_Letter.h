@@ -39,6 +39,7 @@ public:
 
 	void Get_Letter_Cell(RECT &rect);
 	void Finalize();
+	void Test_Draw_All_Steps(HDC hdc);
 	
 	const ELetter_Type Letter_Type;
 
@@ -54,4 +55,5 @@ private:
 	int Next_Rotation_Tick;
 
 	static const int Ticks_Per_Step = 4;
+	static const int Max_Rotation_Step = 16;
 };

@@ -88,12 +88,12 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 		return;  // Падающие буквы могут быть только от кирпичей такого типа
 
 	// Корректируем шаг вращения и угол поворота
-	Rotation_Step = Rotation_Step % 16;
+	Rotation_Step = Rotation_Step % Max_Rotation_Step;
 
 	if (Rotation_Step < 8)
-		rotation_angle = 2.0 * M_PI / 16.0 * (double)Rotation_Step;
+		rotation_angle = 2.0 * M_PI / (double)Max_Rotation_Step * (double)Rotation_Step;
 	else
-		rotation_angle = 2.0 * M_PI / 16.0 * (double)(8 - Rotation_Step);
+		rotation_angle = 2.0 * M_PI /(double) Max_Rotation_Step * (double)(8 - Rotation_Step);
 
 	if (Rotation_Step > 4 and Rotation_Step <= 12)
 	{
@@ -197,5 +197,22 @@ void AFalling_Letter::Finalize()
 	
 	InvalidateRect(AsConfig::Hwnd, &Prev_Letter_Cell, FALSE);
 	InvalidateRect(AsConfig::Hwnd, &Letter_Cell, FALSE);
+}
+//------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Test_Draw_All_Steps(HDC hdc)
+{
+	int i;
+	int x_step = AsConfig::Cell_Width * AsConfig::Global_Scale;
+
+	Rotation_Step = 0;
+
+	for(i = 0; i < Max_Rotation_Step; i++)
+	{
+		Draw_Brick_Letter(hdc);
+		++Rotation_Step;
+		X += x_step;
+		Letter_Cell.left += x_step;
+		Letter_Cell.right += x_step;
+	}
 }
 //------------------------------------------------------------------------------------------------------------
