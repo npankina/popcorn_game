@@ -78,6 +78,7 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	bool switch_color;
 	double offset;
 	double rotation_angle;  // Преобразование шага в угол поворота
+	double y_ratio;
 	int brick_half_height = AsConfig::Brick_Height * AsConfig::Global_Scale / 2;
 	int back_part_offset;
 	HPEN front_pen, back_pen;
@@ -129,11 +130,13 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	}
 	else
 	{
+		y_ratio = cos(rotation_angle);
+
 		// Настраиваем матрицу "переворота" буквы
 		xform.eM11 = 1.0f;
 		xform.eM12 = 0.0f;
 		xform.eM21 = 0.0f;
-		xform.eM22 = (float)cos(rotation_angle);
+		xform.eM22 = (float)fabs(y_ratio);
 		xform.eDx = (float)X;
 		xform.eDy = (float)Y + (float)(brick_half_height);
 		GetWorldTransform(hdc, &old_xform);
@@ -145,20 +148,33 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 
 		offset = 3.0 * (1.0 - fabs(xform.eM22)) * (double)AsConfig::Global_Scale;
 		back_part_offset = (int)round(offset);
-		Rectangle(hdc, 0, -brick_half_height - back_part_offset, AsConfig::Brick_Width * AsConfig::Global_Scale, brick_half_height - back_part_offset);
+		Rectangle(hdc, 0, -brick_half_height - back_part_offset, AsConfig::Brick_Width * AsConfig::Global_Scale - 1, brick_half_height - back_part_offset);
 
 		// Выводим передний план
 		SelectObject(hdc, front_pen);
 		SelectObject(hdc, front_brush);
 
-		Rectangle(hdc, 0, -brick_half_height, AsConfig::Brick_Width * AsConfig::Global_Scale, brick_half_height);
+		Rectangle(hdc, 0, -brick_half_height, AsConfig::Brick_Width * AsConfig::Global_Scale - 1, brick_half_height);
+
+		if (y_ratio > 0.0)
+			back_part_offset = -back_part_offset;
 
 		if (Rotation_Step > 4 and Rotation_Step <= 12)
 		{
-			if (Letter_Type == ELT_O)
+			SelectObject(hdc, AsConfig::Letter_Pen);
+
+			switch (Letter_Type)
 			{
-				SelectObject(hdc, AsConfig::Letter_Pen);
-				Ellipse(hdc, 0 + 5 * AsConfig::Global_Scale, (-5 * AsConfig::Global_Scale) / 2, 0 + 10 * AsConfig::Global_Scale, 5 * AsConfig::Global_Scale / 2);
+			case ELT_O:
+				Ellipse(hdc, 0 + 5 * AsConfig::Global_Scale, 1 * AsConfig::Global_Scale - brick_half_height, 0 + 10 * AsConfig::Global_Scale, 5 * AsConfig::Global_Scale - brick_half_height - 1);
+				break;
+
+			case ELT_I:
+				MoveToEx(hdc, 5 * AsConfig::Global_Scale + 1, 1 * AsConfig::Global_Scale - brick_half_height, 0);
+				LineTo(hdc, 5 * AsConfig::Global_Scale + 1, 6 * AsConfig::Global_Scale - brick_half_height - 1);
+				LineTo(hdc, 9 * AsConfig::Global_Scale + 1, 1 * AsConfig::Global_Scale - brick_half_height);
+				LineTo(hdc, 9 * AsConfig::Global_Scale + 1, 6 * AsConfig::Global_Scale - brick_half_height - 1);
+				break;
 			}
 		}
 
