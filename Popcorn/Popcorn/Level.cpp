@@ -156,7 +156,7 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 	int i, j;
 	RECT intersection_rect{}, brick_rect{};
 
-	AFalling_Letter falling_letter(EBT_Red, ELT_I, 8 * AsConfig::Global_Scale, 150  * AsConfig::Global_Scale);
+	AFalling_Letter falling_letter(EBT_Red, ELT_G, 8 * AsConfig::Global_Scale, 150  * AsConfig::Global_Scale);
 	falling_letter.Test_Draw_All_Steps(hdc);
 
 
@@ -319,33 +319,32 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 
 	int i;
 	int letter_x, letter_y;
-	ELetter_Type letter_type;
 	AFalling_Letter *falling_letter;
 
-	if (brick_type == EBT_Blue or brick_type == EBT_Red)
+	if ( !(brick_type == EBT_Blue or brick_type == EBT_Red))
+		return false;
+	
+	if (AsConfig::Rand(AsConfig::Hits_Per_Letter) != 0)
+		return false;
+	
+	if (Falling_Letters_Counter >= AsConfig::Max_Falling_Letters_Count)
+		return false;
+	
+	
+	for (i = 0; i < AsConfig::Max_Falling_Letters_Count; i++)
 	{
-		if (AsConfig::Rand(AsConfig::Hits_Per_Letter) == 0)
+		if (Falling_Letters[i] == 0)
 		{
-			if (Falling_Letters_Counter < AsConfig::Max_Falling_Letters_Count)
-			{
-				letter_type = ELT_O;
-				for (i = 0; i < AsConfig::Max_Falling_Letters_Count; i++)
-				{
-					if (Falling_Letters[i] == 0)
-					{
-						letter_x = (brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset) * AsConfig::Global_Scale;
-						letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
+			letter_x = (brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset) * AsConfig::Global_Scale;
+			letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
 
-						falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);
-						Falling_Letters[i] = falling_letter;
-						++Falling_Letters_Counter;
-						break;
-					}
-				}
-				return true;
-			}
+			falling_letter = new AFalling_Letter(brick_type, ELT_G, letter_x, letter_y);
+			Falling_Letters[i] = falling_letter;
+			++Falling_Letters_Counter;
+			return true;
 		}
 	}
+
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
