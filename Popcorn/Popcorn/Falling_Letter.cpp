@@ -2,6 +2,9 @@
 
 // AFalling_Letter
 //------------------------------------------------------------------------------------------------------------
+int AFalling_Letter::Letters_Popularity[ELT_Max] = {7, 7, 7, 7, 7, 7, 7, 3, 3, 3, 1};
+int AFalling_Letter::All_Letters_Popularity;
+//-----------------------------------------------------------------------------------------------------------
 AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y)
 : Brick_Type(brick_type), Letter_Type(letter_type), Falling_Letter_State(EFLS_Normal), X(x), Y(y), Rotation_Step(2), 
   Next_Rotation_Tick(AsConfig::Current_Timer_Tick + Ticks_Per_Step)
@@ -70,6 +73,62 @@ bool AFalling_Letter::Is_Finished()
 		return true;
 	else
 		return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Get_Letter_Cell(RECT &rect)
+{
+	rect = Letter_Cell;
+}
+//------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Finalize()
+{
+	Falling_Letter_State = EFLS_Finalising;
+
+	InvalidateRect(AsConfig::Hwnd, &Prev_Letter_Cell, FALSE);
+	InvalidateRect(AsConfig::Hwnd, &Letter_Cell, FALSE);
+}
+//------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Test_Draw_All_Steps(HDC hdc)
+{
+	int i;
+	int x_step = AsConfig::Cell_Width * AsConfig::Global_Scale;
+
+	Rotation_Step = 0;
+
+	for(i = 0; i < Max_Rotation_Step; i++)
+	{
+		Draw_Brick_Letter(hdc);
+		++Rotation_Step;
+		X += x_step;
+		Letter_Cell.left += x_step;
+		Letter_Cell.right += x_step;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Init()
+{
+	int i;
+	All_Letters_Popularity = 0;
+
+	for (i = 0; i < ELT_Max; i++)
+		All_Letters_Popularity += Letters_Popularity[i];
+}
+//------------------------------------------------------------------------------------------------------------
+ELetter_Type AFalling_Letter::Get_Random_Letter_Type()
+{
+	int letters_popularity;
+	int i;
+
+	letters_popularity = AsConfig::Rand(All_Letters_Popularity);
+
+	for (i = 0; i < ELT_Max; i++)
+	{
+		if (letters_popularity < Letters_Popularity[i])
+			return (ELetter_Type)i;
+		letters_popularity -= Letters_Popularity[i];
+	}
+
+	return ELT_O;
 }
 //------------------------------------------------------------------------------------------------------------
 void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
@@ -236,6 +295,26 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Set_Brick_Letter_Colors(bool is_switch_color, HPEN& front_pen, HBRUSH& front_brush, HPEN& back_pen, HBRUSH& back_brush)
+{
+	if (is_switch_color)
+	{
+		front_pen = AsConfig::Brick_Red_Pen;
+		front_brush = AsConfig::Brick_Red_Brush;
+
+		back_pen = AsConfig::Brick_Blue_Pen;
+		back_brush = AsConfig::Brick_Blue_Brush;
+	}
+	else
+	{
+		front_pen = AsConfig::Brick_Blue_Pen;
+		front_brush = AsConfig::Brick_Blue_Brush;
+
+		back_pen = AsConfig::Brick_Red_Pen;
+		back_brush = AsConfig::Brick_Red_Brush;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
 void AFalling_Letter::Draw_Line(HDC hdc, int x_1, int y_1, int x_2, int y_2)
 {
 	int start_y, end_y;
@@ -276,55 +355,5 @@ void AFalling_Letter::Draw_C(HDC hdc)
 	arc_size = 5 * AsConfig::Global_Scale - 1;
 
 	Arc(hdc, arc_x, arc_y, arc_x + arc_size, arc_y + arc_size, arc_x + arc_size, arc_y, arc_x + arc_size, arc_y + arc_size);
-}
-//------------------------------------------------------------------------------------------------------------
-void AFalling_Letter::Set_Brick_Letter_Colors(bool is_switch_color, HPEN& front_pen, HBRUSH& front_brush, HPEN& back_pen, HBRUSH& back_brush)
-{
-	if (is_switch_color)
-	{
-		front_pen = AsConfig::Brick_Red_Pen;
-		front_brush = AsConfig::Brick_Red_Brush;
-
-		back_pen = AsConfig::Brick_Blue_Pen;
-		back_brush = AsConfig::Brick_Blue_Brush;
-	}
-	else
-	{
-		front_pen = AsConfig::Brick_Blue_Pen;
-		front_brush = AsConfig::Brick_Blue_Brush;
-
-		back_pen = AsConfig::Brick_Red_Pen;
-		back_brush = AsConfig::Brick_Red_Brush;
-	}
-}
-//------------------------------------------------------------------------------------------------------------
-void AFalling_Letter::Get_Letter_Cell(RECT &rect)
-{
-	rect = Letter_Cell;
-}
-//------------------------------------------------------------------------------------------------------------
-void AFalling_Letter::Finalize()
-{
-	Falling_Letter_State = EFLS_Finalising;
-	
-	InvalidateRect(AsConfig::Hwnd, &Prev_Letter_Cell, FALSE);
-	InvalidateRect(AsConfig::Hwnd, &Letter_Cell, FALSE);
-}
-//------------------------------------------------------------------------------------------------------------
-void AFalling_Letter::Test_Draw_All_Steps(HDC hdc)
-{
-	int i;
-	int x_step = AsConfig::Cell_Width * AsConfig::Global_Scale;
-
-	Rotation_Step = 0;
-
-	for(i = 0; i < Max_Rotation_Step; i++)
-	{
-		Draw_Brick_Letter(hdc);
-		++Rotation_Step;
-		X += x_step;
-		Letter_Cell.left += x_step;
-		Letter_Cell.right += x_step;
-	}
 }
 //------------------------------------------------------------------------------------------------------------

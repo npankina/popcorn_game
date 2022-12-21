@@ -6,8 +6,6 @@
 //------------------------------------------------------------------------------------------------------------
 enum ELetter_Type
 {
-	ELT_None,
-
 	ELT_O, // "Отмена"
 	ELT_I, // "Инверсия"
 	ELT_C, // "Скорость"
@@ -18,7 +16,9 @@ enum ELetter_Type
 	ELT_P, // "Пол"
 	ELT_L, // Лазер""
 	ELT_T, // "Три"
-	ELT_Plus // "Переход на след. уровень"
+	ELT_Plus, // "Переход на след. уровень"
+
+	ELT_Max // Максимальное значение констант для генерации случайного значения
 };
 //------------------------------------------------------------------------------------------------------------
 enum EFalling_Letter_State
@@ -40,8 +40,12 @@ public:
 	void Get_Letter_Cell(RECT &rect);
 	void Finalize();
 	void Test_Draw_All_Steps(HDC hdc);
+
+	static void Init();
+	static ELetter_Type Get_Random_Letter_Type();
 	
 	const ELetter_Type Letter_Type;
+
 
 private:
 	void Draw_Brick_Letter(HDC hdc);
@@ -63,4 +67,6 @@ private:
 	static const int Max_Rotation_Step = 16;
 	static const int Brick_Half_Height = AsConfig::Brick_Height * AsConfig::Global_Scale / 2;
 
+	static int Letters_Popularity[ELT_Max]; // Вес (вероятность) каждой буквы
+	static int All_Letters_Popularity;
 };
