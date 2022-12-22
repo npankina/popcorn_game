@@ -41,7 +41,7 @@ private:
 	int Active_Bricks_Counter;
 	int Falling_Letters_Counter;
 
-	AActive_Brick *Active_Bricks[AsConfig::Max_Active_Bricks_Count];
+	AActive_Brick_Red_Blue *Active_Bricks[AsConfig::Max_Active_Bricks_Count];
 	AFalling_Letter *Falling_Letters[AsConfig::Max_Falling_Letters_Count];
 };
 //------------------------------------------------------------------------------------------------------------

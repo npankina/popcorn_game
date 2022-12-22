@@ -356,7 +356,7 @@ void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
 {// Создает активный кирпич, если возможно
 
 	int i;
-	AActive_Brick *active_brick;
+	AActive_Brick_Red_Blue *active_brick;
 
 	if (Active_Bricks_Counter >= AsConfig::Max_Active_Bricks_Count)
 		return; // когда активных кирпичей слишком много!
@@ -368,7 +368,7 @@ void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
 
 	case EBT_Red:
 	case EBT_Blue:
-		active_brick = new AActive_Brick(brick_type, brick_x, brick_y);
+		active_brick = new AActive_Brick_Red_Blue(brick_type, brick_x, brick_y);
 		Current_Level[brick_y][brick_x] = EBT_None;
 		break;
 

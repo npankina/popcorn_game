@@ -27,10 +27,10 @@ public:
 	virtual bool Is_Finished() = 0;
 };
 //------------------------------------------------------------------------------------------------------------
-class AActive_Brick : public AGraphics_Object
+class AActive_Brick_Red_Blue : public AGraphics_Object
 {
 public:
-	AActive_Brick(EBrick_Type brick_type, int level_x, int level_y);
+	AActive_Brick_Red_Blue(EBrick_Type brick_type, int level_x, int level_y);
 
 	virtual void Act();
 	virtual void Draw(HDC hdc, RECT& paint_area);
@@ -51,5 +51,22 @@ private:
 	static HBRUSH Fading_Blue_Brick_Brushes[Max_Fade_Step];
 	static HPEN Fading_Red_Brick_Pens[Max_Fade_Step];
 	static HBRUSH Fading_Red_Brick_Brushes[Max_Fade_Step];
+};
+//------------------------------------------------------------------------------------------------------------
+class AActive_Brick_Unbreakable : public AGraphics_Object
+{
+public:
+	AActive_Brick_Unbreakable(int level_x, int level_y);
+
+	virtual void Act();
+	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual bool Is_Finished();
+
+private:
+	static const int Max_Unbreakable_Animation_Step = 5;
+
+	EBrick_Type Brick_Type;
+	RECT Brick_Rect;
+	int Unbreakable_Animation_Step;
 };
 //------------------------------------------------------------------------------------------------------------
