@@ -1,19 +1,37 @@
 ﻿#include "Active_Brick.h"
 
-// AActive_Brick_Red_Blue
-HPEN AActive_Brick_Red_Blue::Fading_Blue_Brick_Pens[Max_Fade_Step];
-HBRUSH AActive_Brick_Red_Blue::Fading_Blue_Brick_Brushes[Max_Fade_Step];
-HPEN AActive_Brick_Red_Blue::Fading_Red_Brick_Pens[Max_Fade_Step];
-HBRUSH AActive_Brick_Red_Blue::Fading_Red_Brick_Brushes[Max_Fade_Step];
+
+// AActive_Brick
 //------------------------------------------------------------------------------------------------------------
-AActive_Brick_Red_Blue::AActive_Brick_Red_Blue(EBrick_Type brick_type, int level_x, int level_y)
-: Fade_Step(0), Brick_Type(brick_type), Brick_Rect{}
+AActive_Brick::~AActive_Brick()
+{}
+//------------------------------------------------------------------------------------------------------------
+AActive_Brick::AActive_Brick(EBrick_Type brick_type, int level_x, int level_y)
+: Brick_Type(brick_type), Brick_Rect{}
 {
 	Brick_Rect.left = (AsConfig::Level_X_Offset + level_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
 	Brick_Rect.top = (AsConfig::Level_Y_Offset + level_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
 	Brick_Rect.right = Brick_Rect.left + AsConfig::Brick_Width * AsConfig::Global_Scale;
 	Brick_Rect.bottom = Brick_Rect.top + AsConfig::Brick_Height * AsConfig::Global_Scale;
 }
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
+// AActive_Brick_Red_Blue
+//------------------------------------------------------------------------------------------------------------
+HPEN AActive_Brick_Red_Blue::Fading_Blue_Brick_Pens[Max_Fade_Step];
+HBRUSH AActive_Brick_Red_Blue::Fading_Blue_Brick_Brushes[Max_Fade_Step];
+HPEN AActive_Brick_Red_Blue::Fading_Red_Brick_Pens[Max_Fade_Step];
+HBRUSH AActive_Brick_Red_Blue::Fading_Red_Brick_Brushes[Max_Fade_Step];
+//------------------------------------------------------------------------------------------------------------
+AActive_Brick_Red_Blue::~AActive_Brick_Red_Blue()
+{}
+//------------------------------------------------------------------------------------------------------------
+AActive_Brick_Red_Blue::AActive_Brick_Red_Blue(EBrick_Type brick_type, int level_x, int level_y)
+: AActive_Brick(brick_type, level_x, level_y), Fade_Step(0)
+{}
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Red_Blue::Act()
 {
@@ -93,14 +111,12 @@ void AActive_Brick_Red_Blue::Get_Fading_Color(const AColor &color, int step, HPE
 
 // AActive_Brick_Unbreakable
 //------------------------------------------------------------------------------------------------------------
+AActive_Brick_Unbreakable::~AActive_Brick_Unbreakable()
+{}
+//------------------------------------------------------------------------------------------------------------
 AActive_Brick_Unbreakable::AActive_Brick_Unbreakable(int level_x, int level_y)
-: Brick_Type(EBT_Unbreakable), Unbreakable_Animation_Step(0), Brick_Rect{}
-{
-	Brick_Rect.left = (AsConfig::Level_X_Offset + level_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
-	Brick_Rect.top = (AsConfig::Level_Y_Offset + level_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
-	Brick_Rect.right = Brick_Rect.left + AsConfig::Brick_Width * AsConfig::Global_Scale;
-	Brick_Rect.bottom = Brick_Rect.top + AsConfig::Brick_Height * AsConfig::Global_Scale;
-}
+: AActive_Brick(EBT_Unbreakable, level_x, level_y), Unbreakable_Animation_Step(0)
+{}
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Unbreakable::Act()
 {
