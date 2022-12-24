@@ -1,5 +1,13 @@
 ﻿#include "Active_Brick.h"
 
+// AGraphics_Object
+//------------------------------------------------------------------------------------------------------------
+AGraphics_Object::~AGraphics_Object()
+{}
+//------------------------------------------------------------------------------------------------------------
+
+
+
 
 // AActive_Brick
 //------------------------------------------------------------------------------------------------------------
@@ -31,7 +39,10 @@ AActive_Brick_Red_Blue::~AActive_Brick_Red_Blue()
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Red_Blue::AActive_Brick_Red_Blue(EBrick_Type brick_type, int level_x, int level_y)
 : AActive_Brick(brick_type, level_x, level_y), Fade_Step(0)
-{}
+{
+	if ( !(brick_type == EBT_Blue or brick_type == EBT_Red) )
+		throw 22;
+}
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Red_Blue::Act()
 {

@@ -22,6 +22,8 @@ enum EBrick_Type
 class AGraphics_Object
 {
 public:
+	virtual ~AGraphics_Object();
+
 	virtual void Act() = 0;
 	virtual void Draw(HDC hdc, RECT& paint_area) = 0;
 	virtual bool Is_Finished() = 0;
