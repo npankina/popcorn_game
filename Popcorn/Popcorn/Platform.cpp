@@ -198,9 +198,7 @@ bool AsPlatform::Hit_By(AFalling_Letter *falling_letter)
 void AsPlatform::Clear_BG(HDC hdc)
 {// Очищаем фоном прежнее место
 
-	SelectObject(hdc, AsConfig::BG_Pen);
-	SelectObject(hdc, AsConfig::BG_Brush);
-
+	AsConfig::BG_Color.Select(hdc);
 	Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.top, Prev_Platform_Rect.right, Prev_Platform_Rect.bottom);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -299,7 +297,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 		// Стираем фоном пиксели над штрихом
 		y = Meltdown_Platform_Y_Pos[i];
 		MoveToEx(hdc, x, y, 0);
-		SelectObject(hdc, AsConfig::BG_Pen);
+		SelectObject(hdc, AsConfig::BG_Color.Pen);
 		LineTo(hdc, x, y + y_offset);
 
 
@@ -340,8 +338,7 @@ void AsPlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
 	GetWorldTransform(hdc, &old_xform);
 	SetWorldTransform(hdc, &xform);
 
-	SelectObject(hdc, AsConfig::BG_Pen);
-	SelectObject(hdc, AsConfig::BG_Brush);
+	AsConfig::BG_Color.Select(hdc);
 
 	Rectangle(hdc, -AsConfig::Global_Scale / 2, -roller_size / 2, AsConfig::Global_Scale / 2, roller_size / 2);
 
@@ -430,7 +427,7 @@ bool AsPlatform::Reflect_On_Circle(double next_x_pos, double next_y_pos, double 
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, HPEN &color_pen, int &stroke_len)
+bool AsPlatform::Get_Platform_Image_Stroke_Color(HDC hdc, int x, int y, HPEN &color_pen, int &stroke_len)
 {// Вычисляет длинну очередного вертикального штриха
 
 	int i;
@@ -466,7 +463,7 @@ bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, HPEN &color_pen, 
 	else if (color == Platform_Inner_Pen_Color.Get_RGB() )
 		color_pen = Platform_Inner_Pen;
 	else if (color == AsConfig::BG_Color.Get_RGB() )
-		color_pen = AsConfig::BG_Pen;
+		color_pen = AsConfig::BG_Color.Select(hdc);
 	else
 		color_pen = 0;
 
