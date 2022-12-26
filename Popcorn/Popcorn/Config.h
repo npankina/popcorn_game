@@ -7,6 +7,7 @@
 class AColor
 {
 public:
+	AColor();
 	AColor(unsigned char r, unsigned char g, unsigned char b);
 
 	int Get_RGB() const;
@@ -20,24 +21,15 @@ public:
 class AsConfig
 {
 public:
-	static void Setup_Colors();
-	static void Create_Pen_Brush(const AColor &color, HPEN &pen, HBRUSH &brush);
-	static void Create_Pen_Brush(unsigned char r, unsigned char g, unsigned char b, HPEN &pen, HBRUSH &brush);
 	static int Rand(int range);
 
 
-	
 	static int Current_Timer_Tick;
 	static bool Level_Has_Floor;
-	static const AColor BG_Color, Red_Brick_Color, Blue_Brick_Color, White_Color;
-	/*static HPEN BG_Pen, Brick_Red_Pen, Brick_Blue_Pen, Letter_Pen, Brick_White_Pen;
-	static HBRUSH BG_Brush, Brick_Red_Brush, Brick_Blue_Brush, Brick_White_Brush;*/
-	static HPEN Letter_Pen;
-
+	static const AColor BG_Color, Red_Color, Blue_Color, White_Color;
 	static HWND Hwnd;
 
 	static const double Moving_Step_Size;
-
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;
 	static const int Border_Y_Offset = 4;
@@ -55,6 +47,6 @@ public:
 	static const int Brick_Height = 7;
 	static const int Max_Active_Bricks_Count = 10;
 	static const int Max_Falling_Letters_Count = 10;
-	static const int Hits_Per_Letter = 10; // Вероятность выбить букву из кирпича = 1.0 / Hits_Per_Letter
+	static const int Hits_Per_Letter = 1; // Вероятность выбить букву из кирпича = 1.0 / Hits_Per_Letter
 };
 //------------------------------------------------------------------------------------------------------------

@@ -24,8 +24,6 @@ class ABall
 public:
 	ABall();
 
-	void Init();
-
 	void Draw(HDC hdc, RECT &paint_area);
 	void Move();
 	void Set_For_Test();
@@ -46,8 +44,6 @@ private:
 	void Redraw_Ball();
 
 	EBall_State Ball_State;
-	HPEN Ball_Pen;
-	HBRUSH Ball_Brush;
 	double Ball_Speed;
 	double Rest_Distance;
 	double Ball_Direction;

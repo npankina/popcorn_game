@@ -282,11 +282,11 @@ void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 		break;
 
 	case EBT_Red:
-		color = &AsConfig::Red_Brick_Color;
+		color = &AsConfig::Red_Color;
 		break;
 
 	case EBT_Blue:
-		color = &AsConfig::Blue_Brick_Color;
+		color = &AsConfig::Blue_Color;
 		break;
 
 	case EBT_Unbreakable:
