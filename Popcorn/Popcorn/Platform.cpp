@@ -210,6 +210,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	int offset = 0;
 	int x = X_Pos;
 	int y = AsConfig::Platform_Y_Pos;
+	RECT inner_rect;
 
 	Clear_BG(hdc);
 
@@ -225,8 +226,13 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	// 3. Рисуем среднюю часть
 	Platform_Inner_Color.Select(hdc);
 
-	RoundRect(hdc, (x + 4) * AsConfig::Global_Scale, (y + 1) * AsConfig::Global_Scale, (x + 4 + Inner_Width - 1) * AsConfig::Global_Scale - 1, (y + 1 + 5) * AsConfig::Global_Scale - 1, 3 * AsConfig::Global_Scale, 3 * AsConfig::Global_Scale);
-	
+	inner_rect.left = (x + 4) * AsConfig::Global_Scale;
+	inner_rect.top = (y + 1) * AsConfig::Global_Scale;
+	inner_rect.right = (x + 4 + Inner_Width - 1) * AsConfig::Global_Scale;
+	inner_rect.bottom = (y + 1 + 5) * AsConfig::Global_Scale;
+
+	AsConfig::Round_Rect(hdc, inner_rect, 3);
+
 	x *= AsConfig::Global_Scale;
 	y *= AsConfig::Global_Scale;
 
