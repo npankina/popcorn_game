@@ -278,29 +278,18 @@ void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 	switch (brick_type)
 	{
 	case EBT_None:
-		color = &AsConfig::BG_Color;
-		break;
-
 	case EBT_Red:
-		color = &AsConfig::Red_Color;
-		break;
-
 	case EBT_Blue:
-		color = &AsConfig::Blue_Color;
+		AActive_Brick_Red_Blue::Draw_In_Level(hdc, brick_rect, brick_type);
 		break;
 
 	case EBT_Unbreakable:
-		color = &AsConfig::White_Color;
+		AActive_Brick_Unbreakable::Draw_In_Level(hdc, brick_rect);
 		break;
 
 	default:
 		throw 22;
 	}
-
-	if (color != 0)
-		color->Select(hdc);
-
-	AsConfig::Round_Rect(hdc, brick_rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::On_Hit(int brick_x, int brick_y)
