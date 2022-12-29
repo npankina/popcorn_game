@@ -70,3 +70,8 @@ void AsConfig::Round_Rect(HDC hdc, RECT &rect, int corner_radius)
 	RoundRect(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1, radius, radius);
 }
 //------------------------------------------------------------------------------------------------------------
+void AsConfig::Throw()
+{
+	throw 22; 
+}
+//------------------------------------------------------------------------------------------------------------

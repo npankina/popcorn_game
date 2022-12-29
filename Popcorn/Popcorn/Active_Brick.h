@@ -83,3 +83,25 @@ private:
 	static AColor Red_Highlight, Blue_Highlight;
 };
 //------------------------------------------------------------------------------------------------------------
+class AActive_Brick_Multihit : public AActive_Brick
+{
+public:
+	~AActive_Brick_Multihit(); 
+	AActive_Brick_Multihit(int level_x, int level_y);
+
+	virtual void Act();
+	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual bool Is_Finished();
+
+	static void Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Type brick_type);
+
+private:
+	static void Draw_Stage(HDC hdc, RECT &brick_rect, int x, int width);
+
+	/*int Animation_Step;
+	HRGN Region;
+
+	static const int Max_Animation_Step = 12;
+	static AColor Red_Highlight, Blue_Highlight;*/
+};
+//------------------------------------------------------------------------------------------------------------
