@@ -34,7 +34,7 @@ public:
 
 	static int Current_Timer_Tick;
 	static bool Level_Has_Floor;
-	static const AColor BG_Color, Red_Color, Blue_Color, White_Color;
+	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color;
 	static HWND Hwnd;
 
 	static const double Moving_Step_Size;

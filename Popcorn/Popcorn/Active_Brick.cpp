@@ -187,6 +187,7 @@ void AActive_Brick_Unbreakable::Draw(HDC hdc, RECT &paint_area)
 	Red_Highlight.Select_Pen(hdc);
 	MoveToEx(hdc, Brick_Rect.left + 6 * scale + offset, Brick_Rect.bottom + scale, 0);
 	LineTo(hdc, Brick_Rect.left + 15 * scale - 1 + offset, Brick_Rect.top - 1 * scale);
+	
 	SelectClipRgn(hdc, 0);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -214,46 +215,70 @@ AActive_Brick_Multihit::~AActive_Brick_Multihit()
 {}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Multihit::AActive_Brick_Multihit(int level_x, int level_y)
-: AActive_Brick(EBT_Multihit_1, level_x, level_y)
+: AActive_Brick(EBT_Multihit_1, level_x, level_y), Rotation_Step(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Multihit::Act()
 {
-	/*if (Max_Animation_Step >= Animation_Step)
+	if (Max_Rotation_Step >= Rotation_Step)
 	{
-		++Animation_Step;*/
+		++Rotation_Step;
 		InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE);
-	//}
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Multihit::Draw(HDC hdc, RECT &paint_area)
 {
-	/*int offset;
+	int step;
 	const int scale = AsConfig::Global_Scale;
+	double rotation_angle, x_ratio;
+	RECT zero_rect{};
+	XFORM xform{}, old_xform{};
 
-	Draw_In_Level(hdc, Brick_Rect);
+	// 1. Очистка фона
+	AsConfig::BG_Color.Select(hdc);
+	AsConfig::Round_Rect(hdc, Brick_Rect);
 
-	AsConfig::Red_Color.Select(hdc);
 
-	SelectClipRgn(hdc, Region);
+	// 2. Настраиваем матрицу "переворота" сотни
+	step = Rotation_Step % Steps_Per_Turn;
+	rotation_angle = M_PI_4 / 2.0 * (double)step;
+	x_ratio = cos(rotation_angle);
 
-	offset = 2 * Animation_Step * scale - AsConfig::Brick_Width * scale;
+	xform.eM11 = (float)(x_ratio);
+	xform.eM12 = 0.0f;
+	xform.eM21 = 0.0f;
+	xform.eM22 = 1.0f;
+	xform.eDx = (float)Brick_Rect.left + (1.0 - x_ratio) * (float)(AsConfig::Brick_Width * AsConfig::Global_Scale) / 2.0f;
+	xform.eDy = (float)Brick_Rect.top;
+	GetWorldTransform(hdc, &old_xform);
+	SetWorldTransform(hdc, &xform);
 
-	Blue_Highlight.Select_Pen(hdc);
-	MoveToEx(hdc, Brick_Rect.left + 4 * scale + offset, Brick_Rect.bottom + scale, 0);
-	LineTo(hdc, Brick_Rect.left + 13 * scale - 1 + offset, Brick_Rect.top - 1 * scale);
 
-	Red_Highlight.Select_Pen(hdc);
-	MoveToEx(hdc, Brick_Rect.left + 6 * scale + offset, Brick_Rect.bottom + scale, 0);
-	LineTo(hdc, Brick_Rect.left + 15 * scale - 1 + offset, Brick_Rect.top - 1 * scale);
-	SelectClipRgn(hdc, 0);*/
+	// 3. Рисуем "сотню"
+	AsConfig::Letter_Color.Select_Pen(hdc);
+	MoveToEx(hdc, 0 + 1 * scale + 1, 0 + 3 * scale, 0);
+	LineTo(hdc, 0 + 3 * scale + 1, 0 + 1 * scale);
+	LineTo(hdc, 0 + 3 * scale + 1, 0 + 6 * scale);
+
+	zero_rect.left = 0 + 5 * scale + 1;
+	zero_rect.top = 0 + 1 * scale;
+	zero_rect.right = zero_rect.left + 3 * scale + 1;
+	zero_rect.bottom = zero_rect.top + 5 * scale + 1;
+	AsConfig::Round_Rect(hdc, zero_rect);
+
+	zero_rect.left += 5 * scale;
+	zero_rect.right += 5 * scale;
+	AsConfig::Round_Rect(hdc, zero_rect);
+
+	SetWorldTransform(hdc, &old_xform);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AActive_Brick_Multihit::Is_Finished()
 {
-	/*if (Animation_Step >= Max_Animation_Step)
+	if (Rotation_Step >= Max_Rotation_Step)
 		return true;
-	else*/
+	else
 		return false;
 }
 //------------------------------------------------------------------------------------------------------------

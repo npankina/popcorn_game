@@ -98,10 +98,9 @@ public:
 private:
 	static void Draw_Stage(HDC hdc, RECT &brick_rect, int x, int width);
 
-	/*int Animation_Step;
-	HRGN Region;
+	int Rotation_Step;
 
-	static const int Max_Animation_Step = 12;
-	static AColor Red_Highlight, Blue_Highlight;*/
+	static const int Steps_Per_Turn = 16;
+	static const int Max_Rotation_Step = Steps_Per_Turn * 4; // 4 - оборотов вокруг совей оси
 };
 //------------------------------------------------------------------------------------------------------------
