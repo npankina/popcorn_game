@@ -37,7 +37,8 @@ AHit_Checker *ABall::Hit_Checkers[] = {};
 //------------------------------------------------------------------------------------------------------------
 ABall::ABall()
 : Ball_State(EBS_Normal), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0),
-  Rest_Distance(0.0), Ball_Direction(0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}
+  Rest_Distance(0.0), Ball_Direction(0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{},
+  Prev_Ball_Rect{}, Parashute_Rect{}
 {
 	//Set_State(EBS_Normal, 0);
 }
@@ -52,6 +53,9 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 		AsConfig::BG_Color.Select(hdc);
 		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
 	}
+
+	if (Ball_State == EBS_On_Parashute)
+		Draw_Parashute(hdc, paint_area);
 
 	if (Ball_State == EBS_Lost)
 		return;
@@ -221,6 +225,26 @@ bool ABall::Is_Moving_Left()
 		return false;
 }
 //------------------------------------------------------------------------------------------------------------
+void ABall::Set_On_Parashute(int x, int y)
+{
+	int cell_x = AsConfig::Level_X_Offset + x * AsConfig::Cell_Width;
+	int cell_y = AsConfig::Level_Y_Offset + y * AsConfig::Cell_Height;
+
+
+	Ball_Direction = M_PI + M_PI_2;
+	Ball_Speed = 1.0;
+	Ball_State = EBS_On_Parashute;
+
+
+	Parashute_Rect.left = cell_x * AsConfig::Global_Scale;
+	Parashute_Rect.top = cell_y * AsConfig::Global_Scale;
+	Parashute_Rect.right = Parashute_Rect.left + Parashute_Size * AsConfig::Global_Scale;
+	Parashute_Rect.bottom = Parashute_Rect.top + Parashute_Size * AsConfig::Global_Scale;
+
+	Center_X_Pos = (double)(cell_x + AsConfig::Cell_Width / 2.0);
+	Center_Y_Pos = (double)(cell_y + Parashute_Size);
+}
+//------------------------------------------------------------------------------------------------------------
 void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)
 {
 	if (Hit_Checkers_Count >= sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]) )
@@ -238,5 +262,10 @@ void ABall::Redraw_Ball()
 
 	InvalidateRect(AsConfig::Hwnd, &Prev_Ball_Rect, FALSE);
 	InvalidateRect(AsConfig::Hwnd, &Ball_Rect, FALSE);
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Draw_Parashute(HDC hdc, RECT &paint_area)
+{
+
 }
 //------------------------------------------------------------------------------------------------------------

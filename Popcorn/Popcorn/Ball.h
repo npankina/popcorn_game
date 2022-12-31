@@ -7,7 +7,8 @@ enum EBall_State
 {
 	EBS_Normal,
 	EBS_Lost,
-	EBS_On_Platform
+	EBS_On_Platform,
+	EBS_On_Parashute
 };
 //------------------------------------------------------------------------------------------------------------
 class ABall;
@@ -35,6 +36,7 @@ public:
 	void Reflect(bool from_horizontal);
 	bool Is_Moving_Up();
 	bool Is_Moving_Left();
+	void Set_On_Parashute(int x, int y);
 
 	static void Add_Hit_Checker(AHit_Checker *hit_checker);
 
@@ -42,6 +44,7 @@ public:
 
 private:
 	void Redraw_Ball();
+	void Draw_Parashute(HDC hdc, RECT &paint_area);
 
 	EBall_State Ball_State;
 	double Ball_Speed;
@@ -54,9 +57,10 @@ private:
 
 	double Center_X_Pos, Center_Y_Pos;
 
-	RECT Ball_Rect, Prev_Ball_Rect;
+	RECT Ball_Rect, Prev_Ball_Rect, Parashute_Rect;
 
 	static const double Start_Ball_Y_Pos;
+	static const int Parashute_Size = 15;
 	static int Hit_Checkers_Count;
 	static AHit_Checker *Hit_Checkers[3];
 };

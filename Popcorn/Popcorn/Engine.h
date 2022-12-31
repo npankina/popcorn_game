@@ -23,7 +23,11 @@ enum EGame_State
 	EGS_Restart_Level
 };
 //------------------------------------------------------------------------------------------------------------
-const int Timer_ID = WM_USER + 1;
+class AsInfo_Panel
+{
+public:
+
+};
 //------------------------------------------------------------------------------------------------------------
 class AsEngine
 {
@@ -36,6 +40,8 @@ public:
 	int On_Timer();
 	void Act();
 
+	static const int Timer_ID = WM_USER + 1;
+
 private:
 	void On_Falling_letter(AFalling_Letter *falling_letter);
 
@@ -45,5 +51,7 @@ private:
 	AsLevel Level;
 	AsPlatform Platform;
 	AsBorder Border;
+
+	AsInfo_Panel Info_Panel;
 };
 //------------------------------------------------------------------------------------------------------------
