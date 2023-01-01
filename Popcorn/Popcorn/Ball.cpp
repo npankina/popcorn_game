@@ -241,8 +241,10 @@ void ABall::Set_On_Parashute(int x, int y)
 	Parashute_Rect.right = Parashute_Rect.left + Parashute_Size * AsConfig::Global_Scale;
 	Parashute_Rect.bottom = Parashute_Rect.top + Parashute_Size * AsConfig::Global_Scale;
 
-	Center_X_Pos = (double)(cell_x + AsConfig::Cell_Width / 2.0);
-	Center_Y_Pos = (double)(cell_y + Parashute_Size);
+	Center_X_Pos = (double)(cell_x + AsConfig::Cell_Width / 2.0) - 1.0 / (double)AsConfig::Global_Scale;
+	Center_Y_Pos = (double)(cell_y + Parashute_Size) - ABall::Radius * 2.0;
+
+	InvalidateRect(AsConfig::Hwnd, &Parashute_Rect, FALSE);
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)
@@ -266,6 +268,68 @@ void ABall::Redraw_Ball()
 //------------------------------------------------------------------------------------------------------------
 void ABall::Draw_Parashute(HDC hdc, RECT &paint_area)
 {
+	int scale = AsConfig::Global_Scale;
+	int dome_height = (Parashute_Rect.bottom - Parashute_Rect.top) / 2;
+	int arc_height = 4 * scale;
+	int arc_x;
+	int ball_center_x, ball_center_y, line_y;
+	RECT intersection_rect, subarc_rect, other_arc;
+
+	// 1. Очищаем фон
+	if ( !IntersectRect(&intersection_rect, &paint_area, &Parashute_Rect) )
+		return;
+
+	// 1. Купол
+	AsConfig::Red_Color.Select(hdc);
+	Chord(hdc, Parashute_Rect.left, Parashute_Rect.top, Parashute_Rect.right - 1, Parashute_Rect.bottom - 1, 
+		Parashute_Rect.right, Parashute_Rect.top + dome_height, Parashute_Rect.left, Parashute_Rect.top + dome_height);
+
+	// 2. Арки
+	arc_x = Parashute_Rect.left + 1;
+	AsConfig::BG_Color.Select(hdc);
+
+	// 2.1 Левая
+	subarc_rect.left = arc_x;
+	subarc_rect.top = Parashute_Rect.top + dome_height - arc_height / 2;
+	subarc_rect.right = subarc_rect.left + 3 * scale;
+	subarc_rect.bottom = subarc_rect.top + 4 * scale;
+
+	Ellipse(hdc, subarc_rect.left, subarc_rect.top, subarc_rect.right - 1, subarc_rect.bottom - 1);
+
+	// 2.2 Средняя
+	other_arc = subarc_rect;
+
+	other_arc.left = arc_x + 3 * scale;
+	other_arc.right = arc_x + 11 * scale;
+
+	Ellipse(hdc, other_arc.left, other_arc.top, other_arc.right - 1, other_arc.bottom - 1);
+
+	// 2.3 Правая
+	other_arc = subarc_rect;
+
+	other_arc.left = arc_x + 11 * scale;
+	other_arc.right = arc_x + 14 * scale;
+
+	Ellipse(hdc, other_arc.left, other_arc.top, other_arc.right - 1, other_arc.bottom - 1);
+
+	// 3. Стропы
+	AsConfig::White_Color.Select(hdc);
+
+	line_y = Parashute_Rect.top + dome_height;
+	ball_center_x = (Parashute_Rect.left + Parashute_Rect.right) / 2;
+	ball_center_y = Parashute_Rect.bottom - scale * 2;
+
+	MoveToEx(hdc, Parashute_Rect.left, line_y, 0);
+	LineTo(hdc, ball_center_x, ball_center_y);
+
+	MoveToEx(hdc, Parashute_Rect.left + 3 * scale + 1, line_y, 0);
+	LineTo(hdc, ball_center_x, ball_center_y);
+
+	MoveToEx(hdc, Parashute_Rect.right, line_y, 0);
+	LineTo(hdc, ball_center_x, ball_center_y);
+
+	MoveToEx(hdc, Parashute_Rect.right - 4 * scale + 1, line_y, 0);
+	LineTo(hdc, ball_center_x, ball_center_y);
 
 }
 //------------------------------------------------------------------------------------------------------------
