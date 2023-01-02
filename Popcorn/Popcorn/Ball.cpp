@@ -36,9 +36,9 @@ int ABall::Hit_Checkers_Count = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};
 //------------------------------------------------------------------------------------------------------------
 ABall::ABall()
-: Ball_State(EBS_Normal), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0),
+: Ball_State(EBS_Normal), Prev_Ball_State(EBS_Normal), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0),
   Rest_Distance(0.0), Ball_Direction(0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{},
-  Prev_Ball_Rect{}, Parashute_Rect{}
+  Prev_Ball_Rect{}, Parashute_Rect{}, Prev_Parashute_Rect{}
 {
 	//Set_State(EBS_Normal, 0);
 }
@@ -54,11 +54,22 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
 	}
 
-	if (Ball_State == EBS_On_Parashute)
+	switch (Ball_State)
+	{
+	case EBS_On_Parashute:
 		Draw_Parashute(hdc, paint_area);
+		break;
 
-	if (Ball_State == EBS_Lost)
+	case EBS_Off_Parashute:
+		Clear_Parashute(hdc);
+		Set_State(EBS_Normal, Center_X_Pos, Center_Y_Pos);
+		break;
+
+	case EBS_Lost:
+		if (Prev_Ball_State == EBS_On_Parashute)
+			Clear_Parashute(hdc);
 		return;
+	}	
 
 	// 2. Рисуем шарик
 	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect) )
@@ -75,7 +86,7 @@ void ABall::Move()
 	double next_x_pos, next_y_pos;
 	double step_size = AsConfig::Moving_Step_Size;
 
-	if (Ball_State != EBS_Normal)
+	if (Ball_State == EBS_Lost or Ball_State == EBS_On_Platform)
 		return;
 
 	Prev_Ball_Rect = Ball_Rect;
@@ -103,9 +114,22 @@ void ABall::Move()
 			if (Testing_Is_Active)
 				Rest_Test_Distance -= step_size;
 		}
+
+		if (Ball_State == EBS_Lost)
+			break;
 	}
 
 	Redraw_Ball();
+
+	if (Ball_State == EBS_On_Parashute)
+	{
+		Prev_Parashute_Rect = Parashute_Rect;
+
+		Parashute_Rect.bottom = Ball_Rect.bottom;
+		Parashute_Rect.top = Parashute_Rect.bottom - Parashute_Size * AsConfig::Global_Scale;
+
+		Redraw_Parashute();
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Set_For_Test()
@@ -166,7 +190,12 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 
 
 	case EBS_Lost:
+		if ( !(Ball_State == EBS_Normal or Ball_State == EBS_On_Parashute) )
+			AsConfig::Throw(); // Только из этих состониях можно потерять мячик!
+
 		Ball_Speed = 0.0;
+		Redraw_Ball();
+		Redraw_Parashute();
 		break;
 
 
@@ -178,8 +207,25 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 		Ball_Direction = M_PI_4;
 		Redraw_Ball();
 		break;
+
+
+	case EBS_On_Parashute:
+		AsConfig::Throw(); // Для постановки на парашют нужно вызвать специальный метод Set_On_Parashute()
+		break;
+
+
+	case EBS_Off_Parashute: 
+		if (Ball_State != EBS_On_Parashute)
+			AsConfig::Throw(); // В это состояние можно перейти только из состояния EBS_On_Parashute!
+
+		Ball_Speed = 0.0;
+		Rest_Distance = 0.0;
+		Redraw_Ball();
+		Redraw_Parashute();
+		break;
 	}
 
+	Prev_Ball_State = Ball_State;
 	Ball_State = new_state;
 }
 //------------------------------------------------------------------------------------------------------------
@@ -235,16 +281,17 @@ void ABall::Set_On_Parashute(int x, int y)
 	Ball_Speed = 1.0;
 	Ball_State = EBS_On_Parashute;
 
-
 	Parashute_Rect.left = cell_x * AsConfig::Global_Scale;
 	Parashute_Rect.top = cell_y * AsConfig::Global_Scale;
 	Parashute_Rect.right = Parashute_Rect.left + Parashute_Size * AsConfig::Global_Scale;
 	Parashute_Rect.bottom = Parashute_Rect.top + Parashute_Size * AsConfig::Global_Scale;
 
-	Center_X_Pos = (double)(cell_x + AsConfig::Cell_Width / 2.0) - 1.0 / (double)AsConfig::Global_Scale;
+	Prev_Parashute_Rect = Parashute_Rect;
+
+	Center_X_Pos = (double)(cell_x + AsConfig::Cell_Width / 2) - 1.0 / (double)AsConfig::Global_Scale;
 	Center_Y_Pos = (double)(cell_y + Parashute_Size) - ABall::Radius * 2.0;
 
-	InvalidateRect(AsConfig::Hwnd, &Parashute_Rect, FALSE);
+	Redraw_Ball();
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)
@@ -273,11 +320,12 @@ void ABall::Draw_Parashute(HDC hdc, RECT &paint_area)
 	int arc_height = 4 * scale;
 	int arc_x;
 	int ball_center_x, ball_center_y, line_y;
-	RECT intersection_rect, subarc_rect, other_arc;
+	RECT intersection_rect{}, subarc_rect{}, other_arc{};
 
-	// 1. Очищаем фон
 	if ( !IntersectRect(&intersection_rect, &paint_area, &Parashute_Rect) )
 		return;
+
+	Clear_Parashute(hdc); 
 
 	// 1. Купол
 	AsConfig::Red_Color.Select(hdc);
@@ -325,11 +373,24 @@ void ABall::Draw_Parashute(HDC hdc, RECT &paint_area)
 	MoveToEx(hdc, Parashute_Rect.left + 3 * scale + 1, line_y, 0);
 	LineTo(hdc, ball_center_x, ball_center_y);
 
-	MoveToEx(hdc, Parashute_Rect.right, line_y, 0);
+	MoveToEx(hdc, Parashute_Rect.right, line_y - 1, 0);
 	LineTo(hdc, ball_center_x, ball_center_y);
 
 	MoveToEx(hdc, Parashute_Rect.right - 4 * scale + 1, line_y, 0);
 	LineTo(hdc, ball_center_x, ball_center_y);
 
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Redraw_Parashute()
+{
+	InvalidateRect(AsConfig::Hwnd, &Prev_Parashute_Rect, FALSE);
+	InvalidateRect(AsConfig::Hwnd, &Parashute_Rect, FALSE);
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Clear_Parashute(HDC hdc)
+{ // Очистка фона
+
+	AsConfig::BG_Color.Select(hdc);
+	AsConfig::Round_Rect(hdc, Prev_Parashute_Rect);
 }
 //------------------------------------------------------------------------------------------------------------

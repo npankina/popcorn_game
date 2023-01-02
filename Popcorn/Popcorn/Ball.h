@@ -8,7 +8,8 @@ enum EBall_State
 	EBS_Normal,
 	EBS_Lost,
 	EBS_On_Platform,
-	EBS_On_Parashute
+	EBS_On_Parashute,
+	EBS_Off_Parashute
 };
 //------------------------------------------------------------------------------------------------------------
 class ABall;
@@ -45,8 +46,10 @@ public:
 private:
 	void Redraw_Ball();
 	void Draw_Parashute(HDC hdc, RECT &paint_area);
+	void Redraw_Parashute();
+	void Clear_Parashute(HDC hdc);
 
-	EBall_State Ball_State;
+	EBall_State Ball_State, Prev_Ball_State;
 	double Ball_Speed;
 	double Rest_Distance;
 	double Ball_Direction;
@@ -57,7 +60,7 @@ private:
 
 	double Center_X_Pos, Center_Y_Pos;
 
-	RECT Ball_Rect, Prev_Ball_Rect, Parashute_Rect;
+	RECT Ball_Rect, Prev_Ball_Rect, Parashute_Rect, Prev_Parashute_Rect;
 
 	static const double Start_Ball_Y_Pos;
 	static const int Parashute_Size = 15;
