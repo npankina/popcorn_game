@@ -5,14 +5,14 @@
 char AsLevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1, 9, 1, 3, 1, 1, 1, 1, 3, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	3, 2, 2, 2, 2, 3, 2, 2, 7, 6, 4, 8,
+	8, 3, 2, 2, 2, 8, 2, 3, 7, 6, 4, 9,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -45,8 +45,7 @@ char AsLevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 // AsLevel
 //------------------------------------------------------------------------------------------------------------
 AsLevel::AsLevel()
-: Level_Rect{}, Active_Bricks_Counter(0), Falling_Letters_Counter(0),
-  Parachute_Color(AsConfig::Red_Color, AsConfig::Blue_Color, AsConfig::Global_Scale)
+: Level_Rect{}, Active_Bricks_Counter(0), Falling_Letters_Counter(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -298,6 +297,10 @@ void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 		Draw_Parashute_In_Level(hdc, brick_rect);
 		break;
 
+	case EBT_Teleport:
+		AActive_Brick_Teleport::Draw_In_Level(hdc, brick_rect);
+		break;
+
 	default:
 		AsConfig::Throw();
 	}
@@ -346,7 +349,7 @@ void AsLevel::Draw_Parashute_In_Level(HDC hdc, RECT &brick_rect)
 void AsLevel::Draw_Parashute_Part(HDC hdc, RECT &brick_rect, int width, int offset)
 {
 	const int scale = AsConfig::Global_Scale;
-	RECT rect;
+	RECT rect{};
 
 	// 1. Верхний сегмент мячика с парашютом
 	rect.left = brick_rect.left + offset * scale + 1;
@@ -354,7 +357,7 @@ void AsLevel::Draw_Parashute_Part(HDC hdc, RECT &brick_rect, int width, int offs
 	rect.right = rect.left + width * scale + 1;
 	rect.bottom = rect.top + 3 * scale + 1;
 
-	Parachute_Color.Select(hdc);
+	AsConfig::Parachute_Color.Select(hdc);
 	AsConfig::Round_Rect(hdc, rect);
 
 	// 2. Нижний сегмент
@@ -435,6 +438,14 @@ void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
 	case EBT_Multihit_3:
 	case EBT_Multihit_4:
 		Current_Level[brick_y][brick_x] = brick_type - 1;
+		break;
+
+	case EBT_Parashute:
+		AsConfig::Throw(); // Для парашюта активный кирпич не создается
+		break;
+
+	case EBT_Teleport:
+		active_brick = new AActive_Brick_Teleport(brick_x, brick_y);
 		break;
 
 	default:

@@ -36,7 +36,6 @@ private:
 
 
 	RECT Level_Rect;
-	AColor Parachute_Color;
 
 	double Current_Brick_Left_X, Current_Brick_Right_X;
 	double Current_Brick_Top_Y, Current_Brick_Low_Y;
