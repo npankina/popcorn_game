@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Falling_Letter.h"
-#include "Ball.h"
 
 //------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker
@@ -30,7 +29,7 @@ private:
 	void Draw_Parashute_Part(HDC hdc, RECT &brick_rect, int width, int offset = 0);
 	void On_Hit(int brick_x, int brick_y, ABall *ball);
 	bool Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type);
-	void Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type);
+	void Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball);
 	void Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count);
 	void Act_Objects(AGraphics_Object **objects_array, int objects_max_count);
 

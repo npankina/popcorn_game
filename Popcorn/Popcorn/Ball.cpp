@@ -47,6 +47,9 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
+	if ( (Ball_State == EBS_Teleporting or Ball_State == EBS_Lost) && Ball_State == Prev_Ball_State)
+		return;
+
 	// 1. Очищаем фон
 	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) )
 	{
@@ -69,6 +72,9 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 		if (Prev_Ball_State == EBS_On_Parashute)
 			Clear_Parashute(hdc);
 		return;
+
+	case EBS_Teleporting:
+		return;
 	}	
 
 	// 2. Рисуем шарик
@@ -79,6 +85,20 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
+void ABall::Draw_Teleporting(HDC hdc, int step)
+{
+	int top_y, low_y;
+
+	top_y = Ball_Rect.top + step / 2;
+	low_y = Ball_Rect.bottom - step / 2 - 1;
+
+	if (top_y >= low_y)
+		return;
+
+	AsConfig::White_Color.Select(hdc);
+	Ellipse(hdc, Ball_Rect.left, top_y, Ball_Rect.right - 1, low_y);
+}
+//------------------------------------------------------------------------------------------------------------
 void ABall::Move()
 {
 	int i;
@@ -86,7 +106,7 @@ void ABall::Move()
 	double next_x_pos, next_y_pos;
 	double step_size = AsConfig::Moving_Step_Size;
 
-	if (Ball_State == EBS_Lost or Ball_State == EBS_On_Platform)
+	if (Ball_State == EBS_Lost or Ball_State == EBS_On_Platform or Ball_State == EBS_Teleporting)
 		return;
 
 	Prev_Ball_Rect = Ball_Rect;
@@ -223,6 +243,25 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 		Redraw_Ball();
 		Redraw_Parashute();
 		break;
+
+	case EBS_Teleporting:
+		// Только из этих состояний можно войти в телепорт!
+		if ( !(Ball_State == EBS_Normal or Ball_State == EBS_On_Parashute) ) 
+			AsConfig::Throw();
+
+		Center_X_Pos = x_pos;
+		Center_Y_Pos = y_pos;
+		Ball_Speed = 0.0;
+		Rest_Distance = 0.0;
+		Redraw_Ball();
+
+		if (Ball_State == EBS_On_Parashute)
+			Redraw_Parashute();
+
+		break;
+
+	default:
+		AsConfig::Throw();
 	}
 
 	Prev_Ball_State = Ball_State;
