@@ -348,8 +348,8 @@ void AActive_Brick_Multihit::Draw_Stage(HDC hdc, RECT &brick_rect, int x, int wi
 AActive_Brick_Teleport::~AActive_Brick_Teleport()
 {}
 //------------------------------------------------------------------------------------------------------------
-AActive_Brick_Teleport::AActive_Brick_Teleport(int level_x, int level_y, ABall *ball)
-: AActive_Brick(EBT_Teleport, level_x, level_y), Animation_Step(0), Ball(ball)
+AActive_Brick_Teleport::AActive_Brick_Teleport(int level_x, int level_y, ABall *ball, AActive_Brick_Teleport *destination_teleport)
+: AActive_Brick(EBT_Teleport, level_x, level_y), Animation_Step(0), Ball(ball), Destination_Teleport(destination_teleport)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Teleport::Act()

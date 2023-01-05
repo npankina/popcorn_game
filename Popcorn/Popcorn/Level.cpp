@@ -44,8 +44,13 @@ char AsLevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 
 // AsLevel
 //------------------------------------------------------------------------------------------------------------
+AsLevel::~AsLevel()
+{
+	delete[] Teleport_Bricks_Position;
+}
+//------------------------------------------------------------------------------------------------------------
 AsLevel::AsLevel()
-: Level_Rect{}, Active_Bricks_Counter(0), Falling_Letters_Counter(0)
+: Level_Rect{}, Active_Bricks_Counter(0), Falling_Letters_Counter(0), Teleport_Bricks_Counter(0), Teleport_Bricks_Position(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -140,7 +145,49 @@ void AsLevel::Init()
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width])
 {
+	int i, j;
+	int index;
+	EBrick_Type brick_type;
+
 	memcpy(Current_Level, level, sizeof(Current_Level) );
+
+	// 1. Считаем телепорты
+	for (i = 0; i < AsConfig::Level_Height; i++)
+	{
+		for (j = 0; j < AsConfig::Level_Width; j++)
+		{
+			brick_type = (EBrick_Type)Current_Level[i][j];
+
+			if (brick_type == EBT_Teleport)
+				++Teleport_Bricks_Counter;
+		}
+	}
+
+	delete[] Teleport_Bricks_Position;
+	Teleport_Bricks_Position = 0;
+
+
+	// 2. Сохраняет координаты телепортов
+	if (Teleport_Bricks_Counter != 0)
+	{
+		Teleport_Bricks_Position = new SPoint[Teleport_Bricks_Counter];
+		index = 0;
+
+		for (i = 0; i < AsConfig::Level_Height; i++)
+		{
+			for (j = 0; j < AsConfig::Level_Width; j++)
+			{
+				brick_type = (EBrick_Type)Current_Level[i][j];
+
+				if (brick_type == EBT_Teleport)
+				{
+					Teleport_Bricks_Position[index].X = j;
+					Teleport_Bricks_Position[index].Y = i;
+					++index;
+				}
+			}
+		}
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Act()
@@ -321,7 +368,7 @@ void AsLevel::On_Hit(int brick_x, int brick_y, ABall *ball)
 	else if (Add_Falling_Letter(brick_x, brick_y, brick_type))
 		Current_Level[brick_y][brick_x] = EBT_None;
 	else
-		Add_Active_Brick(brick_x, brick_y, brick_type, ball);
+		Create_Active_Brick(brick_x, brick_y, brick_type, ball);
 
 	Redraw_Brick(brick_x, brick_y);
 
@@ -405,12 +452,14 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball)
+void AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball)
 {// Создает активный кирпич, если возможно
 
 	int i;
 	double ball_x, ball_y;
 	AActive_Brick *active_brick = 0;
+	AActive_Brick_Teleport *destination_teleport = 0;
+
 
 	if (Active_Bricks_Counter >= AsConfig::Max_Active_Bricks_Count)
 		return; // когда активных кирпичей слишком много!
@@ -452,7 +501,10 @@ void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type,
 
 		ball->Set_State(EBS_Teleporting, ball_x, ball_y);
 
-		active_brick = new AActive_Brick_Teleport(brick_x, brick_y, ball);
+
+		destination_teleport = Select_Destination_Teleport(ball);
+
+		active_brick = new AActive_Brick_Teleport(brick_x, brick_y, ball, destination_teleport);
 		break;
 
 	default:
@@ -469,6 +521,35 @@ void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type,
 			break;
 		}
 	}
+
+	if (destination_teleport != 0)
+		Add_New_Active_Brick(destination_teleport);
+
+	Add_New_Active_Brick(active_brick);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsLevel::Add_New_Active_Brick(AActive_Brick *active_brick)
+{
+	int i;
+
+	for (i = 0; i < AsConfig::Max_Active_Bricks_Count; i++)
+	{
+		if (Active_Bricks[i] == 0)
+		{
+			Active_Bricks[i] = active_brick;
+			++Active_Bricks_Counter;
+			break;
+		}
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+AActive_Brick_Teleport *AsLevel::Select_Destination_Teleport(ABall *ball)
+{
+	AActive_Brick_Teleport *destination_teleport;
+
+	destination_teleport = new AActive_Brick_Teleport(Teleport_Bricks_Position[0].X, Teleport_Bricks_Position[0].Y, ball, 0);
+	
+	return destination_teleport;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count)

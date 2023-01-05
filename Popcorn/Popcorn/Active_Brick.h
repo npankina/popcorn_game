@@ -108,7 +108,7 @@ class AActive_Brick_Teleport : public AActive_Brick
 {
 public:
 	~AActive_Brick_Teleport(); 
-	AActive_Brick_Teleport(int level_x, int level_y, ABall *ball);
+	AActive_Brick_Teleport(int level_x, int level_y, ABall *ball, AActive_Brick_Teleport *destination_teleport);
 
 	virtual void Act();
 	virtual void Draw(HDC hdc, RECT& paint_area);
@@ -116,6 +116,7 @@ public:
 
 	static void Draw_In_Level(HDC hdc, RECT &brick_rect, int step = 0);
 	ABall *Ball;
+	AActive_Brick_Teleport *Destination_Teleport;
 
 private:
 	int Animation_Step;
