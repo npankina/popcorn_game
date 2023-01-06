@@ -36,6 +36,7 @@ public:
 	void Set_State(EBall_State new_state, double x_pos, double y_pos = Start_Ball_Y_Pos);
 	double Get_Direction();
 	void Set_Direction(double new_direction);
+	void Get_Center(double &x_pos, double &y_pos);
 	void Reflect(bool from_horizontal);
 	bool Is_Moving_Up();
 	bool Is_Moving_Left();

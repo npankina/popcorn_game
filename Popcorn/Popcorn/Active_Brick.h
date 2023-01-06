@@ -20,6 +20,13 @@ enum EBrick_Type
 	EBT_Ad
 };
 //------------------------------------------------------------------------------------------------------------
+enum ETeleport_State
+{
+	ETS_Started,
+	ETS_Finished,
+	ETS_Done
+};
+//------------------------------------------------------------------------------------------------------------
 class AGraphics_Object
 {
 public:
@@ -37,7 +44,11 @@ protected:
 	AActive_Brick(EBrick_Type brick_type, int level_x, int level_y);
 
 	EBrick_Type Brick_Type;
+
+	int Level_X, Level_Y;
+
 	RECT Brick_Rect;
+
 };
 //------------------------------------------------------------------------------------------------------------
 class AActive_Brick_Red_Blue : public AActive_Brick
@@ -115,10 +126,14 @@ public:
 	virtual bool Is_Finished();
 
 	static void Draw_In_Level(HDC hdc, RECT &brick_rect, int step = 0);
-	ABall *Ball;
+	void Set_Ball(ABall *ball);
+
 	AActive_Brick_Teleport *Destination_Teleport;
 
 private:
+
+	ABall *Ball;
+	ETeleport_State Teleport_State;
 	int Animation_Step;
 	static const int Max_Animation_Step = 12;
 };

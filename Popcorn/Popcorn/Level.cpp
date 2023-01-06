@@ -170,6 +170,9 @@ void AsLevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Lev
 	// 2. Сохраняет координаты телепортов
 	if (Teleport_Bricks_Counter != 0)
 	{
+		if (Teleport_Bricks_Counter == 1) // Логика программы не рассчитана на одиночные телепорты
+			AsConfig::Throw();
+
 		Teleport_Bricks_Position = new SPoint[Teleport_Bricks_Counter];
 		index = 0;
 
@@ -455,8 +458,6 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 void AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball)
 {// Создает активный кирпич, если возможно
 
-	int i;
-	double ball_x, ball_y;
 	AActive_Brick *active_brick = 0;
 	AActive_Brick_Teleport *destination_teleport = 0;
 
@@ -495,31 +496,12 @@ void AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_ty
 		break;
 
 	case EBT_Teleport:
-		// Ставим мячик в центр кирпича
-		ball_x = (double)(AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) + (double)AsConfig::Brick_Width / 2.0;
-		ball_y = (double)(AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height) + (double)AsConfig::Brick_Height / 2.0;
-
-		ball->Set_State(EBS_Teleporting, ball_x, ball_y);
-
-
-		destination_teleport = Select_Destination_Teleport(ball);
-
+		destination_teleport = Select_Destination_Teleport();
 		active_brick = new AActive_Brick_Teleport(brick_x, brick_y, ball, destination_teleport);
 		break;
 
 	default:
 		AsConfig::Throw();
-	}
-
-	// Добавляем новый активный кирпич на первое свободное место
-	for (i = 0; i < AsConfig::Max_Active_Bricks_Count; i++)
-	{
-		if (Active_Bricks[i] == 0)
-		{
-			Active_Bricks[i] = active_brick;
-			++Active_Bricks_Counter;
-			break;
-		}
 	}
 
 	if (destination_teleport != 0)
@@ -543,11 +525,11 @@ void AsLevel::Add_New_Active_Brick(AActive_Brick *active_brick)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-AActive_Brick_Teleport *AsLevel::Select_Destination_Teleport(ABall *ball)
+AActive_Brick_Teleport *AsLevel::Select_Destination_Teleport()
 {
 	AActive_Brick_Teleport *destination_teleport;
 
-	destination_teleport = new AActive_Brick_Teleport(Teleport_Bricks_Position[0].X, Teleport_Bricks_Position[0].Y, ball, 0);
+	destination_teleport = new AActive_Brick_Teleport(Teleport_Bricks_Position[0].X, Teleport_Bricks_Position[0].Y, 0, 0);
 	
 	return destination_teleport;
 }

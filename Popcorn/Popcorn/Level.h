@@ -38,7 +38,7 @@ private:
 	void Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball);
 	void Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count);
 	void Act_Objects(AGraphics_Object **objects_array, int objects_max_count);
-	AActive_Brick_Teleport *Select_Destination_Teleport(ABall *ball);
+	AActive_Brick_Teleport *Select_Destination_Teleport();
 	void Add_New_Active_Brick(AActive_Brick *active_brick);
 
 
