@@ -13,6 +13,13 @@ enum EBall_State
 	EBS_Teleporting
 };
 //------------------------------------------------------------------------------------------------------------
+enum ETeleport_State
+{
+	ETS_Started,
+	ETS_Finished,
+	ETS_Done
+};
+//------------------------------------------------------------------------------------------------------------
 class ABall;
 class AHit_Checker
 {
@@ -45,6 +52,7 @@ public:
 	static void Add_Hit_Checker(AHit_Checker *hit_checker);
 
 	static const double Radius;
+	double Ball_Speed;
 
 private:
 	void Redraw_Ball();
@@ -53,7 +61,6 @@ private:
 	void Clear_Parashute(HDC hdc);
 
 	EBall_State Ball_State, Prev_Ball_State;
-	double Ball_Speed;
 	double Rest_Distance;
 	double Ball_Direction;
 

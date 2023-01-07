@@ -33,14 +33,14 @@ private:
 	void Redraw_Brick(int brick_x, int brick_y);
 	void Draw_Parashute_In_Level(HDC hdc, RECT &brick_rect);
 	void Draw_Parashute_Part(HDC hdc, RECT &brick_rect, int width, int offset = 0);
-	void On_Hit(int brick_x, int brick_y, ABall *ball);
+	bool On_Hit(int brick_x, int brick_y, ABall *ball, bool vertical_hit);
 	bool Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type);
-	void Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball);
+	bool Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball, bool vertical_hit);
 	void Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count);
-	void Act_Objects(AGraphics_Object **objects_array, int objects_max_count);
-	AActive_Brick_Teleport *Select_Destination_Teleport();
+	void Act_Objects(AGraphics_Object **objects_array, int &objects_count, const int objects_max_count);
+	AActive_Brick_Teleport *Select_Destination_Teleport(int source_x, int source_y);
 	void Add_New_Active_Brick(AActive_Brick *active_brick);
-
+	void Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall *ball, bool vertical_hit);
 
 	RECT Level_Rect;
 
