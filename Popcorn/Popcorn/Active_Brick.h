@@ -35,6 +35,8 @@ public:
 
 	virtual void Act() = 0;
 	virtual void Draw(HDC hdc, RECT& paint_area) = 0;
+	virtual void Clear(HDC hdc, RECT& paint_area) = 0;
+
 	virtual bool Is_Finished() = 0;
 };
 //------------------------------------------------------------------------------------------------------------
@@ -45,7 +47,9 @@ public:
 
 protected:
 	virtual ~AActive_Brick();
+
 	AActive_Brick(EBrick_Type brick_type, int level_x, int level_y);
+	virtual void Clear(HDC hdc, RECT& paint_area);
 	double Get_Brick_X_Pos(bool of_center);
 	double Get_Brick_Y_Pos(bool of_center);
 
@@ -144,5 +148,24 @@ private:
 	ETeleport_State Teleport_State;
 	int Animation_Step;
 	static const int Max_Animation_Step = 12;
+};
+//------------------------------------------------------------------------------------------------------------
+class AActive_Brick_Ad : public AActive_Brick
+{
+public:
+	~AActive_Brick_Ad(); 
+	AActive_Brick_Ad(int level_x, int level_y);
+
+	virtual void Act();
+	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual bool Is_Finished();
+
+	static void Draw_In_Level(HDC hdc, RECT &brick_rect);
+
+private:
+	/*int Animation_Step;
+	HRGN Region;
+
+	static const int Max_Animation_Step = 12;*/
 };
 //------------------------------------------------------------------------------------------------------------

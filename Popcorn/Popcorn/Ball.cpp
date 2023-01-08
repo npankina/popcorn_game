@@ -30,7 +30,7 @@ bool AHit_Checker::Hit_Circle_On_Line(double y, double next_x_pos, double left_x
 
 
 // ABall
-const double ABall::Start_Ball_Y_Pos = 181.0;
+const double ABall::Start_Ball_Y_Pos = 184.0;
 const double ABall::Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
 int ABall::Hit_Checkers_Count = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};
@@ -112,12 +112,12 @@ void ABall::Move()
 	Prev_Ball_Rect = Ball_Rect;
 	Rest_Distance += Ball_Speed;
 
-	while (Rest_Distance >= step_size)
+	while (Rest_Distance >= AsConfig::Moving_Step_Size)
 	{
 		got_hit = false;
 
-		next_x_pos = Center_X_Pos + step_size * cos(Ball_Direction);
-		next_y_pos = Center_Y_Pos - step_size * sin(Ball_Direction);
+		next_x_pos = Center_X_Pos + AsConfig::Moving_Step_Size * cos(Ball_Direction);
+		next_y_pos = Center_Y_Pos - AsConfig::Moving_Step_Size * sin(Ball_Direction);
 
 		// Корректируем позицию при отражении:
 		for (i = 0; i < Hit_Checkers_Count; i++)
@@ -126,13 +126,13 @@ void ABall::Move()
 		if (! got_hit)
 		{
 			// Мячик продолжит движение, если не взаимодействовал с другими объектами
-			Rest_Distance -= step_size;
+			Rest_Distance -= AsConfig::Moving_Step_Size;
 
 			Center_X_Pos = next_x_pos;
 			Center_Y_Pos = next_y_pos;
 
 			if (Testing_Is_Active)
-				Rest_Test_Distance -= step_size;
+				Rest_Test_Distance -= AsConfig::Moving_Step_Size;
 		}
 
 		if (Ball_State == EBS_Lost)
@@ -392,7 +392,7 @@ void ABall::Draw_Parashute(HDC hdc, RECT &paint_area)
 	// 2.2 Средняя
 	other_arc = subarc_rect;
 
-	other_arc.left = arc_x + 3 * scale;
+	other_arc.left = arc_x + 3 * scale + 1;
 	other_arc.right = arc_x + 11 * scale;
 
 	Ellipse(hdc, other_arc.left, other_arc.top, other_arc.right - 1, other_arc.bottom - 1);
@@ -400,8 +400,8 @@ void ABall::Draw_Parashute(HDC hdc, RECT &paint_area)
 	// 2.3 Правая
 	other_arc = subarc_rect;
 
-	other_arc.left = arc_x + 11 * scale;
-	other_arc.right = arc_x + 14 * scale;
+	other_arc.left = arc_x + 11 * scale + 1;
+	other_arc.right = arc_x + 14 * scale + 1;
 
 	Ellipse(hdc, other_arc.left, other_arc.top, other_arc.right - 1, other_arc.bottom - 1);
 

@@ -24,6 +24,7 @@ public:
 
 
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
+	static char Level_02[AsConfig::Level_Height][AsConfig::Level_Width];
 	static char Test_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 
 private:
@@ -37,6 +38,7 @@ private:
 	bool Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type);
 	bool Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball, bool vertical_hit);
 	void Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count);
+	void Clear_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count);
 	void Act_Objects(AGraphics_Object **objects_array, int &objects_count, const int objects_max_count);
 	AActive_Brick_Teleport *Select_Destination_Teleport(int source_x, int source_y);
 	void Add_New_Active_Brick(AActive_Brick *active_brick);
