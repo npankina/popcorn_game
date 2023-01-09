@@ -95,9 +95,20 @@ bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	max_ball_y = next_y_pos + ball->Radius;
 
 	min_level_x = (int)( (min_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width);
+	if (min_level_x < 0)
+		min_level_x = 0;
+
 	max_level_x = (int)( (max_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width);
+	if (max_level_x >= AsConfig::Level_Width - 1)
+		max_level_x = AsConfig::Level_Width - 1;
+
 	min_level_y = (int)( (min_ball_y - AsConfig::Level_Y_Offset) / (double)AsConfig::Cell_Height);
+	if (min_level_y < 0)
+		min_level_y = 0;
+
 	max_level_y = (int)( (max_ball_y - AsConfig::Level_Y_Offset) / (double)AsConfig::Cell_Height);
+	if (max_level_y >= AsConfig::Level_Height - 1)
+		max_level_y = AsConfig::Level_Height - 1;
 
 	for (i = max_level_y; i >= min_level_y; i--)
 	{
@@ -524,6 +535,10 @@ bool AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_ty
 	case EBT_Teleport:
 		Add_Active_Brick_Teleport(brick_x, brick_y, ball, vertical_hit);
 		return false;
+
+	case EBT_Ad:
+		active_brick = new AActive_Brick_Ad(brick_x, brick_y);
+		break;
 
 	default:
 		AsConfig::Throw();

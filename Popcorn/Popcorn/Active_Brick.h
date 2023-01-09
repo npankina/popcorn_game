@@ -163,9 +163,7 @@ public:
 	static void Draw_In_Level(HDC hdc, RECT &brick_rect);
 
 private:
-	/*int Animation_Step;
-	HRGN Region;
 
-	static const int Max_Animation_Step = 12;*/
+	static const int Circle_Size = 7;
 };
 //------------------------------------------------------------------------------------------------------------
