@@ -46,7 +46,6 @@ private:
 
 	RECT Level_Rect;
 
-
 	double Current_Brick_Left_X, Current_Brick_Right_X;
 	double Current_Brick_Top_Y, Current_Brick_Low_Y;
 
@@ -58,5 +57,6 @@ private:
 	AActive_Brick *Active_Bricks[AsConfig::Max_Active_Bricks_Count];
 	AFalling_Letter *Falling_Letters[AsConfig::Max_Falling_Letters_Count];
 	SPoint *Teleport_Bricks_Position;
+	AAdvertisement *Advertisement;
 };
 //------------------------------------------------------------------------------------------------------------

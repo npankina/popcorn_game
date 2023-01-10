@@ -29,9 +29,9 @@ char AsLevel::Level_02[AsConfig::Level_Height][AsConfig::Level_Width] =
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 1, 1, 1, 1, 1, 1, 1, 0, 10,10,0,
-	2, 2, 2, 2, 2, 2, 2, 2, 0, 10,10,0,
-	2, 2, 2, 2, 2, 2, 2, 2, 0, 10,10,0,
+	1, 1, 1, 1, 0, 0, 0, 0, 0, 10,10,0,
+	2, 2, 2, 2, 0, 0, 0, 0, 0, 10,10,0,
+	2, 2, 2, 2, 0, 0, 0, 0, 0, 10,10,0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -69,7 +69,8 @@ AsLevel::~AsLevel()
 }
 //------------------------------------------------------------------------------------------------------------
 AsLevel::AsLevel()
-: Level_Rect{}, Active_Bricks_Counter(0), Falling_Letters_Counter(0), Teleport_Bricks_Counter(0), Teleport_Bricks_Position(0)
+: Level_Rect{}, Active_Bricks_Counter(0), Falling_Letters_Counter(0), Teleport_Bricks_Counter(0), 
+  Teleport_Bricks_Position(0), Advertisement(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -225,12 +226,16 @@ void AsLevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Lev
 			}
 		}
 	}
+	Advertisement = new AAdvertisement(5, 7, 2, 3);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Act()
 {
 	Act_Objects((AGraphics_Object**)&Active_Bricks, Active_Bricks_Counter, AsConfig::Max_Active_Bricks_Count);
 	Act_Objects((AGraphics_Object**)&Falling_Letters, Falling_Letters_Counter, AsConfig::Max_Falling_Letters_Count);
+
+	if (Advertisement != 0)
+		Advertisement->Act();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Draw(HDC hdc, RECT &paint_area)
@@ -259,6 +264,9 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 	}
 
 	Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
+
+	if (Advertisement != 0)
+		Advertisement->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Get_Next_Falling_letter(int &index, AFalling_Letter **falling_letter)
