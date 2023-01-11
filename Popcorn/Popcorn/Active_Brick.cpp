@@ -539,36 +539,64 @@ void AAdvertisement::Act()
 void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 {
 	const int scale = AsConfig::Global_Scale;
+	RECT inresection_rect{};
+
+	if ( !IntersectRect(&inresection_rect, &paint_area, &Ad_Rect) )
+		return;
 
 	// 1. Стол
 	// 1.1 Белая поверхность
 	AsConfig::White_Color.Select(hdc);
-	MoveToEx(hdc, Ad_Rect.left, Ad_Rect.top + 15 * scale, 0);
-	LineTo(hdc,Ad_Rect.left + 15 * scale, Ad_Rect.top + 10 * scale);
-	LineTo(hdc,Ad_Rect.left + 30 * scale, Ad_Rect.top + 15 * scale);
-	LineTo(hdc,Ad_Rect.left + 15 * scale, Ad_Rect.top + 20 * scale);
-	LineTo(hdc,Ad_Rect.left, Ad_Rect.top + 15 * scale);
+	MoveToEx(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale, 0);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale);
+	LineTo(hdc, Ad_Rect.left + 30 * scale + 1, Ad_Rect.top + 15 * scale);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale);
+	LineTo(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale);
 
-	// 1.2 Синяя кайма толщиной в 1 пиксел
-	// 1.3 Розовая кайма толщиной в 2 пиксела
+	FloodFill(hdc, Ad_Rect.left + 15 * scale, Ad_Rect.top + 15 * scale, AsConfig::White_Color.Get_RGB() );
 
-	// 2. Шарик
-	// 2.1 Эллипс 12х12
+	// 2. Тень под шариком
+	// 2.1 Эллипс размер 8х6, пока шарик над столом
 	AsConfig::Blue_Color.Select(hdc);
-	Ellipse(hdc, Ad_Rect.left + 10 * scale, Ad_Rect.top + 2 * scale, Ad_Rect.left + 22 * scale - 1, Ad_Rect.top + 14 * scale - 1);
-
-	// 2.2 Блик сверху
-	// 2.3 Летает сверху-вниз (по затухающей траектории)
-	// 2.4 Сплющивается внизу до 16х9
-
-	// 3. Тень под шариком
-	// 3.1 Эллипс размер 8х6, пока шарик над столом
-	// 3.2 Уезжает вниз, когда шарик в верхней точке
-	// 3.3 Увеличивается, когда шарик плющится
+	Ellipse(hdc, Ad_Rect.left + 11 * scale + 1, Ad_Rect.top + 14 * scale, Ad_Rect.left + 20 * scale - 1, Ad_Rect.top + 18 * scale - 1);
 
 
-	// 4. Рамка
-	// 4.1 Тонкая пунктирная рамка скругленная по краям
+
+	// 2.2 Уезжает вниз, когда шарик в верхней точке
+	// 2.3 Увеличивается, когда шарик плющится
+
+
+	// Каемки стола
+	// 3.1 Синяя кайма толщиной в 1 пиксел
+	AsConfig::Advertising_Blue_Table_Color.Select(hdc);
+	MoveToEx(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale, 0);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale);
+	LineTo(hdc, Ad_Rect.left + 30 * scale + 1, Ad_Rect.top + 15 * scale);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale);
+	LineTo(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale);
+
+	// 3.2 Розовая кайма толщиной в 2 пиксела
+	AsConfig::Advertising_Red_Color.Select(hdc);
+	MoveToEx(hdc, Ad_Rect.left + scale - 1, Ad_Rect.top + 16 * scale, 0);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 21 * scale);
+	LineTo(hdc, Ad_Rect.left + 30 * scale, Ad_Rect.top + 16 * scale);
+
+	
+
+
+	// 4. Шарик
+	// 4.1 Эллипс 12х12
+	AsConfig::Red_Color.Select(hdc);
+	Ellipse(hdc, Ad_Rect.left + 9 * scale + 1, Ad_Rect.top + 2 * scale, Ad_Rect.left + 21 * scale + 1, Ad_Rect.top + 14 * scale);
+
+	// 5.2 Блик сверху
+	// 5.3 Летает сверху-вниз (по затухающей траектории)
+	// 5.4 Сплющивается внизу до 16х9
+
+	
+
+	// 6. Рамка
+	// 6.1 Тонкая пунктирная рамка скругленная по краям
 
 
 }

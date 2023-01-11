@@ -9,6 +9,7 @@ class AColor
 public:
 	AColor();
 	AColor(unsigned char r, unsigned char g, unsigned char b);
+	AColor(unsigned char r, unsigned char g, unsigned char b, int pen_size);
 	AColor(const AColor &color, int pen_size);
 	AColor(const AColor &pen_color, const AColor &brush_color, int pen_size);
 
@@ -36,7 +37,7 @@ public:
 	static int Current_Timer_Tick;
 	static bool Level_Has_Floor;
 	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color;
-	static const AColor Unbreakable_Red_Highlight, Unbreakable_Blue_Highlight, Teleport_Portal_Color, Parachute_Color;
+	static const AColor Unbreakable_Red_Highlight, Unbreakable_Blue_Highlight, Teleport_Portal_Color, Parachute_Color, Advertising_Red_Color, Advertising_Blue_Table_Color;
 
 	static HWND Hwnd;
 
