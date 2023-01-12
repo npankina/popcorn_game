@@ -30,7 +30,7 @@ public:
 private:
 	bool Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos);
 	bool Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos);
-	void Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type);
+	void Draw_Brick(HDC hdc, RECT &brick_rect, int level_x, int level_y);
 	void Redraw_Brick(int brick_x, int brick_y);
 	void Draw_Parashute_In_Level(HDC hdc, RECT &brick_rect);
 	void Draw_Parashute_Part(HDC hdc, RECT &brick_rect, int width, int offset = 0);

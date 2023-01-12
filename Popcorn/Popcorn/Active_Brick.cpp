@@ -524,9 +524,18 @@ void AActive_Brick_Teleport::Set_Ball(ABall *ball)
 
 
 // AAdvertisement
-AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
-: Level_X(level_x), Level_Y(level_y), Width(width), Height(height)
+//------------------------------------------------------------------------------------------------------------
+AAdvertisement::~AAdvertisement()
 {
+	delete[] Brick_Mask;
+}
+//------------------------------------------------------------------------------------------------------------
+AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
+: Level_X(level_x), Level_Y(level_y), Width(width), Height(height), Brick_Mask(0)
+{
+	Brick_Mask = new char[Width * Height];
+	memset(Brick_Mask, 0, Width * Height); // сбросили массив в 0
+
 	Ad_Rect.left = (AsConfig::Level_X_Offset + Level_X * AsConfig::Cell_Width) * AsConfig::Global_Scale;
 	Ad_Rect.top = (AsConfig::Level_Y_Offset + Level_Y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
 	Ad_Rect.right = Ad_Rect.left + Width * AsConfig::Cell_Width * AsConfig::Global_Scale;
@@ -534,7 +543,25 @@ AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Act()
-{}
+{
+	int i, j;
+	int cell_width = AsConfig::Cell_Width * AsConfig::Global_Scale;
+	int cell_height = AsConfig::Cell_Height * AsConfig::Global_Scale;
+
+	RECT rect{};
+
+	for (i = 0; i < Height; i++) // y
+		for (j = 0; j < Width; j++) // x
+			if (Brick_Mask[i * Width + j] == 1) // строка * ширину + смещение внутри этой строки
+			{
+				rect.left = Ad_Rect.left + j * cell_width; // смещение области рекламы на х ячеек 
+				rect.top = Ad_Rect.top + i * cell_height; // смещение на y ячеек по высоте
+				rect.right = rect.left + cell_width;
+				rect.bottom = rect.top + cell_height;
+
+				InvalidateRect(AsConfig::Hwnd, &rect, FALSE);
+			}
+}
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 {
@@ -581,9 +608,6 @@ void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 21 * scale);
 	LineTo(hdc, Ad_Rect.left + 30 * scale, Ad_Rect.top + 16 * scale);
 
-	
-
-
 	// 4. Шарик
 	// 4.1 Эллипс 12х12
 	AsConfig::Red_Color.Select(hdc);
@@ -602,13 +626,46 @@ void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Clear(HDC hdc, RECT& paint_area)
-{}
+{
+	RECT inresection_rect{};
+
+	if ( !IntersectRect(&inresection_rect, &paint_area, &Ad_Rect) )
+		return;
+
+	AsConfig::BG_Color.Select(hdc);
+	Rectangle(hdc, Ad_Rect.left, Ad_Rect.top, Ad_Rect.right - 1, Ad_Rect.bottom - 1);
+}
 //------------------------------------------------------------------------------------------------------------
 bool AAdvertisement::Is_Finished()
 {
 	return false; // Реклама не заканчивается до окончания уровня
 }
 //------------------------------------------------------------------------------------------------------------
+void AAdvertisement::Show_Under_Brick(int level_x, int level_y)
+{
+	int x, y;
+	x = level_x - Level_X;
+	y = level_y - Level_Y;
+
+	if (x < 0 or x > Width)
+		AsConfig::Throw();
+
+	if (y < 0 or y > Height)
+		AsConfig::Throw();
+
+	Brick_Mask[y * Width + x] = 1; // вычисляем адрес соответствующий байту внутри нашей маски
+}
+//------------------------------------------------------------------------------------------------------------
+bool AAdvertisement::Has_Brick_At(int level_x, int level_y)
+{
+	if (level_x >= Level_X and level_x <= Level_X + Width)
+		if (level_y >= Level_Y and level_y <= Level_Y + Height)
+			return true;
+
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+
 
 
 
@@ -617,10 +674,11 @@ bool AAdvertisement::Is_Finished()
 AActive_Brick_Ad::~AActive_Brick_Ad()
 {}
 //------------------------------------------------------------------------------------------------------------
-AActive_Brick_Ad::AActive_Brick_Ad(int level_x, int level_y)
-: AActive_Brick(EBT_Unbreakable, level_x, level_y)//, Animation_Step(0), Region(0)
+AActive_Brick_Ad::AActive_Brick_Ad(int level_x, int level_y, AAdvertisement *advertisement)
+: AActive_Brick(EBT_Unbreakable, level_x, level_y), Advertisement(advertisement)
 {
-	//Region = CreateRoundRectRgn(Brick_Rect.left, Brick_Rect.top, Brick_Rect.right + 1, Brick_Rect.bottom + 1, 2 * AsConfig::Global_Scale - 1, 2 * AsConfig::Global_Scale - 1);
+	if (Advertisement != 0)
+		Advertisement->Show_Under_Brick(Level_X, Level_Y);
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Ad::Act()
@@ -634,7 +692,10 @@ void AActive_Brick_Ad::Act()
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Ad::Draw(HDC hdc, RECT &paint_area)
 {
-	
+	/*RECT inresection_rect{};
+
+	if ( !IntersectRect(&inresection_rect, &paint_area, &Brick_Rect) )
+		return;*/
 }
 //------------------------------------------------------------------------------------------------------------
 bool AActive_Brick_Ad::Is_Finished()
@@ -654,6 +715,11 @@ void AActive_Brick_Ad::Draw_In_Level(HDC hdc, RECT &brick_rect)
 	int y = brick_rect.top;
 	int size = (Circle_Size - 1) * scale - 1;
 
+	// Стираем предыдущее изображение
+	AsConfig::BG_Color.Select(hdc);
+	Rectangle(hdc, x, y, brick_rect.right + scale, brick_rect.bottom + scale);
+
+	// Рисуем шарики
 	for (i = 0; i < 2; i++)
 	{
 		AsConfig::Red_Color.Select(hdc);

@@ -27,12 +27,12 @@ char AsLevel::Level_02[AsConfig::Level_Height][AsConfig::Level_Width] =
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 1, 1, 1, 2, 2, 2, 2, 0, 10,10,0,
-	2, 2, 2, 2, 2, 2, 2, 2, 0, 10,10,0,
-	2, 2, 2, 2, 2, 2, 2, 2, 0, 10,10,0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3,
+	0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0,
+	1, 1, 1, 1, 1, 1, 1, 3, 0, 10,10,0,
+	2, 2, 2, 2, 2, 2, 2, 3, 0, 10,10,0,
+	2, 2, 2, 2, 2, 2, 2, 3, 0, 10,10,0,
+	0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -226,7 +226,7 @@ void AsLevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Lev
 			}
 		}
 	}
-	Advertisement = new AAdvertisement(5, 7, 2, 3);
+	Advertisement = new AAdvertisement(9, 7, 2, 3);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Act()
@@ -245,6 +245,11 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 	RECT intersection_rect{}, brick_rect{};
 
 	Clear_Objects(hdc, paint_area, (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
+	if (Advertisement != 0)
+		Advertisement->Clear(hdc, paint_area);
+
+	if (Advertisement != 0)
+		Advertisement->Draw(hdc, paint_area);
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect) )
 	{
@@ -257,7 +262,7 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 				brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height  * AsConfig::Global_Scale;
 
 				if (IntersectRect(&intersection_rect, &paint_area, &brick_rect) )	
-					Draw_Brick(hdc, brick_rect, (EBrick_Type)Current_Level[i][j]);
+					Draw_Brick(hdc, brick_rect, j, i);
 			}
 
 		Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Active_Bricks, AsConfig::Max_Active_Bricks_Count);
@@ -265,8 +270,6 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 
 	Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
 
-	if (Advertisement != 0)
-		Advertisement->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Get_Next_Falling_letter(int &index, AFalling_Letter **falling_letter)
@@ -357,14 +360,19 @@ bool AsLevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int lev
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
+void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, int level_x, int level_y)
 {// Вывод "кирпича"
 
 	const AColor *color = 0;
+	EBrick_Type brick_type = (EBrick_Type)Current_Level[level_y][level_x];
 
 	switch (brick_type)
 	{
 	case EBT_None:
+		if (Advertisement != 0 and Advertisement->Has_Brick_At(level_x, level_y) )
+			break;
+		// else = NO break!
+
 	case EBT_Red:
 	case EBT_Blue:
 		AActive_Brick_Red_Blue::Draw_In_Level(hdc, brick_rect, brick_type);
@@ -391,6 +399,9 @@ void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 
 	case EBT_Ad:
 		AActive_Brick_Ad::Draw_In_Level(hdc, brick_rect);
+		break;
+
+	case EBT_Invisible:
 		break;
 
 	default:
@@ -545,14 +556,19 @@ bool AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_ty
 		return false;
 
 	case EBT_Ad:
-		active_brick = new AActive_Brick_Ad(brick_x, brick_y);
+		active_brick = new AActive_Brick_Ad(brick_x, brick_y, Advertisement);
+		Current_Level[brick_y][brick_x] = EBT_Invisible;
 		break;
+
+	case EBT_Invisible:
+		return true;
 
 	default:
 		AsConfig::Throw();
 	}
 
-	Add_New_Active_Brick(active_brick);
+	if (active_brick != 0)
+		Add_New_Active_Brick(active_brick);
 
 	return true;
 }
