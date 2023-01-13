@@ -169,7 +169,8 @@ public:
 private:
 	int Level_X, Level_Y, Width, Height;
 	RECT Ad_Rect;
-	char *Brick_Mask;
+	HRGN Empty_Region;
+	HRGN *Brick_Regions;
 };
 //------------------------------------------------------------------------------------------------------------
 class AActive_Brick_Ad : public AActive_Brick

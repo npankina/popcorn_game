@@ -523,23 +523,44 @@ void AActive_Brick_Teleport::Set_Ball(ABall *ball)
 //------------------------------------------------------------------------------------------------------------
 
 
+
+
 // AAdvertisement
 //------------------------------------------------------------------------------------------------------------
 AAdvertisement::~AAdvertisement()
 {
-	delete[] Brick_Mask;
+	int i, j;
+	HRGN region;
+
+	for (i = 0; i < Height; i++)
+		for (j = 0; j < Width; j++)
+		{
+			region = Brick_Regions[i * Width + j];
+
+			if ( region != 0)
+				DeleteObject(region);
+		}
+
+	delete[] Brick_Regions;
 }
 //------------------------------------------------------------------------------------------------------------
 AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
-: Level_X(level_x), Level_Y(level_y), Width(width), Height(height), Brick_Mask(0)
+: Level_X(level_x), Level_Y(level_y), Width(width), Height(height), Empty_Region(0), Brick_Regions(0)
 {
-	Brick_Mask = new char[Width * Height];
-	memset(Brick_Mask, 0, Width * Height); // сбросили массив в 0
+	int i, j;
+	Empty_Region = CreateRectRgn(0, 0, 0, 0);
+
+	Brick_Regions = new HRGN[Width * Height];
+	memset(Brick_Regions, 0, sizeof(HRGN) * Width * Height); // сбросили массив в 0
 
 	Ad_Rect.left = (AsConfig::Level_X_Offset + Level_X * AsConfig::Cell_Width) * AsConfig::Global_Scale;
 	Ad_Rect.top = (AsConfig::Level_Y_Offset + Level_Y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
-	Ad_Rect.right = Ad_Rect.left + Width * AsConfig::Cell_Width * AsConfig::Global_Scale;
-	Ad_Rect.bottom = Ad_Rect.top + Height * AsConfig::Cell_Height * AsConfig::Global_Scale;
+	Ad_Rect.right = Ad_Rect.left + ( (Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width) * AsConfig::Global_Scale;
+	Ad_Rect.bottom = Ad_Rect.top + ( (Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height) * AsConfig::Global_Scale;
+
+	for (i = 0; i < Height; i++)
+		for (j = 0; j < Width; j++)
+			Show_Under_Brick(Level_X + j, Level_Y + i);
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Act()
@@ -552,7 +573,7 @@ void AAdvertisement::Act()
 
 	for (i = 0; i < Height; i++) // y
 		for (j = 0; j < Width; j++) // x
-			if (Brick_Mask[i * Width + j] == 1) // строка * ширину + смещение внутри этой строки
+			if (Brick_Regions[i * Width + j] != 0) // строка * ширину + смещение внутри этой строки
 			{
 				rect.left = Ad_Rect.left + j * cell_width; // смещение области рекламы на х ячеек 
 				rect.top = Ad_Rect.top + i * cell_height; // смещение на y ячеек по высоте
@@ -565,29 +586,48 @@ void AAdvertisement::Act()
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 {
+	int i, j;
+	int x, y;
 	const int scale = AsConfig::Global_Scale;
+	int circle_size = 12 * scale;
 	RECT inresection_rect{};
-
+	HRGN region;
+	POINT table_points[4] = 
+	{
+		{Ad_Rect.left + 1, Ad_Rect.top + 15 * scale},
+		{Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale},
+		{Ad_Rect.left + 30 * scale + 1, Ad_Rect.top + 15 * scale},
+		{Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale}
+	};
+	
 	if ( !IntersectRect(&inresection_rect, &paint_area, &Ad_Rect) )
 		return;
+
+	SelectClipRgn(hdc, Empty_Region);
+
+	for (i = 0; i < Height; i++)
+		for (j = 0; j < Width; j++)
+		{
+			region = Brick_Regions[i * Width + j];
+			if ( region != 0)
+				ExtSelectClipRgn(hdc, region, RGN_OR); // выбираем регион
+		}
+
+	// 6. Рамка
+	// 6.1 Тонкая пунктирная рамка скругленная по краям
+	AsConfig::BG_Color.Select(hdc);
+	AsConfig::Blue_Color.Select_Pen(hdc);
+	AsConfig::Round_Rect(hdc, Ad_Rect);
 
 	// 1. Стол
 	// 1.1 Белая поверхность
 	AsConfig::White_Color.Select(hdc);
-	MoveToEx(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale, 0);
-	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale);
-	LineTo(hdc, Ad_Rect.left + 30 * scale + 1, Ad_Rect.top + 15 * scale);
-	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale);
-	LineTo(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale);
-
-	FloodFill(hdc, Ad_Rect.left + 15 * scale, Ad_Rect.top + 15 * scale, AsConfig::White_Color.Get_RGB() );
+	Polygon(hdc, table_points, 4);
 
 	// 2. Тень под шариком
 	// 2.1 Эллипс размер 8х6, пока шарик над столом
 	AsConfig::Blue_Color.Select(hdc);
 	Ellipse(hdc, Ad_Rect.left + 11 * scale + 1, Ad_Rect.top + 14 * scale, Ad_Rect.left + 20 * scale - 1, Ad_Rect.top + 18 * scale - 1);
-
-
 
 	// 2.2 Уезжает вниз, когда шарик в верхней точке
 	// 2.3 Увеличивается, когда шарик плющится
@@ -596,45 +636,41 @@ void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 	// Каемки стола
 	// 3.1 Синяя кайма толщиной в 1 пиксел
 	AsConfig::Advertising_Blue_Table_Color.Select(hdc);
-	MoveToEx(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale, 0);
+	MoveToEx(hdc, Ad_Rect.left + scale - 1, Ad_Rect.top + 15 * scale, 0);
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale);
-	LineTo(hdc, Ad_Rect.left + 30 * scale + 1, Ad_Rect.top + 15 * scale);
+	LineTo(hdc, Ad_Rect.left + 30 * scale, Ad_Rect.top + 15 * scale);
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale);
-	LineTo(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale);
+	LineTo(hdc, Ad_Rect.left + scale - 1, Ad_Rect.top + 15 * scale);
 
 	// 3.2 Розовая кайма толщиной в 2 пиксела
 	AsConfig::Advertising_Red_Color.Select(hdc);
-	MoveToEx(hdc, Ad_Rect.left + scale - 1, Ad_Rect.top + 16 * scale, 0);
+	MoveToEx(hdc, Ad_Rect.left + scale, Ad_Rect.top + 16 * scale, 0);
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 21 * scale);
-	LineTo(hdc, Ad_Rect.left + 30 * scale, Ad_Rect.top + 16 * scale);
+	LineTo(hdc, Ad_Rect.left + 30 * scale - 1, Ad_Rect.top + 16 * scale);
 
 	// 4. Шарик
 	// 4.1 Эллипс 12х12
 	AsConfig::Red_Color.Select(hdc);
-	Ellipse(hdc, Ad_Rect.left + 9 * scale + 1, Ad_Rect.top + 2 * scale, Ad_Rect.left + 21 * scale + 1, Ad_Rect.top + 14 * scale);
+
+	x = Ad_Rect.left + 9 * scale + 1;
+	y = Ad_Rect.top + 2 * scale;
+	Ellipse(hdc, x, y, x + circle_size, y + circle_size);
 
 	// 5.2 Блик сверху
+	AsConfig::Letter_Color.Select(hdc);
+	Arc(hdc, x + scale, y + scale, 
+			 x + circle_size - scale, y + circle_size - scale,
+			 x + 4 * scale, y + scale, 
+			 x + scale, y + 4 * scale);
+
 	// 5.3 Летает сверху-вниз (по затухающей траектории)
 	// 5.4 Сплющивается внизу до 16х9
 
-	
-
-	// 6. Рамка
-	// 6.1 Тонкая пунктирная рамка скругленная по краям
-
-
+	SelectClipRgn(hdc, 0);
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Clear(HDC hdc, RECT& paint_area)
-{
-	RECT inresection_rect{};
-
-	if ( !IntersectRect(&inresection_rect, &paint_area, &Ad_Rect) )
-		return;
-
-	AsConfig::BG_Color.Select(hdc);
-	Rectangle(hdc, Ad_Rect.left, Ad_Rect.top, Ad_Rect.right - 1, Ad_Rect.bottom - 1);
-}
+{} // заглушка виртуального метода базового класса - нужна для возможности создавать объекты
 //------------------------------------------------------------------------------------------------------------
 bool AAdvertisement::Is_Finished()
 {
@@ -644,6 +680,8 @@ bool AAdvertisement::Is_Finished()
 void AAdvertisement::Show_Under_Brick(int level_x, int level_y)
 {
 	int x, y;
+	RECT rect;
+
 	x = level_x - Level_X;
 	y = level_y - Level_Y;
 
@@ -653,7 +691,13 @@ void AAdvertisement::Show_Under_Brick(int level_x, int level_y)
 	if (y < 0 or y > Height)
 		AsConfig::Throw();
 
-	Brick_Mask[y * Width + x] = 1; // вычисляем адрес соответствующий байту внутри нашей маски
+	rect.left = Ad_Rect.left + x * AsConfig::Cell_Width * AsConfig::Global_Scale;
+	rect.top = Ad_Rect.top + y * AsConfig::Cell_Height * AsConfig::Global_Scale;
+	rect.right = rect.left + AsConfig::Cell_Width * AsConfig::Global_Scale;
+	rect.bottom = rect.top + AsConfig::Cell_Height * AsConfig::Global_Scale;
+
+
+	Brick_Regions[y * Width + x] = CreateRectRgnIndirect(&rect); // вычисляем адрес соответствующий байту внутри нашей маски
 }
 //------------------------------------------------------------------------------------------------------------
 bool AAdvertisement::Has_Brick_At(int level_x, int level_y)
