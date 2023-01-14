@@ -545,22 +545,30 @@ AAdvertisement::~AAdvertisement()
 }
 //------------------------------------------------------------------------------------------------------------
 AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
-: Level_X(level_x), Level_Y(level_y), Width(width), Height(height), Empty_Region(0), Brick_Regions(0)
+: Level_X(level_x), Level_Y(level_y), Width(width), Height(height),  
+  Ball_X(0), Ball_Y(0), Ball_Y_Offset(0), Empty_Region(0), Brick_Regions(0),
+  Ball_Width(Ball_Size * AsConfig::Global_Scale), Ball_Height(Ball_Size * AsConfig::Global_Scale),
+  Falling_Speed(0.0), Accseleration_Step(0.3), Deformation_Ratio(0.0)
 {
-	int i, j;
+	const int scale = AsConfig::Global_Scale;
+	//int i, j;
+
 	Empty_Region = CreateRectRgn(0, 0, 0, 0);
 
 	Brick_Regions = new HRGN[Width * Height];
 	memset(Brick_Regions, 0, sizeof(HRGN) * Width * Height); // сбросили массив в 0
 
-	Ad_Rect.left = (AsConfig::Level_X_Offset + Level_X * AsConfig::Cell_Width) * AsConfig::Global_Scale;
-	Ad_Rect.top = (AsConfig::Level_Y_Offset + Level_Y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
-	Ad_Rect.right = Ad_Rect.left + ( (Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width) * AsConfig::Global_Scale;
-	Ad_Rect.bottom = Ad_Rect.top + ( (Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height) * AsConfig::Global_Scale;
+	Ad_Rect.left = (AsConfig::Level_X_Offset + Level_X * AsConfig::Cell_Width) * scale;
+	Ad_Rect.top = (AsConfig::Level_Y_Offset + Level_Y * AsConfig::Cell_Height) * scale;
+	Ad_Rect.right = Ad_Rect.left + ( (Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width) * scale;
+	Ad_Rect.bottom = Ad_Rect.top + ( (Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height) * scale;
 
-	for (i = 0; i < Height; i++)
+	Ball_X = Ad_Rect.left + 9 * scale + Ball_Width / 2 + 1;
+	Ball_Y = Ad_Rect.top + 2 * scale + Ball_Height / 2;
+
+	/*for (i = 0; i < Height; i++)
 		for (j = 0; j < Width; j++)
-			Show_Under_Brick(Level_X + j, Level_Y + i);
+			Show_Under_Brick(Level_X + j, Level_Y + i);*/
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Act()
@@ -571,6 +579,7 @@ void AAdvertisement::Act()
 
 	RECT rect{};
 
+	// Заказ перерисовки области открытой части рекламы
 	for (i = 0; i < Height; i++) // y
 		for (j = 0; j < Width; j++) // x
 			if (Brick_Regions[i * Width + j] != 0) // строка * ширину + смещение внутри этой строки
@@ -582,14 +591,30 @@ void AAdvertisement::Act()
 
 				InvalidateRect(AsConfig::Hwnd, &rect, FALSE);
 			}
+
+	// Смещаем шарик
+	Falling_Speed += Accseleration_Step;
+	Ball_Y_Offset = High_Ball_Threshold - (int)(Falling_Speed * Falling_Speed);
+
+	if (Ball_Y_Offset <= Low_Ball_Threshold + Deformation_Height)
+		Deformation_Ratio = (double)(Ball_Y_Offset - Low_Ball_Threshold) / (double)Deformation_Height;
+	else
+		Deformation_Ratio = 1.0;
+
+
+	if (Ball_Y_Offset > High_Ball_Threshold or Ball_Y_Offset < Low_Ball_Threshold)
+		Accseleration_Step = -Accseleration_Step;
+
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 {
 	int i, j;
 	int x, y;
+	int deformation;
+	int ball_width, ball_hight;
+	int shadow_width, shadow_hight;
 	const int scale = AsConfig::Global_Scale;
-	int circle_size = 12 * scale;
 	RECT inresection_rect{};
 	HRGN region;
 	POINT table_points[4] = 
@@ -613,8 +638,8 @@ void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 				ExtSelectClipRgn(hdc, region, RGN_OR); // выбираем регион
 		}
 
-	// 6. Рамка
-	// 6.1 Тонкая пунктирная рамка скругленная по краям
+	// 0. Рамка
+	// 0.1 Тонкая пунктирная рамка скругленная по краям
 	AsConfig::BG_Color.Select(hdc);
 	AsConfig::Blue_Color.Select_Pen(hdc);
 	AsConfig::Round_Rect(hdc, Ad_Rect);
@@ -626,12 +651,20 @@ void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 
 	// 2. Тень под шариком
 	// 2.1 Эллипс размер 8х6, пока шарик над столом
+	deformation = (int)( (1 - Deformation_Ratio) * (double)scale * 2.0 );
+
+	shadow_width = Ball_Width - 4 * scale;
+	shadow_hight = 4 * scale;
+
+	ball_width = shadow_width + deformation;
+	ball_hight = shadow_hight - deformation;
+
+	x = Ball_X - ball_width / 2;
+	y = Ball_Y - ball_hight / 2 + Ball_Y_Offset / 6 + 9 * scale;
+
 	AsConfig::Blue_Color.Select(hdc);
-	Ellipse(hdc, Ad_Rect.left + 11 * scale + 1, Ad_Rect.top + 14 * scale, Ad_Rect.left + 20 * scale - 1, Ad_Rect.top + 18 * scale - 1);
-
-	// 2.2 Уезжает вниз, когда шарик в верхней точке
-	// 2.3 Увеличивается, когда шарик плющится
-
+	Ellipse(hdc, x, y, x + ball_width, y + ball_hight);
+	
 
 	// Каемки стола
 	// 3.1 Синяя кайма толщиной в 1 пиксел
@@ -650,16 +683,20 @@ void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 
 	// 4. Шарик
 	// 4.1 Эллипс 12х12
-	AsConfig::Red_Color.Select(hdc);
 
-	x = Ad_Rect.left + 9 * scale + 1;
-	y = Ad_Rect.top + 2 * scale;
-	Ellipse(hdc, x, y, x + circle_size, y + circle_size);
+	ball_width = Ball_Width + deformation;
+	ball_hight = Ball_Height - deformation;
+
+	x = Ball_X - ball_width / 2;
+	y = Ball_Y - ball_hight / 2 - Ball_Y_Offset;
+
+	AsConfig::Red_Color.Select(hdc);
+	Ellipse(hdc, x, y, x + ball_width, y + ball_hight);
 
 	// 5.2 Блик сверху
 	AsConfig::Letter_Color.Select(hdc);
 	Arc(hdc, x + scale, y + scale, 
-			 x + circle_size - scale, y + circle_size - scale,
+			 x + Ball_Width - scale, y + Ball_Height - scale,
 			 x + 4 * scale, y + scale, 
 			 x + scale, y + 4 * scale);
 
@@ -680,7 +717,7 @@ bool AAdvertisement::Is_Finished()
 void AAdvertisement::Show_Under_Brick(int level_x, int level_y)
 {
 	int x, y;
-	RECT rect;
+	RECT rect{};
 
 	x = level_x - Level_X;
 	y = level_y - Level_Y;
@@ -761,13 +798,13 @@ void AActive_Brick_Ad::Draw_In_Level(HDC hdc, RECT &brick_rect)
 
 	// Стираем предыдущее изображение
 	AsConfig::BG_Color.Select(hdc);
-	Rectangle(hdc, x, y, brick_rect.right + scale, brick_rect.bottom + scale);
+	Rectangle(hdc, x, y, brick_rect.right + scale - 1, brick_rect.bottom + scale - 1);
 
 	// Рисуем шарики
 	for (i = 0; i < 2; i++)
 	{
 		AsConfig::Red_Color.Select(hdc);
-		Ellipse(hdc, x,y, x + 7 * scale, brick_rect.bottom);
+		Ellipse(hdc, x,y, x + 7 * scale - 1, brick_rect.bottom - 1);
 
 		// Рисуем блик на шарике
 		AsConfig::White_Color.Select(hdc);

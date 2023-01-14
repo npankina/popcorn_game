@@ -168,9 +168,20 @@ public:
 
 private:
 	int Level_X, Level_Y, Width, Height;
+	int Ball_X, Ball_Y;
+	int Ball_Y_Offset;
 	RECT Ad_Rect;
 	HRGN Empty_Region;
 	HRGN *Brick_Regions;
+	int Ball_Width, Ball_Height;
+	double Falling_Speed, Accseleration_Step;
+	double Deformation_Ratio;
+
+
+	static const int Ball_Size = 12;
+	static const int High_Ball_Threshold = 10 * AsConfig::Global_Scale;
+	static const int Low_Ball_Threshold = -3 * AsConfig::Global_Scale;
+	static const int Deformation_Height = 2 * AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------
 class AActive_Brick_Ad : public AActive_Brick
