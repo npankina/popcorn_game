@@ -5,6 +5,8 @@
 //------------------------------------------------------------------------------------------------------------
 enum EBall_State
 {
+	EBS_Disabled, // мяч отключен: не рисуется, не перемещается, никак не действует
+
 	EBS_Normal,
 	EBS_Lost,
 	EBS_On_Platform,
@@ -40,7 +42,7 @@ public:
 	void Set_For_Test();
 	bool Is_Test_Finished();
 	EBall_State Get_State();
-	void Set_State(EBall_State new_state, double x_pos, double y_pos = Start_Ball_Y_Pos);
+	void Set_State(EBall_State new_state, double x_pos = 0, double y_pos = 0);
 	double Get_Direction();
 	void Set_Direction(double new_direction);
 	void Get_Center(double &x_pos, double &y_pos);
@@ -52,6 +54,7 @@ public:
 	static void Add_Hit_Checker(AHit_Checker *hit_checker);
 
 	static const double Radius;
+
 	double Ball_Speed;
 
 private:
@@ -72,7 +75,6 @@ private:
 
 	RECT Ball_Rect, Prev_Ball_Rect, Parashute_Rect, Prev_Parashute_Rect;
 
-	static const double Start_Ball_Y_Pos;
 	static const int Parashute_Size = 15;
 	static int Hit_Checkers_Count;
 	static AHit_Checker *Hit_Checkers[3];

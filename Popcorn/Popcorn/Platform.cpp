@@ -56,7 +56,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 
 _on_hit:
 	if (ball->Get_State() == EBS_On_Parashute)
-		ball->Set_State(EBS_Off_Parashute, 0, 0);
+		ball->Set_State(EBS_Off_Parashute);
 
 	return true;
 }

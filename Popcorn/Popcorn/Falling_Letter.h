@@ -14,7 +14,7 @@ enum ELetter_Type
 	ELT_K, // "Клей"
 	ELT_W, // "Шире"
 	ELT_P, // "Пол"
-	ELT_L, // Лазер""
+	ELT_L, // "Лазер"
 	ELT_T, // "Три"
 	ELT_Plus, // "Переход на след. уровень"
 

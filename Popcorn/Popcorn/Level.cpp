@@ -27,12 +27,11 @@ char AsLevel::Level_02[AsConfig::Level_Height][AsConfig::Level_Width] =
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3,
-	0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0,
-	1, 1, 1, 1, 1, 1, 1, 3, 0, 10, 10, 0,
-	2, 2, 2, 2, 2, 2, 2, 3, 0, 10, 10, 0,
-	2, 2, 2, 2, 2, 2, 2, 3, 0, 10, 10, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -65,11 +64,13 @@ char AsLevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 //------------------------------------------------------------------------------------------------------------
 AsLevel::~AsLevel()
 {
+	Cancel_All_Activity();
+
 	delete[] Teleport_Bricks_Position;
 }
 //------------------------------------------------------------------------------------------------------------
 AsLevel::AsLevel()
-: Level_Rect{}, Active_Bricks_Counter(0), Falling_Letters_Counter(0), Teleport_Bricks_Counter(0), 
+: Level_Rect{}, Need_To_Cancel_All(false), Active_Bricks_Counter(0), Falling_Letters_Counter(0), Teleport_Bricks_Counter(0), 
   Teleport_Bricks_Position(0), Advertisement(0)
 {}
 //------------------------------------------------------------------------------------------------------------
@@ -248,6 +249,13 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 	if (Advertisement != 0)
 		Advertisement->Clear(hdc, paint_area);
 
+	if (Need_To_Cancel_All)
+	{
+		Cancel_All_Activity();
+		Need_To_Cancel_All = false;
+	}
+
+
 	if (Advertisement != 0)
 		Advertisement->Draw(hdc, paint_area);
 
@@ -293,6 +301,11 @@ bool AsLevel::Get_Next_Falling_letter(int &index, AFalling_Letter **falling_lett
 		}
 	}
 	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsLevel::Stop()
+{// выполнить отложенную остановку действия
+	Need_To_Cancel_All = true;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
@@ -500,8 +513,9 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 			letter_x = (brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset) * AsConfig::Global_Scale;
 			letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
 
-			//letter_type = (ELetter_Type)AsConfig::Rand(ELT_Max - 1);
-			letter_type = AFalling_Letter::Get_Random_Letter_Type();
+			//letter_type = AFalling_Letter::Get_Random_Letter_Type();
+			letter_type = ELT_T;
+
 
 			falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);
 			Falling_Letters[i] = falling_letter;
@@ -737,5 +751,27 @@ void AsLevel::Add_New_Active_Brick(AActive_Brick *active_brick)
 			break;
 		}
 	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsLevel::Cancel_All_Activity()
+{
+	Delete_Objects((AGraphics_Object**)&Active_Bricks, Active_Bricks_Counter, AsConfig::Max_Active_Bricks_Count);
+	Delete_Objects((AGraphics_Object**)&Falling_Letters, Falling_Letters_Counter, AsConfig::Max_Falling_Letters_Count);
+}
+//------------------------------------------------------------------------------------------------------------
+void  AsLevel::Delete_Objects(AGraphics_Object **objects_array, int &objects_count, int objects_max_count)
+{
+	int i;
+
+	for (i = 0; i < objects_max_count; i++)
+	{
+		if (objects_array[i] != 0)
+		{
+			delete objects_array[i];
+			objects_array[i] = 0;
+		}
+	}
+
+	objects_count = 0;
 }
 //------------------------------------------------------------------------------------------------------------

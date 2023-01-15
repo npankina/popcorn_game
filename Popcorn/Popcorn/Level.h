@@ -21,6 +21,7 @@ public:
 	void Act();
 	void Draw(HDC hdc, RECT &paint_area);
 	bool Get_Next_Falling_letter(int &index, AFalling_Letter **falling_letter);
+	void Stop();
 
 
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
@@ -43,8 +44,13 @@ private:
 	AActive_Brick_Teleport *Select_Destination_Teleport(int source_x, int source_y);
 	void Add_New_Active_Brick(AActive_Brick *active_brick);
 	void Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall *ball, bool vertical_hit);
+	void Cancel_All_Activity();
+	void Delete_Objects(AGraphics_Object **objects_array, int &objects_count, int objects_max_count);
+
 
 	RECT Level_Rect;
+
+	bool Need_To_Cancel_All;
 
 	double Current_Brick_Left_X, Current_Brick_Right_X;
 	double Current_Brick_Top_Y, Current_Brick_Low_Y;

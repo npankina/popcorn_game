@@ -42,6 +42,8 @@ public:
 	static HWND Hwnd;
 
 	static const double Moving_Step_Size;
+	static const double Start_Ball_Y_Pos;
+
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;
 	static const int Border_Y_Offset = 4;
@@ -59,6 +61,7 @@ public:
 	static const int Brick_Height = 7;
 	static const int Max_Active_Bricks_Count = 10;
 	static const int Max_Falling_Letters_Count = 10;
-	static const int Hits_Per_Letter = 3; // Вероятность выбить букву из кирпича = 1.0 / Hits_Per_Letter
+	static const int Hits_Per_Letter = 1; // Вероятность выбить букву из кирпича = 1.0 / Hits_Per_Letter
+	static const int Max_Balls_Count = 10;
 };
 //------------------------------------------------------------------------------------------------------------

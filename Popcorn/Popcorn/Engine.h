@@ -38,20 +38,22 @@ public:
 	void Draw_Frame(HDC hdc, RECT &paint_area);
 	int On_Key_Down(EKey_Type key_type);
 	int On_Timer();
-	void Act();
 
 	static const int Timer_ID = WM_USER + 1;
 
 private:
+	void Act();
+	void Restart_Level();
+	void Play_Level();
 	void On_Falling_letter(AFalling_Letter *falling_letter);
 
 	EGame_State Game_State;
 
-	ABall Ball;
 	AsLevel Level;
 	AsPlatform Platform;
 	AsBorder Border;
 
 	AsInfo_Panel Info_Panel;
+	ABall Balls[AsConfig::Max_Balls_Count];
 };
 //------------------------------------------------------------------------------------------------------------
