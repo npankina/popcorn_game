@@ -344,7 +344,7 @@ void ABall::Set_On_Parashute(int x, int y)
 
 	Prev_Parashute_Rect = Parashute_Rect;
 
-	Center_X_Pos = (double)(cell_x + AsConfig::Cell_Width / 2) - 1.0 / (double)AsConfig::Global_Scale;
+	Center_X_Pos = (double)(cell_x + AsConfig::Cell_Width / 2) - 1.0 / AsConfig::D_Global_Scale;
 	Center_Y_Pos = (double)(cell_y + Parashute_Size) - ABall::Radius * 2.0;
 
 	Redraw_Ball();

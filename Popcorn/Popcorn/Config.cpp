@@ -77,7 +77,8 @@ const AColor AsConfig::Advertising_Blue_Table_Color(100, 206, 206, Global_Scale)
 
 HWND AsConfig::Hwnd;
 
-const double AsConfig::Moving_Step_Size = 1.0 / AsConfig::Global_Scale;
+const double AsConfig::D_Global_Scale = (double)Global_Scale;
+const double AsConfig::Moving_Step_Size = 1.0 / Global_Scale;
 const double AsConfig::Start_Ball_Y_Pos = 184.0;
 
 //------------------------------------------------------------------------------------------------------------

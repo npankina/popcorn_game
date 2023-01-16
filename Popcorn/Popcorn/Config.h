@@ -41,6 +41,7 @@ public:
 
 	static HWND Hwnd;
 
+	static const double D_Global_Scale;
 	static const double Moving_Step_Size;
 	static const double Start_Ball_Y_Pos;
 

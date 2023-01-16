@@ -59,7 +59,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-	WNDCLASSEXW wcex;
+	WNDCLASSEXW wcex{};
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
@@ -92,7 +92,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // Store instance handle in our global variable
 
-	RECT window_rect;
+	RECT window_rect{};
 	window_rect.left = 0;
 	window_rect.top = 0;
 	window_rect.right = 320 * 3;
@@ -168,13 +168,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case VK_LEFT:
-			return Engine.On_Key_Down(EKT_Left);
+			return Engine.On_Key(EKT_Left, true);
 
 		case VK_RIGHT:
-			return Engine.On_Key_Down(EKT_Right);
+			return Engine.On_Key(EKT_Right, true);
 
 		case VK_SPACE:
-			return Engine.On_Key_Down(EKT_Space);
+			return Engine.On_Key(EKT_Space, true);
+		}
+		break;
+
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case VK_LEFT:
+			return Engine.On_Key(EKT_Left, false);
+
+		case VK_RIGHT:
+			return Engine.On_Key(EKT_Right, false);
+
+		case VK_SPACE:
+			return Engine.On_Key(EKT_Space, false);
 		}
 		break;
 

@@ -13,6 +13,13 @@ enum EPlatform_State
 	EPS_Expand_Roll_In
 };
 //------------------------------------------------------------------------------------------------------------
+enum EPlatform_Moving_State
+{
+	EPMS_Stop,
+	EPMS_Moving_Left,
+	EPMS_Moving_Right
+};
+//------------------------------------------------------------------------------------------------------------
 class AsPlatform: public AHit_Checker
 {
 public:
@@ -26,12 +33,14 @@ public:
 	void Set_State(EPlatform_State new_state);
 	void Redraw_Platform();
 	void Draw(HDC hdc, RECT &paint_area);
-	void Move(bool to_left);
+	void Move(bool to_left, bool is_key_down);
 	bool Hit_By(AFalling_Letter *falling_letter);
+	void Advance(double max_speed);
+	double Get_Middle_Pos();
+	void Get_Normal_Platform_Image(HDC hdc);
 
-	int X_Pos;
 	int Width;
-	int X_Step;
+	double Speed; // количество пикселов на которые смещается платформа за кадр
 
 private:
 	void Clear_BG(HDC hdc);
@@ -44,6 +53,10 @@ private:
 	bool Get_Platform_Image_Stroke_Color(int x, int y, const AColor **color, int &stroke_len);
 
 	EPlatform_State Platform_State;
+	EPlatform_Moving_State Platform_Moving_State;
+
+	double X_Pos;
+
 	int Inner_Width;
 	int Rolling_Step;
 	
@@ -59,6 +72,7 @@ private:
 
 	static const int Height = 7;
 	static const int Circle_Size = 7;
+	static const int X_Step = AsConfig::Global_Scale * 2;
 	static const int Normal_Platform_Inner_Width = Normal_Width - Circle_Size;
 	static const int Meltdown_Speed = 3;
 	static const int Max_Rolling_Step = 16;
