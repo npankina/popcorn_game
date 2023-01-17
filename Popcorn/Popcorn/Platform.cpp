@@ -1,6 +1,5 @@
 ﻿#include "Platform.h"
 
-
 // AsPlatform
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::~AsPlatform()
@@ -9,8 +8,8 @@ AsPlatform::~AsPlatform()
 }
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-: X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Moving_State(EPMS_Stop), Speed(0.0), 
-  Inner_Width(Normal_Platform_Inner_Width),Rolling_Step(0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0), 
+: X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Moving_State(EPMS_Stop), 
+  Inner_Width(Normal_Platform_Inner_Width),Rolling_Step(0), Speed(0.0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0), 
   Normal_Platform_Image(0), Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Color(255, 255, 255),
   Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255)
 {}
@@ -57,6 +56,34 @@ _on_hit:
 		ball->Set_State(EBS_Off_Parashute);
 
 	return true;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Advance(double max_speed) // смещение платформы по нажатию клавиш
+{
+	double max_platform_x = AsConfig::Max_X_Pos - Width + 1;
+	double next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
+
+	X_Pos += next_step;
+
+	if (X_Pos <= AsConfig::Border_X_Offset)
+		X_Pos = AsConfig::Border_X_Offset;
+
+	if (X_Pos >= max_platform_x)
+		X_Pos = max_platform_x;
+
+}
+//------------------------------------------------------------------------------------------------------------
+double AsPlatform::Get_Speed()
+{
+	return Speed;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Begin_Movement()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Finish_Movement()
+{
+	Redraw_Platform();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Act()
@@ -203,19 +230,6 @@ bool AsPlatform::Hit_By(AFalling_Letter *falling_letter)
 		return true;
 	else
 		return false;
-}
-//------------------------------------------------------------------------------------------------------------
-void AsPlatform::Advance(double max_speed) // смещение платформы по нажатию клавиш
-{
-	double max_platform_x = AsConfig::Max_X_Pos - Width + 1;
-	X_Pos += Speed / max_speed * AsConfig::Moving_Step_Size;
-
-	if (X_Pos <= AsConfig::Border_X_Offset)
-		X_Pos = AsConfig::Border_X_Offset;
-
-	if (X_Pos >= max_platform_x)
-		X_Pos = max_platform_x;
-
 }
 //------------------------------------------------------------------------------------------------------------
 double AsPlatform::Get_Middle_Pos()
@@ -445,7 +459,8 @@ bool AsPlatform::Reflect_On_Circle(double next_x_pos, double next_y_pos, double 
 	distance = sqrt(dx * dx + dy * dy);
 	two_radiuses = platform_ball_radius + ball->Radius;
 
-	if (fabs(distance - two_radiuses) < AsConfig::Moving_Step_Size)
+	//if (fabs(distance - two_radiuses) < AsConfig::Moving_Step_Size)
+	if (distance + AsConfig::Moving_Step_Size < two_radiuses)
 	{// Мячик коснулся бокового шарика
 
 		beta = atan2(-dy, dx);

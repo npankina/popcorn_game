@@ -31,14 +31,30 @@ public:
 	bool Hit_Circle_On_Line(double y, double next_x_pos, double left_x, double right_x, double radius, double &x);
 };
 //------------------------------------------------------------------------------------------------------------
-class ABall
+class AMover
+{
+public:
+	virtual ~AMover();
+
+	virtual void Begin_Movement() = 0;
+	virtual void Finish_Movement() = 0;
+	virtual void Advance(double max_speed) = 0;
+	virtual double Get_Speed() = 0;
+
+};
+//------------------------------------------------------------------------------------------------------------
+class ABall : public AMover
 {
 public:
 	ABall();
 
+	virtual void Begin_Movement();
+	virtual void Finish_Movement();
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+
 	void Draw(HDC hdc, RECT &paint_area);
 	void Draw_Teleporting(HDC hdc, int step);
-	void Move();
 	void Set_For_Test();
 	bool Is_Test_Finished();
 	EBall_State Get_State();
@@ -55,8 +71,6 @@ public:
 
 	static const double Radius;
 
-	double Ball_Speed;
-
 private:
 	void Redraw_Ball();
 	void Draw_Parashute(HDC hdc, RECT &paint_area);
@@ -64,16 +78,16 @@ private:
 	void Clear_Parashute(HDC hdc);
 
 	EBall_State Ball_State, Prev_Ball_State;
-	double Rest_Distance;
+	RECT Ball_Rect, Prev_Ball_Rect, Parashute_Rect, Prev_Parashute_Rect;
+
+	//double Rest_Distance;
 	double Ball_Direction;
+	double Ball_Speed;
+	double Rest_Test_Distance;
+	double Center_X_Pos, Center_Y_Pos;
 
 	bool Testing_Is_Active;
 	int Test_Iteration;
-	double Rest_Test_Distance;
-
-	double Center_X_Pos, Center_Y_Pos;
-
-	RECT Ball_Rect, Prev_Ball_Rect, Parashute_Rect, Prev_Parashute_Rect;
 
 	static const int Parashute_Size = 15;
 	static int Hit_Checkers_Count;

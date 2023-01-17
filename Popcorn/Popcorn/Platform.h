@@ -20,13 +20,17 @@ enum EPlatform_Moving_State
 	EPMS_Moving_Right
 };
 //------------------------------------------------------------------------------------------------------------
-class AsPlatform: public AHit_Checker
+class AsPlatform: public AHit_Checker, public AMover
 {
 public:
 	~AsPlatform();
 	AsPlatform();
 
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+	virtual void Begin_Movement();
+	virtual void Finish_Movement();
 
 	void Act();
 	EPlatform_State Get_State();
@@ -35,12 +39,10 @@ public:
 	void Draw(HDC hdc, RECT &paint_area);
 	void Move(bool to_left, bool is_key_down);
 	bool Hit_By(AFalling_Letter *falling_letter);
-	void Advance(double max_speed);
 	double Get_Middle_Pos();
 	void Get_Normal_Platform_Image(HDC hdc);
 
 	int Width;
-	double Speed; // количество пикселов на которые смещается платформа за кадр
 
 private:
 	void Clear_BG(HDC hdc);
@@ -59,6 +61,8 @@ private:
 
 	int Inner_Width;
 	int Rolling_Step;
+	double Speed; // количество пикселов на которые смещается платформа за кадр
+
 	
 	int Normal_Platform_Image_Width, Normal_Platform_Image_Height;
 	int *Normal_Platform_Image; // указатель на массив
@@ -72,7 +76,7 @@ private:
 
 	static const int Height = 7;
 	static const int Circle_Size = 7;
-	static const int X_Step = AsConfig::Global_Scale * 2;
+	static const int X_Step = 6;
 	static const int Normal_Platform_Inner_Width = Normal_Width - Circle_Size;
 	static const int Meltdown_Speed = 3;
 	static const int Max_Rolling_Step = 16;

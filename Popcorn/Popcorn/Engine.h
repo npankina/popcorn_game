@@ -23,10 +23,23 @@ enum EGame_State
 	EGS_Restart_Level
 };
 //------------------------------------------------------------------------------------------------------------
-class AsInfo_Panel
+class AsBall_Set: public AMover
 {
 public:
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+	virtual void Begin_Movement();
+	virtual void Finish_Movement();
 
+	void Draw(HDC hdc, RECT &paint_area);
+	void Release_From_Platform(double platform_x_pos);
+	void Set_On_Platform(double platform_x_pos);
+	bool All_Balls_Are_Lost();
+	void Set_For_Test();
+	bool Is_Test_Finished();
+
+private:
+	ABall Balls[AsConfig::Max_Balls_Count];
 };
 //------------------------------------------------------------------------------------------------------------
 class AsEngine
@@ -43,17 +56,18 @@ public:
 
 private:
 	void Act();
-	void Restart_Level();
 	void Play_Level();
+	void Advance_Mover();
 	void On_Falling_letter(AFalling_Letter *falling_letter);
 
 	EGame_State Game_State;
+	double Rest_Distanse;
 
 	AsLevel Level;
 	AsPlatform Platform;
 	AsBorder Border;
-
-	AsInfo_Panel Info_Panel;
-	ABall Balls[AsConfig::Max_Balls_Count];
+	AsBall_Set Ball_Set;
+	
+	AMover *Movers[AsConfig::Max_Movres_Count];
 };
 //------------------------------------------------------------------------------------------------------------
