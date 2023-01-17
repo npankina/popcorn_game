@@ -68,7 +68,7 @@ void AsBall_Set::Set_On_Platform(double platform_x_pos)
 {
 	int i;
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < 5; i++)	
 		Balls[i].Set_State(EBS_On_Platform, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
 
 	for (; i < AsConfig::Max_Balls_Count; i++)	
@@ -112,6 +112,88 @@ void AsBall_Set::Set_For_Test()
 bool AsBall_Set::Is_Test_Finished()
 {
 	return Balls[0].Is_Test_Finished(); // В повторяющихся тестах участвует только 0-й мячик
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBall_Set::Tripple_Balls()
+{ // "Растроить" самый дальний мячик
+
+	int i;
+	double current_ball_x, current_ball_y;
+	double further_ball_x, further_ball_y;
+	ABall *further_ball = 0;
+	ABall *current_ball = 0;
+	ABall *left_ball = 0, *right_ball = 0;
+
+	// 1. Выбираем самый дальний по Y мячик
+	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+	{
+		if (Balls[i].Get_State() != EBS_Normal)
+			continue;
+
+		current_ball = &Balls[i];
+
+		if (further_ball == 0)
+			further_ball = current_ball;
+		else
+		{
+			current_ball->Get_Center(current_ball_x, current_ball_y);
+			further_ball->Get_Center(further_ball_x, further_ball_y);
+			if (current_ball_y < further_ball_y)
+				further_ball = current_ball;
+		}
+	}
+
+	// 2. Если есть мячик в нормальном состоянии, растроить его
+	if (further_ball == 0)
+		return;
+
+	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+	{
+		current_ball = &Balls[i];
+
+		switch (current_ball->Get_State() )
+		{
+		case EBS_Disabled:
+		case EBS_Lost:
+			if (left_ball == 0)
+				left_ball = current_ball;
+			else
+			{
+				if (right_ball == 0)
+				{
+					right_ball = current_ball;
+					break; // Оба мяча найдены
+				}
+			}
+		}
+	}
+
+	// 3. Разводим боковые мячи в стороны
+	if (left_ball != 0)
+	{
+		*left_ball = *further_ball;
+		left_ball->Set_Direction(left_ball->Get_Direction() + M_PI / 8.0);
+	}
+
+	if (right_ball != 0)
+	{
+		*right_ball = *further_ball;
+		right_ball->Set_Direction(right_ball->Get_Direction() - M_PI / 8.0);
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBall_Set::Inverse()
+{
+	int i;
+	ABall *current_ball = 0;
+
+	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+	{
+		current_ball = &Balls[i];
+
+		if (current_ball->Get_State() == EBS_Normal)
+			current_ball->Set_Direction( current_ball->Get_Direction() + M_PI );
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -262,7 +344,7 @@ void AsEngine::Act()
 void AsEngine::Play_Level()
 {
 
-	Advance_Mover();
+	Advance_Movers();
 	if (Ball_Set.All_Balls_Are_Lost() )
 	{
 		Game_State = EGS_Lost_Ball;
@@ -275,7 +357,7 @@ void AsEngine::Play_Level()
 
 }
 //------------------------------------------------------------------------------------------------------------
-void AsEngine::Advance_Mover()
+void AsEngine::Advance_Movers()
 {
 	int i;
 	double max_speed = 0.0;
@@ -321,8 +403,9 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 	//case ELT_O: // "Отмена"
 		//break;
 
-	//case ELT_I: // "Инверсия"
-		//break;
+	case ELT_I: // "Инверсия"
+		Ball_Set.Inverse();
+		break;
 
 	//case ELT_C: // "Скорость"
 		//break;
@@ -346,6 +429,7 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 		//break;
 
 	case ELT_T: // "Три"
+		Ball_Set.Tripple_Balls();
 		break;
 
 	//case ELT_Plus: // "Переход на след. уровень"

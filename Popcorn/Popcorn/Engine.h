@@ -37,6 +37,8 @@ public:
 	bool All_Balls_Are_Lost();
 	void Set_For_Test();
 	bool Is_Test_Finished();
+	void Tripple_Balls();
+	void Inverse();
 
 private:
 	ABall Balls[AsConfig::Max_Balls_Count];
@@ -57,7 +59,7 @@ public:
 private:
 	void Act();
 	void Play_Level();
-	void Advance_Mover();
+	void Advance_Movers();
 	void On_Falling_letter(AFalling_Letter *falling_letter);
 
 	EGame_State Game_State;
