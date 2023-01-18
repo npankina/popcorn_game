@@ -59,6 +59,7 @@ public:
 	bool Is_Test_Finished();
 	EBall_State Get_State();
 	void Set_State(EBall_State new_state, double x_pos = 0, double y_pos = 0);
+	void Set_Speed(double new_speed);
 	double Get_Direction();
 	void Set_Direction(double new_direction);
 	void Get_Center(double &x_pos, double &y_pos);

@@ -44,6 +44,9 @@ public:
 	static const double D_Global_Scale;
 	static const double Moving_Step_Size;
 	static const double Start_Ball_Y_Pos;
+	static const double Ball_Acseleration;
+	static const double Normal_Ball_Speed;
+
 
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;
@@ -65,5 +68,7 @@ public:
 	static const int Hits_Per_Letter = 1; // Вероятность выбить букву из кирпича = 1.0 / Hits_Per_Letter
 	static const int Max_Balls_Count = 10;
 	static const int Max_Movres_Count = 12;
+	static const int Initial_Life_Count = 5;
+	static const int Max_Life_Count = 12;
 };
 //------------------------------------------------------------------------------------------------------------

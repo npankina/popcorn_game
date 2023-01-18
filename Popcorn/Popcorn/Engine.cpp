@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
 : Game_State(EGS_Lost_Ball), // EGS_Test_Ball EGS_Play_Level , EGS_Play_Level
-  Rest_Distanse(0.0)
+  Rest_Distanse(0.0), Life_Counter(AsConfig::Initial_Life_Count)
 {
 	memset(Movers, 0, sizeof(Movers) );
 }
@@ -149,8 +149,10 @@ void AsEngine::Play_Level()
 	{
 		Game_State = EGS_Lost_Ball;
 		Level.Stop();
-		Platform.Set_State(EPS_Meltdown);
+		Platform.Set_State(EPS_Pre_Meltdown);
 	}
+	else
+		Ball_Set.Accelerate();
 
 	if (Ball_Set.Is_Test_Finished() )
 			Game_State = EGS_Test_Ball;
@@ -207,14 +209,18 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 		Ball_Set.Inverse();
 		break;
 
-	//case ELT_C: // "Скорость"
-		//break;
+	case ELT_C: // "Скорость"
+		Ball_Set.Reset_Speed();
+		break;
 
 	//case ELT_M: // "Монстры"
 		//break;
 
-	//case ELT_G: // "Жизнь"
-		//break;
+	case ELT_G: // "Жизнь"
+		if (Life_Counter < AsConfig::Max_Life_Count)
+			++Life_Counter; // !!! отобразить на индикаторе
+
+		break;
 
 	//case ELT_K: // "Клей"
 		//break;

@@ -8,6 +8,7 @@ enum EPlatform_State
 	EPS_Missing,
 	EPS_Ready,
 	EPS_Normal,
+	EPS_Pre_Meltdown,
 	EPS_Meltdown,
 	EPS_Roll_In,
 	EPS_Expand_Roll_In
