@@ -68,10 +68,10 @@ void AsBall_Set::Set_On_Platform(double platform_x_pos)
 {
 	int i;
 
-	for (i = 0; i < 5; i++)	
-		Balls[i].Set_State(EBS_On_Platform, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
+	//for (i = 0; i < 5; i++)	
+	Balls[0].Set_State(EBS_On_Platform, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
 
-	for (; i < AsConfig::Max_Balls_Count; i++)	
+	for (i = 1; i < AsConfig::Max_Balls_Count; i++)	
 		Balls[i].Set_State(EBS_Disabled);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -205,7 +205,7 @@ void AsBall_Set::Accelerate()
 	{
 		current_ball = &Balls[i];
 
-		if (current_ball->Get_State() == EBS_Normal)
+		if (current_ball->Get_State() == EBS_Normal and current_ball->Get_Speed() <= 7.0)
 			current_ball->Set_Speed( current_ball->Get_Speed() * AsConfig::Ball_Acseleration);
 	}
 }

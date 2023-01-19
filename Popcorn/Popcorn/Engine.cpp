@@ -230,7 +230,7 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 
 	case ELT_P: // "Пол"
 		AsConfig::Level_Has_Floor = true;
-		Border.Draw_Floor();
+		Border.Redraw_Floor();
 		// !!! отобразить пол на индикаторе
 		break;
 

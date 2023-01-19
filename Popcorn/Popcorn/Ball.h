@@ -81,7 +81,6 @@ private:
 	EBall_State Ball_State, Prev_Ball_State;
 	RECT Ball_Rect, Prev_Ball_Rect, Parashute_Rect, Prev_Parashute_Rect;
 
-	//double Rest_Distance;
 	double Ball_Direction;
 	double Ball_Speed;
 	double Rest_Test_Distance;
