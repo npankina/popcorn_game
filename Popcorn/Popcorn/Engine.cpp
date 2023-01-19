@@ -228,8 +228,11 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 	//case ELT_W: // "Шире"
 		//break;
 
-	//case ELT_P: // "Пол"
-		//break;
+	case ELT_P: // "Пол"
+		AsConfig::Level_Has_Floor = true;
+		Border.Draw_Floor();
+		// !!! отобразить пол на индикаторе
+		break;
 
 	//case ELT_L: // "Лазер"
 		//break;

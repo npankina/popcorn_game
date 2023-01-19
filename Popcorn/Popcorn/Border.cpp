@@ -3,24 +3,50 @@
 // AsBorder
 //------------------------------------------------------------------------------------------------------------
 AsBorder::AsBorder()
-{}
+: Floor_Rect{}
+{
+	int scale = AsConfig::Global_Scale;
+	 
+	Floor_Rect.left = AsConfig::Level_X_Offset * scale;
+	Floor_Rect.top = (AsConfig::Max_Y_Pos - 1) * scale;
+	Floor_Rect.right = (AsConfig::Max_X_Pos - 1) * scale;
+	Floor_Rect.bottom = AsConfig::Max_Y_Pos * scale;
+}
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw(HDC hdc, RECT &paint_area)
 {// Отрисовка рамки уровня
 
 	int i;
+	RECT intersection_rect;
 
 	// 1. Линия слева
 	for (i = 0; i < 50; i++)
-		Draw_Element(hdc, 2, 1 + i * 4, false);
+		Draw_Element(hdc, paint_area, 2, 1 + i * 4, false);
 
 	// 2. Линия справа
 	for (i = 0; i < 50; i++)
-		Draw_Element(hdc, 201, 1 + i * 4, false);
+		Draw_Element(hdc, paint_area, AsConfig::Max_X_Pos + 1, 1 + i * 4, false);
 
 	// 3. Линия сверху
 	for (i = 0; i < 50; i++)
-		Draw_Element(hdc, 3 + i * 4, 0, true);
+		Draw_Element(hdc, paint_area, 3 + i * 4, 0, true);
+
+	if (AsConfig::Level_Has_Floor)
+	{
+		if ( IntersectRect(&intersection_rect, &paint_area, &Floor_Rect) )
+		{
+			//AsConfig::Unbreakable_Red_Highlight.Select(hdc);
+
+
+			MoveToEx(hdc, Floor_Rect.left, Floor_Rect.top, 0);
+			LineTo(hdc, Floor_Rect.right, Floor_Rect.top);
+		}
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBorder::Draw_Floor()
+{
+	InvalidateRect(AsConfig::Hwnd, &Floor_Rect, FALSE);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -63,32 +89,43 @@ bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	return got_hit;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border)
+void AsBorder::Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_border)
 {// Рисует элемент рамки уровня
+
+	RECT intersection_rect, rect;
+	int scale = AsConfig::Global_Scale;
+
+	rect.left = x * scale;
+	rect.top = y * scale;
+	rect.right = (x + 4) * scale - 1;
+	rect.bottom = (y + 4) * scale - 1;
+
+	if ( !IntersectRect(&intersection_rect, &paint_area, &Floor_Rect) )
+		return;
 
  // Вывод основной линии
 	AsConfig::Blue_Color.Select(hdc);
 
 	if (top_border)
-		Rectangle(hdc, x * AsConfig::Global_Scale, (y + 1) * AsConfig::Global_Scale, (x + 4) * AsConfig::Global_Scale - 1, (y + 4) * AsConfig::Global_Scale - 1);
+		Rectangle(hdc, x * scale, (y + 1) * scale, (x + 4) * scale - 1, (y + 4) * scale - 1);
 	else
-		Rectangle(hdc, (x + 1) * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + 4) * AsConfig::Global_Scale - 1, (y + 4) * AsConfig::Global_Scale - 1);
+		Rectangle(hdc, (x + 1) * scale, y * scale, (x + 4) * scale - 1, (y + 4) * scale - 1);
 
 
 	// Вывод белой линии
 	AsConfig::White_Color.Select(hdc);
 
 	if (top_border)
-		Rectangle(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + 4) * AsConfig::Global_Scale - 1, (y + 1) * AsConfig::Global_Scale - 1);
+		Rectangle(hdc, x * scale, y * scale, (x + 4) * scale - 1, (y + 1) * scale - 1);
 	else
-		Rectangle(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + 1) * AsConfig::Global_Scale - 1, (y + 4) * AsConfig::Global_Scale - 1);
+		Rectangle(hdc, x * scale, y * scale, (x + 1) * scale - 1, (y + 4) * scale - 1);
 
 	// Черная точка
 	AsConfig::BG_Color.Select(hdc);
 
 	if (top_border)
-		Rectangle(hdc, (x + 2) * AsConfig::Global_Scale, (y + 2) * AsConfig::Global_Scale, (x + 3) * AsConfig::Global_Scale - 1, (y + 3) * AsConfig::Global_Scale - 1);
-	else
-		Rectangle(hdc, (x + 2) * AsConfig::Global_Scale, (y + 1) * AsConfig::Global_Scale, (x + 3) * AsConfig::Global_Scale - 1, (y + 2) * AsConfig::Global_Scale - 1);
+		Rectangle(hdc, (x + 2) * scale, (y + 2) * scale, (x + 3) * scale - 1, (y + 3) * scale - 1);
+	else										  				   						
+		Rectangle(hdc, (x + 2) * scale, (y + 1) * scale, (x + 3) * scale - 1, (y + 2) * scale - 1);
 }
 //------------------------------------------------------------------------------------------------------------
