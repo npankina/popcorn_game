@@ -1,14 +1,5 @@
 ﻿#include "Active_Brick.h"
 
-// AGraphics_Object
-//------------------------------------------------------------------------------------------------------------
-AGraphics_Object::~AGraphics_Object()
-{}
-//------------------------------------------------------------------------------------------------------------
-
-
-
-
 // AActive_Brick
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick::Get_Level_Pos(int &dest_brick_x, int &dest_brick_y)
@@ -394,6 +385,8 @@ void AActive_Brick_Teleport::Act()
 	double ball_y = 0.0;
 	double direction;
 
+	//if (AsConfig::Current_Timer_Tick % 5 != 0)
+	//	return;
 
 	if (Animation_Step <= Max_Animation_Step)
 	{
@@ -566,9 +559,9 @@ AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
 	Ball_X = Ad_Rect.left + 9 * scale + Ball_Width / 2 + 1;
 	Ball_Y = Ad_Rect.top + 2 * scale + Ball_Height / 2;
 
-	/*for (i = 0; i < Height; i++)
-		for (j = 0; j < Width; j++)
-			Show_Under_Brick(Level_X + j, Level_Y + i);*/
+	//for (i = 0; i < Height; i++)
+	//	for (j = 0; j < Width; j++)
+	//		Show_Under_Brick(Level_X + j, Level_Y + i);
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Act()
@@ -576,7 +569,6 @@ void AAdvertisement::Act()
 	int i, j;
 	int cell_width = AsConfig::Cell_Width * AsConfig::Global_Scale;
 	int cell_height = AsConfig::Cell_Height * AsConfig::Global_Scale;
-
 	RECT rect{};
 
 	// Заказ перерисовки области открытой части рекламы
@@ -695,10 +687,10 @@ void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 
 	// 5.2 Блик сверху
 	AsConfig::Letter_Color.Select(hdc);
-	Arc(hdc, x + scale, y + scale, 
-			 x + Ball_Width - scale, y + Ball_Height - scale,
+	Arc(hdc, x + scale + 1, y + scale + 1, 
+			 x + ball_width - scale, y + ball_hight - scale,
 			 x + 4 * scale, y + scale, 
-			 x + scale, y + 4 * scale);
+			 x + scale, y + 3 * scale);
 
 	// 5.3 Летает сверху-вниз (по затухающей траектории)
 	// 5.4 Сплющивается внизу до 16х9

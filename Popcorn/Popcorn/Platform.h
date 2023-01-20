@@ -16,12 +16,13 @@ enum EPlatform_State
 //------------------------------------------------------------------------------------------------------------
 enum EPlatform_Moving_State
 {
+	EPMS_Stopping,
 	EPMS_Stop,
 	EPMS_Moving_Left,
 	EPMS_Moving_Right
 };
 //------------------------------------------------------------------------------------------------------------
-class AsPlatform: public AHit_Checker, public AMover
+class AsPlatform: public AHit_Checker, public AMover, public AGraphics_Object
 {
 public:
 	~AsPlatform();
@@ -33,11 +34,14 @@ public:
 	virtual void Begin_Movement();
 	virtual void Finish_Movement();
 
-	void Act();
+	virtual void Act();
+	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual void Clear(HDC hdc, RECT& paint_area);
+	virtual bool Is_Finished();
+
 	EPlatform_State Get_State();
 	void Set_State(EPlatform_State new_state);
 	void Redraw_Platform();
-	void Draw(HDC hdc, RECT &paint_area);
 	void Move(bool to_left, bool is_key_down);
 	bool Hit_By(AFalling_Letter *falling_letter);
 	double Get_Middle_Pos();
@@ -46,7 +50,6 @@ public:
 	int Width;
 
 private:
-	void Clear_BG(HDC hdc);
 	void Draw_Circle_Highlight(HDC hdc, int x, int y);
 	void Draw_Normal_State(HDC hdc, RECT &paint_area);
 	void Draw_Meltdown_State(HDC hdc, RECT &paint_area);
@@ -63,7 +66,7 @@ private:
 	int Inner_Width;
 	int Rolling_Step;
 	double Speed; // количество пикселов на которые смещается платформа за кадр
-
+	bool Left_Key_Down, Right_Key_Down;
 	
 	int Normal_Platform_Image_Width, Normal_Platform_Image_Height;
 	int *Normal_Platform_Image; // указатель на массив

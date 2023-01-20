@@ -165,6 +165,58 @@ bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
+void AsLevel::Act()
+{
+	Act_Objects((AGraphics_Object**)&Active_Bricks, Active_Bricks_Counter, AsConfig::Max_Active_Bricks_Count);
+	Act_Objects((AGraphics_Object**)&Falling_Letters, Falling_Letters_Counter, AsConfig::Max_Falling_Letters_Count);
+
+	if (Advertisement != 0)
+		Advertisement->Act();
+}
+//------------------------------------------------------------------------------------------------------------
+void AsLevel::Draw(HDC hdc, RECT &paint_area)
+{// Вывод всех объектов уровня
+	int i, j;
+	RECT intersection_rect{}, brick_rect{};
+
+	if (Advertisement != 0)
+		Advertisement->Draw(hdc, paint_area);
+
+	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect) )
+	{
+		for (i = 0; i < AsConfig::Level_Height; i++)
+			for (j = 0; j < AsConfig::Level_Width; j++)
+			{
+				brick_rect.left = (AsConfig::Level_X_Offset + j * AsConfig::Cell_Width) * AsConfig::Global_Scale;
+				brick_rect.top = (AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height) * AsConfig::Global_Scale;
+				brick_rect.right = brick_rect.left + AsConfig::Brick_Width  * AsConfig::Global_Scale;
+				brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height  * AsConfig::Global_Scale;
+
+				if (IntersectRect(&intersection_rect, &paint_area, &brick_rect) )	
+					Draw_Brick(hdc, brick_rect, j, i);
+			}
+
+		Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Active_Bricks, AsConfig::Max_Active_Bricks_Count);
+	}
+
+	Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsLevel::Clear(HDC hdc, RECT& paint_area)
+{ // Стираем все движущиеся объекты
+	Clear_Objects(hdc, paint_area, (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
+	if (Advertisement != 0)
+		Advertisement->Clear(hdc, paint_area);
+
+	if (Need_To_Cancel_All)
+	{
+		Cancel_All_Activity();
+		Need_To_Cancel_All = false;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsLevel::Is_Finished() { return false; /* Заглушка! этот метод не используется */ }
+//------------------------------------------------------------------------------------------------------------
 void AsLevel::Init()
 {
 	Level_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
@@ -228,56 +280,6 @@ void AsLevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Lev
 		}
 	}
 	Advertisement = new AAdvertisement(9, 7, 2, 3);
-}
-//------------------------------------------------------------------------------------------------------------
-void AsLevel::Act()
-{
-	Act_Objects((AGraphics_Object**)&Active_Bricks, Active_Bricks_Counter, AsConfig::Max_Active_Bricks_Count);
-	Act_Objects((AGraphics_Object**)&Falling_Letters, Falling_Letters_Counter, AsConfig::Max_Falling_Letters_Count);
-
-	if (Advertisement != 0)
-		Advertisement->Act();
-}
-//------------------------------------------------------------------------------------------------------------
-void AsLevel::Draw(HDC hdc, RECT &paint_area)
-{// Вывод всех кирпичей уровня
-
-	int i, j;
-	RECT intersection_rect{}, brick_rect{};
-
-	Clear_Objects(hdc, paint_area, (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
-	if (Advertisement != 0)
-		Advertisement->Clear(hdc, paint_area);
-
-	if (Need_To_Cancel_All)
-	{
-		Cancel_All_Activity();
-		Need_To_Cancel_All = false;
-	}
-
-
-	if (Advertisement != 0)
-		Advertisement->Draw(hdc, paint_area);
-
-	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect) )
-	{
-		for (i = 0; i < AsConfig::Level_Height; i++)
-			for (j = 0; j < AsConfig::Level_Width; j++)
-			{
-				brick_rect.left = (AsConfig::Level_X_Offset + j * AsConfig::Cell_Width) * AsConfig::Global_Scale;
-				brick_rect.top = (AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height) * AsConfig::Global_Scale;
-				brick_rect.right = brick_rect.left + AsConfig::Brick_Width  * AsConfig::Global_Scale;
-				brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height  * AsConfig::Global_Scale;
-
-				if (IntersectRect(&intersection_rect, &paint_area, &brick_rect) )	
-					Draw_Brick(hdc, brick_rect, j, i);
-			}
-
-		Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Active_Bricks, AsConfig::Max_Active_Bricks_Count);
-	}
-
-	Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
-
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Get_Next_Falling_letter(int &index, AFalling_Letter **falling_letter)

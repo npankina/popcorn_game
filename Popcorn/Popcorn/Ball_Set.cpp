@@ -46,13 +46,25 @@ void AsBall_Set::Finish_Movement()
 		Balls[i].Finish_Movement();
 }
 //------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Draw(HDC hdc, RECT &paint_area)
+void AsBall_Set::Act() {/* Заглушка! т.к. мячик сам не анимируется */}
+//------------------------------------------------------------------------------------------------------------
+void AsBall_Set::Draw(HDC hdc, RECT& paint_area)
 {
 	int i;
 
 	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
 		Balls[i].Draw(hdc, paint_area);
 }
+//------------------------------------------------------------------------------------------------------------
+void AsBall_Set::Clear(HDC hdc, RECT& paint_area)
+{
+	int i;
+
+	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+		Balls[i].Clear(hdc, paint_area);
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsBall_Set::Is_Finished() { return false; /* Заглушка! этот метод не используется */ }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Release_From_Platform(double platform_x_pos)
 {
@@ -205,7 +217,7 @@ void AsBall_Set::Accelerate()
 	{
 		current_ball = &Balls[i];
 
-		if (current_ball->Get_State() == EBS_Normal and current_ball->Get_Speed() <= 7.0)
+		if (current_ball->Get_State() == EBS_Normal and current_ball->Get_Speed() <= 6.5)
 			current_ball->Set_Speed( current_ball->Get_Speed() * AsConfig::Ball_Acseleration);
 	}
 }

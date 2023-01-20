@@ -2,7 +2,7 @@
 #include "Ball.h"
 
 //------------------------------------------------------------------------------------------------------------
-class AsBall_Set: public AMover
+class AsBall_Set: public AMover, public AGraphics_Object
 {
 public:
 	virtual void Advance(double max_speed);
@@ -10,7 +10,11 @@ public:
 	virtual void Begin_Movement();
 	virtual void Finish_Movement();
 
-	void Draw(HDC hdc, RECT &paint_area);
+	virtual void Act();
+	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual void Clear(HDC hdc, RECT& paint_area);
+	virtual bool Is_Finished();
+
 	void Release_From_Platform(double platform_x_pos);
 	void Set_On_Platform(double platform_x_pos);
 	bool All_Balls_Are_Lost();

@@ -51,6 +51,7 @@ private:
 	AsBorder Border;
 	AsBall_Set Ball_Set;
 	
-	AMover *Movers[AsConfig::Max_Movres_Count];
+	AMover *Movers[AsConfig::Max_Movers_Count]; // UNO (Use Not Own); Движущиеся в данный момент объекты
+	AGraphics_Object *Modules[AsConfig::Max_Modules_Count]; // UNO (Use Not Own); Главные графические модули (объекты) игры
 };
 //------------------------------------------------------------------------------------------------------------

@@ -67,7 +67,8 @@ public:
 	static const int Max_Falling_Letters_Count = 10;
 	static const int Hits_Per_Letter = 1; // Вероятность выбить букву из кирпича = 1.0 / Hits_Per_Letter
 	static const int Max_Balls_Count = 10;
-	static const int Max_Movres_Count = 12;
+	static const int Max_Modules_Count = 10;
+	static const int Max_Movers_Count = 12;
 	static const int Initial_Life_Count = 5;
 	static const int Max_Life_Count = 12;
 	static const int Floor_Y_Pos = Max_Y_Pos - 1;

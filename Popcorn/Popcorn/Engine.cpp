@@ -7,6 +7,8 @@ AsEngine::AsEngine()
   Rest_Distanse(0.0), Life_Counter(AsConfig::Initial_Life_Count)
 {
 	memset(Movers, 0, sizeof(Movers) );
+	memset(Modules, 0, sizeof(Modules) );
+
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Init_Engine(HWND hwnd)
@@ -42,19 +44,30 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 
+	// Movers
 	Movers[0] = &Platform;
 	Movers[1] = &Ball_Set;
+
+	// Modules
+	Modules[0] = &Level;
+	Modules[1] = &Border;
+	Modules[2] = &Platform;
+	Modules[4] = &Ball_Set;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 {// Отрисовка экрана игры
-
+	
+	int i;
 	SetGraphicsMode(hdc, GM_ADVANCED);
 
-	Level.Draw(hdc, paint_area);
-	Border.Draw(hdc, paint_area);
-	Platform.Draw(hdc, paint_area);
-	Ball_Set.Draw(hdc, paint_area);
+	for (i = 0; i < AsConfig::Max_Modules_Count; i++)
+		if (Modules[i] != 0)
+			Modules[i]->Clear(hdc, paint_area);
+	
+	for (i = 0; i < AsConfig::Max_Modules_Count; i++)
+		if (Modules[i] != 0)
+			Modules[i]->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key(EKey_Type key_type, bool is_key_down)
@@ -167,7 +180,7 @@ void AsEngine::Advance_Movers()
 
 
 	// 1. Получение максимальной скорости движущихся объектов
-	for (i = 0; i < AsConfig::Max_Movres_Count; i++)
+	for (i = 0; i < AsConfig::Max_Movers_Count; i++)
 	{ 
 		if (Movers[i] != 0)
 		{
@@ -184,7 +197,7 @@ void AsEngine::Advance_Movers()
 
 	while (Rest_Distanse > 0.0)
 	{
-		for (i = 0; i < AsConfig::Max_Movres_Count; i++)
+		for (i = 0; i < AsConfig::Max_Movers_Count; i++)
 			if (Movers[i] != 0)
 				Movers[i]->Advance(max_speed);
 
@@ -193,7 +206,7 @@ void AsEngine::Advance_Movers()
 	}
 
 	// 3. Заканчиваем все движения на этом кадре
-	for (i = 0; i < AsConfig::Max_Movres_Count; i++)
+	for (i = 0; i < AsConfig::Max_Movers_Count; i++)
 		if (Movers[i] != 0)
 			Movers[i]->Finish_Movement();
 }
