@@ -39,6 +39,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	//Ball.Set_State(EBS_Normal, (double)(Platform.X_Pos + Platform.Width / 2));
 	//Platform.Set_State(EPS_Normal);
+	Platform.Set_State(EPS_Glue_Init);
 
 	Platform.Redraw_Platform();
 
@@ -232,11 +233,11 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 	case ELT_G: // "Жизнь"
 		if (Life_Counter < AsConfig::Max_Life_Count)
 			++Life_Counter; // !!! отобразить на индикаторе
-
 		break;
 
-	//case ELT_K: // "Клей"
-		//break;
+	case ELT_K: // "Клей"
+
+		break;
 
 	//case ELT_W: // "Шире"
 		//break;

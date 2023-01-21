@@ -147,6 +147,10 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 	case EPS_Expand_Roll_In:
 		Draw_Expanding_Roll_In_State(hdc, paint_area);
 		break;
+
+	case EPS_Glue_Init:
+		Draw_Glue_State(hdc, paint_area);
+		break;
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -469,6 +473,38 @@ void AsPlatform::Draw_Expanding_Roll_In_State(HDC hdc, RECT &paint_area)
 		Platform_State = EPS_Ready;
 		Redraw_Platform();
 	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Glue_State(HDC hdc, RECT &paint_area)
+{// Рисуем растекающийся клей на платформе
+
+	Draw_Normal_State(hdc, paint_area);
+
+	Draw_Glue_Spot(hdc, 13, 5);
+	Draw_Glue_Spot(hdc, 9, 6, 8);
+
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Glue_Spot(HDC hdc, int width, int height, int x_offset)
+{ // рисуем пятно клея
+
+	RECT spot_rect{};
+	const int scale = AsConfig::Global_Scale;
+	int platform_top = (AsConfig::Platform_Y_Pos + 1) * scale;
+	int spot_height = height * scale;
+
+	spot_rect.left = ( (int)X_Pos + 6 + x_offset) * scale;
+	spot_rect.top = platform_top - spot_height;
+	spot_rect.right = spot_rect.left + width * scale;
+	spot_rect.bottom = platform_top + spot_height - scale;
+
+	// рисуем эллипс как пятно клея
+	AsConfig::White_Color.Select(hdc);
+	AsConfig::BG_Color.Select_Pen(hdc);
+
+	// 4 координаты - ограничивающий прямоугольник
+	Chord(hdc, spot_rect.left, spot_rect.top, spot_rect.right - 1, spot_rect.bottom - 1,
+		spot_rect.left, platform_top - 1, spot_rect.right - 1, platform_top - 1); // по 2 координаты - хорды
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball)
