@@ -82,6 +82,7 @@ const double AsConfig::Moving_Step_Size = 1.0 / Global_Scale;
 const double AsConfig::Start_Ball_Y_Pos = 184.0;
 const double AsConfig::Ball_Acseleration = 1.0001;
 const double AsConfig::Normal_Ball_Speed = 3.0;
+const double AsConfig::Max_Glue_Spot_Height_Ratio = 1.0;
 
 //------------------------------------------------------------------------------------------------------------
 int AsConfig::Rand(int range)

@@ -71,6 +71,7 @@ private:
 	int Inner_Width;
 	int Rolling_Step;
 	double Speed; // количество пикселов на которые смещается платформа за кадр
+	double Glue_Spot_Height_Ratio;
 	bool Left_Key_Down, Right_Key_Down;
 	
 	int Normal_Platform_Image_Width, Normal_Platform_Image_Height;

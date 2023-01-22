@@ -9,9 +9,10 @@ AsPlatform::~AsPlatform()
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
 : X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Moving_State(EPMS_Stop), 
-  Inner_Width(Normal_Platform_Inner_Width),Rolling_Step(0), Speed(0.0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0), 
-  Normal_Platform_Image(0), Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Color(255, 255, 255),
-  Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Left_Key_Down(false), Right_Key_Down(false)
+  Inner_Width(Normal_Platform_Inner_Width),Rolling_Step(0), Speed(0.0), Glue_Spot_Height_Ratio(0.0), Normal_Platform_Image_Width(0), 
+  Normal_Platform_Image_Height(0), Normal_Platform_Image(0), Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, 
+  Highlight_Color(255, 255, 255), Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), 
+  Left_Key_Down(false), Right_Key_Down(false)
 {}
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -113,6 +114,14 @@ void AsPlatform::Act()
 	case EPS_Roll_In:
 	case EPS_Expand_Roll_In:
 		Redraw_Platform();
+		break;
+
+	case EPS_Glue_Init:
+		if (Glue_Spot_Height_Ratio < AsConfig::Max_Glue_Spot_Height_Ratio)
+			Glue_Spot_Height_Ratio += 0.02;
+		else
+			Platform_State = EPS_Glue;
+		break;
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -149,6 +158,8 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 		break;
 
 	case EPS_Glue_Init:
+	case EPS_Glue:
+	case EPS_Glue_Finalize:
 		Draw_Glue_State(hdc, paint_area);
 		break;
 	}
@@ -168,6 +179,9 @@ void AsPlatform::Clear(HDC hdc, RECT& paint_area)
 	case EPS_Pre_Meltdown:
 	case EPS_Roll_In:
 	case EPS_Expand_Roll_In:
+	case EPS_Glue_Init:
+	case EPS_Glue:
+	case EPS_Glue_Finalize:
 		AsConfig::BG_Color.Select(hdc);
 		Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.top, Prev_Platform_Rect.right, Prev_Platform_Rect.bottom);
 	}
@@ -206,6 +220,16 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		X_Pos = AsConfig::Max_X_Pos - 1;
 		Rolling_Step = Max_Rolling_Step - 1;
 		break;
+
+	case EPS_Glue_Init:
+		Glue_Spot_Height_Ratio = 0.4;
+		break;
+
+	//case EPS_Glue: // !!! Надо сделать
+		//break;
+	//case EPS_Glue_Finalize: // !!! Надо сделать
+		//break;
+
 	}
 
 	Platform_State = new_state;
@@ -236,7 +260,10 @@ void AsPlatform::Redraw_Platform()
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Move(bool to_left, bool is_key_down)
 {
-	if (Platform_State != EPS_Normal)
+	if ( ! (Platform_State == EPS_Normal or 
+			Platform_State == EPS_Glue_Init or
+			Platform_State == EPS_Glue or
+			Platform_State == EPS_Glue_Finalize) )
 		return;
 
 	if (to_left)
@@ -478,11 +505,33 @@ void AsPlatform::Draw_Expanding_Roll_In_State(HDC hdc, RECT &paint_area)
 void AsPlatform::Draw_Glue_State(HDC hdc, RECT &paint_area)
 {// Рисуем растекающийся клей на платформе
 
+	HRGN region;
+	RECT glue_rect{};
+	const int scale = AsConfig::Global_Scale;
+
 	Draw_Normal_State(hdc, paint_area);
 
-	Draw_Glue_Spot(hdc, 13, 5);
-	Draw_Glue_Spot(hdc, 9, 6, 8);
+	glue_rect.left = (int)(X_Pos + 5) * scale;
+	glue_rect.top = (AsConfig::Platform_Y_Pos + 1) * scale;
+	glue_rect.right = glue_rect.left + Normal_Platform_Inner_Width * scale;
+	glue_rect.bottom = glue_rect.top + (Height - 2) * scale;
 
+
+	region = CreateRectRgnIndirect(&glue_rect);
+	SelectClipRgn(hdc, region);
+
+	AsConfig::BG_Color.Select(hdc);
+	Draw_Glue_Spot(hdc, 9, 5);
+	Draw_Glue_Spot(hdc, 6, 5, 6);
+	Draw_Glue_Spot(hdc, 9, 6, 9);
+
+	AsConfig::White_Color.Select(hdc);
+	Draw_Glue_Spot(hdc, 9, 4);
+	Draw_Glue_Spot(hdc, 6, 4, 6);
+	Draw_Glue_Spot(hdc, 9, 5, 9);
+
+	SelectClipRgn(hdc, 0);
+	DeleteObject(region);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Glue_Spot(HDC hdc, int width, int height, int x_offset)
@@ -491,17 +540,14 @@ void AsPlatform::Draw_Glue_Spot(HDC hdc, int width, int height, int x_offset)
 	RECT spot_rect{};
 	const int scale = AsConfig::Global_Scale;
 	int platform_top = (AsConfig::Platform_Y_Pos + 1) * scale;
-	int spot_height = height * scale;
+	int spot_height = (int)( (double)height * AsConfig::D_Global_Scale * Glue_Spot_Height_Ratio );
 
-	spot_rect.left = ( (int)X_Pos + 6 + x_offset) * scale;
+	spot_rect.left = ( (int)X_Pos + 5 + x_offset) * scale;
 	spot_rect.top = platform_top - spot_height;
 	spot_rect.right = spot_rect.left + width * scale;
 	spot_rect.bottom = platform_top + spot_height - scale;
 
 	// рисуем эллипс как пятно клея
-	AsConfig::White_Color.Select(hdc);
-	AsConfig::BG_Color.Select_Pen(hdc);
-
 	// 4 координаты - ограничивающий прямоугольник
 	Chord(hdc, spot_rect.left, spot_rect.top, spot_rect.right - 1, spot_rect.bottom - 1,
 		spot_rect.left, platform_top - 1, spot_rect.right - 1, platform_top - 1); // по 2 координаты - хорды
