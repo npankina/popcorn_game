@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "Falling_Letter.h"
+#include "Ball_Set.h"
+
 
 //------------------------------------------------------------------------------------------------------------
 enum EPlatform_State
@@ -42,10 +44,12 @@ public:
 	virtual void Clear(HDC hdc, RECT& paint_area);
 	virtual bool Is_Finished();
 
+	void Init(AsBall_Set *ball_set);
 	EPlatform_State Get_State();
 	void Set_State(EPlatform_State new_state);
 	void Redraw_Platform();
 	void Move(bool to_left, bool is_key_down);
+	void On_Space_Key(bool is_key_down);
 	bool Hit_By(AFalling_Letter *falling_letter);
 	double Get_Middle_Pos();
 	void Get_Normal_Platform_Image(HDC hdc);
@@ -81,8 +85,8 @@ private:
 	int Meltdown_Platform_Y_Pos[Normal_Width * AsConfig::Global_Scale];
 
 	RECT Platform_Rect, Prev_Platform_Rect;
-
 	AColor Highlight_Color, Platform_Circle_Color, Platform_Inner_Color;
+	AsBall_Set *Ball_Set;
 
 	static const int Height = 7;
 	static const int Circle_Size = 7;

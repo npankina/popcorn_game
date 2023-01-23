@@ -87,12 +87,7 @@ int AsEngine::On_Key(EKey_Type key_type, bool is_key_down)
 
 
 	case EKT_Space:
-		if (is_key_down)
-			if (Platform.Get_State() == EPS_Ready)
-			{
-				Ball_Set.Release_From_Platform(Platform.Get_Middle_Pos() );
-				Platform.Set_State(EPS_Normal);
-			}
+		Platform.On_Space_Key(is_key_down);
 		break;
 	}
 
@@ -131,7 +126,7 @@ int AsEngine::On_Timer()
 		{
 			Game_State = EGS_Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos() );
-			Platform.Set_State(EPS_Glue_Init);
+			//Platform.Set_State(EPS_Glue_Init);
 		}
 		break;
 	}
@@ -237,7 +232,7 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 		break;
 
 	case ELT_K: // "Клей"
-
+		Platform.Set_State(EPS_Glue_Init);
 		break;
 
 	//case ELT_W: // "Шире"

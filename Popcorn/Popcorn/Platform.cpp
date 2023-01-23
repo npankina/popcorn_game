@@ -11,7 +11,7 @@ AsPlatform::AsPlatform()
 : X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Moving_State(EPMS_Stop), 
   Inner_Width(Normal_Platform_Inner_Width),Rolling_Step(0), Speed(0.0), Glue_Spot_Height_Ratio(0.0), Normal_Platform_Image_Width(0), 
   Normal_Platform_Image_Height(0), Normal_Platform_Image(0), Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, 
-  Highlight_Color(255, 255, 255), Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), 
+  Highlight_Color(255, 255, 255), Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Ball_Set(0),
   Left_Key_Down(false), Right_Key_Down(false)
 {}
 //------------------------------------------------------------------------------------------------------------
@@ -21,11 +21,12 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	double inner_top_y, inner_low_y;
 	double inner_y;
 	double reflection_pos;
+	double ball_x, ball_y;
 
 	if (next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
 		return false;
 
-	inner_top_y = (double)(AsConfig::Platform_Y_Pos - 1);
+	inner_top_y = (double)(AsConfig::Platform_Y_Pos + 1);
 	inner_low_y = (double)(AsConfig::Platform_Y_Pos + Height - 1);
 	inner_left_x = (double)(X_Pos + Circle_Size - 1);
 	inner_right_x = (double)(X_Pos + Width - (Circle_Size - 1) );
@@ -55,6 +56,12 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 _on_hit:
 	if (ball->Get_State() == EBS_On_Parashute)
 		ball->Set_State(EBS_Off_Parashute);
+
+	if (Platform_State == EPS_Glue)
+	{
+		ball->Get_Center(ball_x, ball_y);
+		ball->Set_State(EBS_On_Platform, ball_x, ball_y);
+	}
 
 	return true;
 }
@@ -189,6 +196,11 @@ void AsPlatform::Clear(HDC hdc, RECT& paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Is_Finished() { return false; /* Заглушка! метод не используется */ }
 //------------------------------------------------------------------------------------------------------------
+void AsPlatform::Init(AsBall_Set *ball_set)
+{
+	Ball_Set = ball_set;
+}
+//------------------------------------------------------------------------------------------------------------
 EPlatform_State AsPlatform::Get_State()
 {
 	return Platform_State;
@@ -290,6 +302,18 @@ void AsPlatform::Move(bool to_left, bool is_key_down)
 	{
 		Platform_Moving_State = EPMS_Moving_Right;
 		Speed = X_Step;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::On_Space_Key(bool is_key_down)
+{
+	if (! is_key_down)
+		return;
+
+	if (Get_State() == EPS_Ready)
+	{
+		Ball_Set->Release_From_Platform(Get_Middle_Pos() );
+		Set_State(EPS_Normal);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
