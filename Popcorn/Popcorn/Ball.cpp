@@ -54,9 +54,9 @@ int ABall::Hit_Checkers_Count = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};
 //------------------------------------------------------------------------------------------------------------
 ABall::ABall()
-: Ball_State(EBS_Disabled), Prev_Ball_State(EBS_Disabled), Center_X_Pos(0.0), Center_Y_Pos(0.0), Ball_Speed(0.0),
-  Ball_Direction(0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{},
-  Prev_Ball_Rect{}, Parashute_Rect{}, Prev_Parashute_Rect{}
+: Ball_State(EBS_Disabled), Prev_Ball_State(EBS_Disabled), Center_X_Pos(0.0), Center_Y_Pos(0.0), Ball_Speed(0.0), 
+  Prev_Ball_Speed(0.0), Ball_Direction(0.0), Prev_Ball_Direction(0.0), Testing_Is_Active(false), Test_Iteration(0), 
+  Ball_Rect{}, Prev_Ball_Rect{}, Parashute_Rect{}, Prev_Parashute_Rect{}
 {
 	//Set_State(EBS_Normal, 0);
 }
@@ -89,6 +89,8 @@ void ABall::Finish_Movement()
 void ABall::Advance(double max_speed)
 {
 	int i;
+	int prev_hits_count = 0;
+	const int max_hits_count = 8;
 	bool got_hit = true;
 	double next_x_pos, next_y_pos;
 	double step_size = AsConfig::Moving_Step_Size;
@@ -114,14 +116,30 @@ void ABall::Advance(double max_speed)
 		for (i = 0; i < Hit_Checkers_Count; i++)
 			got_hit |= Hit_Checkers[i]->Check_Hit(next_x_pos, next_y_pos, this);
 
-		if (! got_hit)
+		if (got_hit)
+		{
+			++prev_hits_count;
+
+			if (prev_hits_count >= max_hits_count)
+			{
+				Ball_Direction += M_PI /8.0;
+				prev_hits_count = 0;
+			}
+		}
+		else
 		{// Мячик продолжит движение, если не взаимодействовал с другими объектами
 			Center_X_Pos = next_x_pos;
 			Center_Y_Pos = next_y_pos;
 
 			if (Testing_Is_Active)
+			{
 				Rest_Test_Distance -= next_step;
+				prev_hits_count = 0;
+			}
 		}
+
+		if (Ball_State == EBS_On_Platform)
+			break;
 	}
 
 	Redraw_Ball();
@@ -279,8 +297,10 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 	case EBS_On_Platform:
 		Center_X_Pos = x_pos;
 		Center_Y_Pos = y_pos;
+		Prev_Ball_Speed = Ball_Speed;
 		Ball_Speed = 0.0;
-		Ball_Direction = M_PI_4;
+		Prev_Ball_Direction = Ball_Direction;
+		//Ball_Direction = M_PI_4;
 		Redraw_Ball();
 		break;
 
@@ -395,7 +415,34 @@ void ABall::Set_On_Parashute(int x, int y)
 	Center_X_Pos = (double)(cell_x + AsConfig::Cell_Width / 2) - 1.0 / AsConfig::D_Global_Scale;
 	Center_Y_Pos = (double)(cell_y + Parashute_Size) - ABall::Radius * 2.0;
 
-	Redraw_Ball();
+	Redraw_Parashute();
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Forced_Advance(double direction, double max_speed)
+{ // Принудительное смещение мячика
+
+	double prev_ball_direction = Ball_Direction;
+	double prev_ball_speed = Ball_Speed;
+	EBall_State prev_ball_state = Ball_State;
+
+
+	Ball_Direction = direction;
+	Ball_Speed = max_speed;
+	Ball_State = EBS_Normal;
+
+	Advance(max_speed);
+
+	Ball_Direction = prev_ball_direction;
+	Ball_Speed = prev_ball_speed;
+	Ball_State = prev_ball_state;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Release()
+{ // Продолжить прерванное движение мячика
+
+	Set_State(EBS_Normal, Center_X_Pos, Center_Y_Pos);
+	Ball_Speed = Prev_Ball_Speed;
+	Ball_Direction = Prev_Ball_Direction;
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)

@@ -92,6 +92,15 @@ void AsPlatform::Advance(double max_speed) // смещение платформ�
 		Platform_Moving_State = EPMS_Stopping;
 	}
 
+	// Смещаем приклеенные мячики
+	if (Platform_State == EPS_Ready or Platform_State == EPS_Glue)
+	{
+		if (Platform_Moving_State = EPMS_Moving_Left)
+			Ball_Set->Advance_On_Platform(M_PI, max_speed);
+		else if (Platform_Moving_State = EPMS_Moving_Right)
+			Ball_Set->Advance_On_Platform(0.0, max_speed);
+
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 double AsPlatform::Get_Speed()
@@ -227,14 +236,14 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 
 		break;
 
-
 	case EPS_Roll_In:
 		X_Pos = AsConfig::Max_X_Pos - 1;
 		Rolling_Step = Max_Rolling_Step - 1;
 		break;
 
 	case EPS_Glue_Init:
-		Glue_Spot_Height_Ratio = 0.4;
+		if ( !(Platform_State == EPS_Glue or Platform_State == EPS_Glue_Finalize) )
+			Glue_Spot_Height_Ratio = 0.4;
 		break;
 
 	//case EPS_Glue: // !!! Надо сделать
@@ -310,10 +319,16 @@ void AsPlatform::On_Space_Key(bool is_key_down)
 	if (! is_key_down)
 		return;
 
-	if (Get_State() == EPS_Ready)
+	switch ( Get_State() )
 	{
+	case EPS_Ready:
 		Ball_Set->Release_From_Platform(Get_Middle_Pos() );
 		Set_State(EPS_Normal);
+		break;
+
+	case EPS_Glue:
+		Ball_Set->Release_Next_Ball();
+		break;
 	}
 }
 //------------------------------------------------------------------------------------------------------------

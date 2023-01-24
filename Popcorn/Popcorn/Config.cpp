@@ -60,7 +60,7 @@ HBRUSH AColor::Get_Brush() const
 //AsConfig
 //------------------------------------------------------------------------------------------------------------
 int AsConfig::Current_Timer_Tick = 0;
-bool AsConfig::Level_Has_Floor = false;
+bool AsConfig::Level_Has_Floor = true;
 
 const AColor AsConfig::BG_Color(6, 30, 82);
 const AColor AsConfig::Red_Color(230, 25, 229);

@@ -82,6 +82,8 @@ public:
 	bool Is_Moving_Up();
 	bool Is_Moving_Left();
 	void Set_On_Parashute(int x, int y);
+	void Forced_Advance(double direction, double max_speed);
+	void Release();
 
 	static void Add_Hit_Checker(AHit_Checker *hit_checker);
 
@@ -96,8 +98,8 @@ private:
 	EBall_State Ball_State, Prev_Ball_State;
 	RECT Ball_Rect, Prev_Ball_Rect, Parashute_Rect, Prev_Parashute_Rect;
 
-	double Ball_Direction;
-	double Ball_Speed;
+	double Ball_Direction, Prev_Ball_Direction;
+	double Ball_Speed, Prev_Ball_Speed;
 	double Rest_Test_Distance;
 	double Center_X_Pos, Center_Y_Pos;
 
