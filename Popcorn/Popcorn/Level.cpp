@@ -147,6 +147,7 @@ bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 				{
 					if (On_Hit(j, i, ball, false) )
 						ball->Reflect(false);
+
 					return true;
 				}
 				else
@@ -516,7 +517,10 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 			letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
 
 			//letter_type = AFalling_Letter::Get_Random_Letter_Type();
-			letter_type = ELT_K;
+			if (AsConfig::Rand(2) == 0)
+				letter_type = ELT_K;
+			else
+				letter_type = ELT_O;
 
 
 			falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);

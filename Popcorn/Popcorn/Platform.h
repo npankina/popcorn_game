@@ -47,7 +47,7 @@ public:
 	void Init(AsBall_Set *ball_set);
 	EPlatform_State Get_State();
 	void Set_State(EPlatform_State new_state);
-	void Redraw_Platform();
+	void Redraw_Platform(bool update_rect = true);
 	void Move(bool to_left, bool is_key_down);
 	void On_Space_Key(bool is_key_down);
 	bool Hit_By(AFalling_Letter *falling_letter);
@@ -96,5 +96,7 @@ private:
 	static const int Max_Rolling_Step = 16;
 	static const int Roll_In_Platform_End_X_Pos = 99;
 	static const int Rolling_Platform_Speed = 3;
+
+	static const double Max_Glue_Spot_Height_Ratio, Min_Glue_Spot_Height_Ratio;
 };
 //------------------------------------------------------------------------------------------------------------

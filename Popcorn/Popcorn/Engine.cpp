@@ -145,6 +145,9 @@ void AsEngine::Act()
 	Platform.Act();
 	Level.Act();
 
+	if (Platform.Get_State() != EPS_Ready)
+		Ball_Set.Act();
+
 	while (Level.Get_Next_Falling_letter(index, &falling_letter) )
 	{
 		if (Platform.Hit_By(falling_letter) )
@@ -213,8 +216,9 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 {
 	switch(falling_letter->Letter_Type)
 	{
-	//case ELT_O: // "Отмена"
-		//break;
+	case ELT_O: // "Отмена"
+		Platform.Set_State(EPS_Glue_Finalize); // Отменяет действие буквы Клей
+		break;
 
 	case ELT_I: // "Инверсия"
 		Ball_Set.Inverse();

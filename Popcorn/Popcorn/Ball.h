@@ -82,10 +82,12 @@ public:
 	bool Is_Moving_Up();
 	bool Is_Moving_Left();
 	void Set_On_Parashute(int x, int y);
-	void Forced_Advance(double direction, double max_speed);
+	void Forced_Advance(double direction, double speed, double max_speed);
 	void Release();
 
 	static void Add_Hit_Checker(AHit_Checker *hit_checker);
+
+	int Release_Timer_Tick;  // Значение счётчика времени, после которого надо отпустить прикленненый мячик
 
 	static const double Radius;
 
@@ -107,6 +109,7 @@ private:
 	int Test_Iteration;
 
 	static const int Parashute_Size = 15;
+	static const int On_Platform_Timeout = 3 * AsConfig::FPS; // Время нахождения мяча на платформе (количество тиков за секунду)
 	static int Hit_Checkers_Count;
 	static AHit_Checker *Hit_Checkers[3];
 };

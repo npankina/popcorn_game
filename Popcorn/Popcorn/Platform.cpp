@@ -1,6 +1,9 @@
 ﻿#include "Platform.h"
 
 // AsPlatform
+
+const double AsPlatform::Max_Glue_Spot_Height_Ratio = 1.0;
+const double AsPlatform::Min_Glue_Spot_Height_Ratio = 0.4;
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::~AsPlatform()
 {
@@ -48,7 +51,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	if (Hit_Circle_On_Line(next_y_pos - inner_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
 	{
 		ball->Reflect(true);
-			goto _on_hit;
+		goto _on_hit;
 	}
 
 	return false;
@@ -96,10 +99,10 @@ void AsPlatform::Advance(double max_speed) // смещение платформ�
 	if (Platform_State == EPS_Ready or Platform_State == EPS_Glue)
 	{
 		if (Platform_Moving_State = EPMS_Moving_Left)
-			Ball_Set->Advance_On_Platform(M_PI, max_speed);
-		else if (Platform_Moving_State = EPMS_Moving_Right)
-			Ball_Set->Advance_On_Platform(0.0, max_speed);
-
+			Ball_Set->Advance_On_Platform(M_PI, fabs(Speed), max_speed);
+		else 
+			if (Platform_Moving_State = EPMS_Moving_Right)
+				Ball_Set->Advance_On_Platform(0.0, fabs(Speed), max_speed);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -133,10 +136,19 @@ void AsPlatform::Act()
 		break;
 
 	case EPS_Glue_Init:
-		if (Glue_Spot_Height_Ratio < AsConfig::Max_Glue_Spot_Height_Ratio)
+		if (Glue_Spot_Height_Ratio < Max_Glue_Spot_Height_Ratio)
 			Glue_Spot_Height_Ratio += 0.02;
 		else
 			Platform_State = EPS_Glue;
+		Redraw_Platform(false);
+		break;
+
+	case EPS_Glue_Finalize:
+		if (Glue_Spot_Height_Ratio > Min_Glue_Spot_Height_Ratio)
+			Glue_Spot_Height_Ratio -= 0.05;
+		else
+			Platform_State = EPS_Normal;
+		Redraw_Platform(false);
 		break;
 	}
 }
@@ -203,7 +215,10 @@ void AsPlatform::Clear(HDC hdc, RECT& paint_area)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsPlatform::Is_Finished() { return false; /* Заглушка! метод не используется */ }
+bool AsPlatform::Is_Finished() 
+{ 
+	return false; /* Заглушка! метод не используется */ 
+}
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Init(AsBall_Set *ball_set)
 {
@@ -242,38 +257,46 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		break;
 
 	case EPS_Glue_Init:
-		if ( !(Platform_State == EPS_Glue or Platform_State == EPS_Glue_Finalize) )
-			Glue_Spot_Height_Ratio = 0.4;
+		if (Platform_State == EPS_Glue or Platform_State == EPS_Glue_Finalize)
+			return;
+		else
+			Glue_Spot_Height_Ratio = Min_Glue_Spot_Height_Ratio;
 		break;
 
-	//case EPS_Glue: // !!! Надо сделать
-		//break;
-	//case EPS_Glue_Finalize: // !!! Надо сделать
-		//break;
+	case EPS_Glue: // Нельзя перейти в это состояние извне, т.е. через Set_State()
+		AsConfig::Throw();
+		break;
+
+	case EPS_Glue_Finalize:
+		while ( Ball_Set->Release_Next_Ball() ) {}
+		break;
 
 	}
 
 	Platform_State = new_state;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform::Redraw_Platform()
+void AsPlatform::Redraw_Platform(bool update_rect)
 {
 	int platform_width;
 
-	Prev_Platform_Rect = Platform_Rect;
+	if (update_rect)
+	{
+		Prev_Platform_Rect = Platform_Rect;
 
-	if (Platform_State == EPS_Roll_In)
-		platform_width = Circle_Size;
-	else
-		platform_width = Width;
+		if (Platform_State == EPS_Roll_In)
+			platform_width = Circle_Size;
+		else
+			platform_width = Width;
 
-	Platform_Rect.left = (int)(X_Pos * AsConfig::D_Global_Scale);
-	Platform_Rect.top = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
-	Platform_Rect.right = Platform_Rect.left + platform_width * AsConfig::Global_Scale;
-	Platform_Rect.bottom = Platform_Rect.top + Height * AsConfig::Global_Scale;
+		Platform_Rect.left = (int)(X_Pos * AsConfig::D_Global_Scale);
+		Platform_Rect.top = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
+		Platform_Rect.right = Platform_Rect.left + platform_width * AsConfig::Global_Scale;
+		Platform_Rect.bottom = Platform_Rect.top + Height * AsConfig::Global_Scale;
 
-	if (Platform_State == EPS_Meltdown)
-		Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1) * AsConfig::Global_Scale;
+		if (Platform_State == EPS_Meltdown)
+			Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1) * AsConfig::Global_Scale;
+	}
 
 	InvalidateRect(AsConfig::Hwnd, &Prev_Platform_Rect, FALSE);
 	InvalidateRect(AsConfig::Hwnd, &Platform_Rect, FALSE);
@@ -295,7 +318,7 @@ void AsPlatform::Move(bool to_left, bool is_key_down)
 	if (Left_Key_Down and Right_Key_Down)
 		return; // Игнорируем одновременное нажатие двух клавиш
 	
-	if (! Left_Key_Down and ! Right_Key_Down)
+	if ( !Left_Key_Down and !Right_Key_Down)
 	{
 		Platform_Moving_State = EPMS_Stop;
 		Speed = 0.0;

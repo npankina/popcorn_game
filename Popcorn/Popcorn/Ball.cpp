@@ -55,17 +55,13 @@ AHit_Checker *ABall::Hit_Checkers[] = {};
 //------------------------------------------------------------------------------------------------------------
 ABall::ABall()
 : Ball_State(EBS_Disabled), Prev_Ball_State(EBS_Disabled), Center_X_Pos(0.0), Center_Y_Pos(0.0), Ball_Speed(0.0), 
-  Prev_Ball_Speed(0.0), Ball_Direction(0.0), Prev_Ball_Direction(0.0), Testing_Is_Active(false), Test_Iteration(0), 
+  Prev_Ball_Speed(0.0), Ball_Direction(0.0), Prev_Ball_Direction(0.0), Testing_Is_Active(false), Test_Iteration(0), Release_Timer_Tick(0), 
   Ball_Rect{}, Prev_Ball_Rect{}, Parashute_Rect{}, Prev_Parashute_Rect{}
-{
-	//Set_State(EBS_Normal, 0);
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 void ABall::Begin_Movement()
 {
 	Prev_Ball_Rect = Ball_Rect;
-
-	
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Finish_Movement()
@@ -93,7 +89,6 @@ void ABall::Advance(double max_speed)
 	const int max_hits_count = 8;
 	bool got_hit = true;
 	double next_x_pos, next_y_pos;
-	double step_size = AsConfig::Moving_Step_Size;
 	double next_step;
 
 
@@ -122,7 +117,7 @@ void ABall::Advance(double max_speed)
 
 			if (prev_hits_count >= max_hits_count)
 			{
-				Ball_Direction += M_PI /8.0;
+				Ball_Direction += M_PI / 8.0;
 				prev_hits_count = 0;
 			}
 		}
@@ -132,17 +127,12 @@ void ABall::Advance(double max_speed)
 			Center_Y_Pos = next_y_pos;
 
 			if (Testing_Is_Active)
-			{
 				Rest_Test_Distance -= next_step;
-				prev_hits_count = 0;
-			}
 		}
 
 		if (Ball_State == EBS_On_Platform)
 			break;
 	}
-
-	Redraw_Ball();
 }
 //------------------------------------------------------------------------------------------------------------
 double ABall::Get_Speed() 
@@ -207,14 +197,16 @@ void ABall::Clear(HDC hdc, RECT& paint_area)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-bool ABall::Is_Finished() { return false; /* Заглушка! т.к. мячик сам не анимируется */ }
+bool ABall::Is_Finished() 
+{ 
+	return false; 
+	/* Заглушка! т.к. мячик сам не анимируется */ 
+}
 //------------------------------------------------------------------------------------------------------------
 void ABall::Draw_Teleporting(HDC hdc, int step)
 {
-	int top_y, low_y;
-
-	top_y = Ball_Rect.top + step / 2;
-	low_y = Ball_Rect.bottom - step / 2 - 1;
+	int top_y = Ball_Rect.top + step / 2;
+	int low_y = Ball_Rect.bottom - step / 2 - 1;
 
 	if (top_y >= low_y)
 		return;
@@ -301,6 +293,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 		Ball_Speed = 0.0;
 		Prev_Ball_Direction = Ball_Direction;
 		//Ball_Direction = M_PI_4;
+		Release_Timer_Tick = AsConfig::Current_Timer_Tick + On_Platform_Timeout;
 		Redraw_Ball();
 		break;
 
@@ -418,7 +411,7 @@ void ABall::Set_On_Parashute(int x, int y)
 	Redraw_Parashute();
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Forced_Advance(double direction, double max_speed)
+void ABall::Forced_Advance(double direction, double speed, double max_speed)
 { // Принудительное смещение мячика
 
 	double prev_ball_direction = Ball_Direction;
@@ -427,7 +420,7 @@ void ABall::Forced_Advance(double direction, double max_speed)
 
 
 	Ball_Direction = direction;
-	Ball_Speed = max_speed;
+	Ball_Speed = speed;
 	Ball_State = EBS_Normal;
 
 	Advance(max_speed);
@@ -442,7 +435,12 @@ void ABall::Release()
 
 	Set_State(EBS_Normal, Center_X_Pos, Center_Y_Pos);
 	Ball_Speed = Prev_Ball_Speed;
+
+	if (Ball_Speed < AsConfig::Normal_Ball_Speed)
+		Ball_Speed = AsConfig::Normal_Ball_Speed;
+
 	Ball_Direction = Prev_Ball_Direction;
+	Release_Timer_Tick = 0;
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)

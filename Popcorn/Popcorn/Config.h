@@ -46,8 +46,6 @@ public:
 	static const double Start_Ball_Y_Pos;
 	static const double Ball_Acseleration;
 	static const double Normal_Ball_Speed;
-	static const double Max_Glue_Spot_Height_Ratio;
-
 
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;

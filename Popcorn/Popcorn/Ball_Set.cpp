@@ -18,9 +18,10 @@ double AsBall_Set::Get_Speed()
 
 	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
 	{
-		if (&Balls[i] != 0)
+		current_speed = Balls[i].Get_Speed();
+
+		if (current_speed != 0)
 		{
-			current_speed = Balls[i].Get_Speed();
 
 			if (current_speed > max_speed)
 				max_speed = current_speed;
@@ -46,7 +47,20 @@ void AsBall_Set::Finish_Movement()
 		Balls[i].Finish_Movement();
 }
 //------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Act() {/* Заглушка! т.к. мячик сам не анимируется */}
+void AsBall_Set::Act() 
+{
+	int i;
+	ABall *current_ball;
+
+	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+	{
+		current_ball = &Balls[i];
+
+		if (current_ball->Get_State() == EBS_On_Platform)
+			if (current_ball->Release_Timer_Tick != 0 and AsConfig::Current_Timer_Tick >= current_ball->Release_Timer_Tick)
+				current_ball->Release();
+	}
+}
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Draw(HDC hdc, RECT& paint_area)
 {
@@ -75,7 +89,7 @@ void AsBall_Set::Release_From_Platform(double platform_x_pos)
 			Balls[i].Set_State(EBS_Normal, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Release_Next_Ball()
+bool AsBall_Set::Release_Next_Ball()
 {
 	int i;
 	ABall *current_ball;
@@ -87,17 +101,22 @@ void AsBall_Set::Release_Next_Ball()
 		if (current_ball->Get_State() == EBS_On_Platform)
 		{
 			current_ball->Release();
-			break;
+			return true;
 		}
 	}
+
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Set_On_Platform(double platform_x_pos)
 {
 	int i;
 
-	for (i = 0; i < 5; i++)	
+	for (i = 0; i < 1; i++)
+	{
+		Balls[i].Set_State(EBS_Normal);
 		Balls[i].Set_State(EBS_On_Platform, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
+	}
 
 	for (; i < AsConfig::Max_Balls_Count; i++)	
 		Balls[i].Set_State(EBS_Disabled);
@@ -166,6 +185,7 @@ void AsBall_Set::Tripple_Balls()
 		{
 			current_ball->Get_Center(current_ball_x, current_ball_y);
 			further_ball->Get_Center(further_ball_x, further_ball_y);
+
 			if (current_ball_y < further_ball_y)
 				further_ball = current_ball;
 		}
@@ -252,7 +272,7 @@ void AsBall_Set::Reset_Speed()
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Advance_On_Platform(double direction, double max_speed)
+void AsBall_Set::Advance_On_Platform(double direction, double platform_speed, double max_speed)
 {
 	int i;
 	ABall *current_ball = 0;
@@ -262,7 +282,7 @@ void AsBall_Set::Advance_On_Platform(double direction, double max_speed)
 		current_ball = &Balls[i];
 
 		if (current_ball->Get_State() == EBS_On_Platform)
-			current_ball->Forced_Advance(direction, max_speed);
+			current_ball->Forced_Advance(direction, platform_speed, max_speed);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
