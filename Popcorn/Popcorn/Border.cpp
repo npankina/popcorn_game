@@ -94,7 +94,7 @@ bool AsBorder::Is_Finished() { return false; /* Заглушка! т.к. border 
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Redraw_Floor()
 {
-	InvalidateRect(AsConfig::Hwnd, &Floor_Rect, FALSE);
+	AsConfig::Invalidate_Rect(Floor_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_border)

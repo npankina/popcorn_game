@@ -220,13 +220,13 @@ void AsBall_Set::Tripple_Balls()
 	if (left_ball != 0)
 	{
 		*left_ball = *further_ball;
-		left_ball->Set_Direction(left_ball->Get_Direction() + M_PI / 8.0);
+		left_ball->Set_Direction(left_ball->Get_Direction() + AsConfig::Min_Ball_Angle);
 	}
 
 	if (right_ball != 0)
 	{
 		*right_ball = *further_ball;
-		right_ball->Set_Direction(right_ball->Get_Direction() - M_PI / 8.0);
+		right_ball->Set_Direction(right_ball->Get_Direction() - AsConfig::Min_Ball_Angle);
 	}
 }
 //------------------------------------------------------------------------------------------------------------

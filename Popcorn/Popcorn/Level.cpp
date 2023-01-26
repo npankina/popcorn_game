@@ -434,7 +434,7 @@ void AsLevel::Redraw_Brick(int brick_x, int brick_y)
 	brick_rect.right = brick_rect.left + AsConfig::Cell_Width * AsConfig::Global_Scale;
 	brick_rect.bottom = brick_rect.top + AsConfig::Cell_Height * AsConfig::Global_Scale;
 
-	InvalidateRect(AsConfig::Hwnd, &brick_rect, FALSE);
+	AsConfig::Invalidate_Rect(brick_rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Draw_Parashute_In_Level(HDC hdc, RECT &brick_rect)
@@ -520,7 +520,7 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 			if (AsConfig::Rand(2) == 0)
 				letter_type = ELT_K;
 			else
-				letter_type = ELT_O;
+				letter_type = ELT_T;
 
 
 			falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);

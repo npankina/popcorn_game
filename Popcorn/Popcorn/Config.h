@@ -32,6 +32,7 @@ public:
 	static int Rand(int range);
 	static void Round_Rect(HDC hdc, RECT &rect, int corner_radius = 2);
 	static void Throw();
+	static void Invalidate_Rect(RECT &rect);
 
 
 	static int Current_Timer_Tick;
@@ -46,6 +47,7 @@ public:
 	static const double Start_Ball_Y_Pos;
 	static const double Ball_Acseleration;
 	static const double Normal_Ball_Speed;
+	static const double Min_Ball_Angle;
 
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;

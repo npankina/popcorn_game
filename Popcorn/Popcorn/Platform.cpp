@@ -4,6 +4,7 @@
 
 const double AsPlatform::Max_Glue_Spot_Height_Ratio = 1.0;
 const double AsPlatform::Min_Glue_Spot_Height_Ratio = 0.4;
+const double AsPlatform::Glue_Spot_Height_Ratio_Step = 0.03;
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::~AsPlatform()
 {
@@ -11,7 +12,7 @@ AsPlatform::~AsPlatform()
 }
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-: X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Moving_State(EPMS_Stop), 
+: X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Substate_Glue(EPSG_Unknown), Platform_Moving_State(EPMS_Stop), 
   Inner_Width(Normal_Platform_Inner_Width),Rolling_Step(0), Speed(0.0), Glue_Spot_Height_Ratio(0.0), Normal_Platform_Image_Width(0), 
   Normal_Platform_Image_Height(0), Normal_Platform_Image(0), Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, 
   Highlight_Color(255, 255, 255), Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Ball_Set(0),
@@ -60,7 +61,7 @@ _on_hit:
 	if (ball->Get_State() == EBS_On_Parashute)
 		ball->Set_State(EBS_Off_Parashute);
 
-	if (Platform_State == EPS_Glue)
+	if (Platform_State == EPS_Glue and Platform_Substate_Glue == EPSG_Active)
 	{
 		ball->Get_Center(ball_x, ball_y);
 		ball->Set_State(EBS_On_Platform, ball_x, ball_y);
@@ -96,7 +97,7 @@ void AsPlatform::Advance(double max_speed) // смещение платформ�
 	}
 
 	// Смещаем приклеенные мячики
-	if (Platform_State == EPS_Ready or Platform_State == EPS_Glue)
+	if (Platform_State == EPS_Ready or (Platform_State == EPS_Glue and Platform_Substate_Glue == EPSG_Active) )
 	{
 		if (Platform_Moving_State = EPMS_Moving_Left)
 			Ball_Set->Advance_On_Platform(M_PI, fabs(Speed), max_speed);
@@ -135,20 +136,28 @@ void AsPlatform::Act()
 		Redraw_Platform();
 		break;
 
-	case EPS_Glue_Init:
-		if (Glue_Spot_Height_Ratio < Max_Glue_Spot_Height_Ratio)
-			Glue_Spot_Height_Ratio += 0.02;
-		else
-			Platform_State = EPS_Glue;
-		Redraw_Platform(false);
-		break;
+	case EPS_Glue:
+		switch (Platform_Substate_Glue)
+		{
+		case EPSG_Init:
+			if (Glue_Spot_Height_Ratio < Max_Glue_Spot_Height_Ratio)
+				Glue_Spot_Height_Ratio += Glue_Spot_Height_Ratio_Step;
+			else
+				Platform_Substate_Glue = EPSG_Active;
+			Redraw_Platform(false);
+			break;
 
-	case EPS_Glue_Finalize:
-		if (Glue_Spot_Height_Ratio > Min_Glue_Spot_Height_Ratio)
-			Glue_Spot_Height_Ratio -= 0.05;
-		else
-			Platform_State = EPS_Normal;
-		Redraw_Platform(false);
+		case EPSG_Finalize:
+			if (Glue_Spot_Height_Ratio > Min_Glue_Spot_Height_Ratio)
+				Glue_Spot_Height_Ratio -= Glue_Spot_Height_Ratio_Step;
+			else
+			{
+				Platform_State = EPS_Normal;
+				Platform_Substate_Glue = EPSG_Unknown;
+			}
+			Redraw_Platform(false);
+			break;
+		}
 		break;
 	}
 }
@@ -185,9 +194,7 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 		Draw_Expanding_Roll_In_State(hdc, paint_area);
 		break;
 
-	case EPS_Glue_Init:
 	case EPS_Glue:
-	case EPS_Glue_Finalize:
 		Draw_Glue_State(hdc, paint_area);
 		break;
 	}
@@ -207,9 +214,7 @@ void AsPlatform::Clear(HDC hdc, RECT& paint_area)
 	case EPS_Pre_Meltdown:
 	case EPS_Roll_In:
 	case EPS_Expand_Roll_In:
-	case EPS_Glue_Init:
 	case EPS_Glue:
-	case EPS_Glue_Finalize:
 		AsConfig::BG_Color.Select(hdc);
 		Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.top, Prev_Platform_Rect.right, Prev_Platform_Rect.bottom);
 	}
@@ -239,6 +244,15 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 
 	switch (new_state)
 	{
+	case EPS_Normal:
+		if (Platform_State == EPS_Glue)
+		{
+			Platform_Substate_Glue = EPSG_Finalize;
+			while ( Ball_Set->Release_Next_Ball() ) {};
+			return;
+		}
+		break;
+
 	case EPS_Pre_Meltdown:
 		Speed = 0.0;
 		break;
@@ -256,21 +270,16 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		Rolling_Step = Max_Rolling_Step - 1;
 		break;
 
-	case EPS_Glue_Init:
-		if (Platform_State == EPS_Glue or Platform_State == EPS_Glue_Finalize)
+	case EPS_Glue:
+		if (Platform_Substate_Glue == EPSG_Finalize)
 			return;
 		else
+		{
+			Platform_Substate_Glue = EPSG_Init;
 			Glue_Spot_Height_Ratio = Min_Glue_Spot_Height_Ratio;
-		break;
 
-	case EPS_Glue: // Нельзя перейти в это состояние извне, т.е. через Set_State()
-		AsConfig::Throw();
+		}
 		break;
-
-	case EPS_Glue_Finalize:
-		while ( Ball_Set->Release_Next_Ball() ) {}
-		break;
-
 	}
 
 	Platform_State = new_state;
@@ -298,16 +307,13 @@ void AsPlatform::Redraw_Platform(bool update_rect)
 			Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1) * AsConfig::Global_Scale;
 	}
 
-	InvalidateRect(AsConfig::Hwnd, &Prev_Platform_Rect, FALSE);
-	InvalidateRect(AsConfig::Hwnd, &Platform_Rect, FALSE);
+	AsConfig::Invalidate_Rect(Prev_Platform_Rect);
+	AsConfig::Invalidate_Rect(Platform_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Move(bool to_left, bool is_key_down)
 {
-	if ( ! (Platform_State == EPS_Normal or 
-			Platform_State == EPS_Glue_Init or
-			Platform_State == EPS_Glue or
-			Platform_State == EPS_Glue_Finalize) )
+	if ( ! (Platform_State == EPS_Normal or Platform_State == EPS_Glue) )
 		return;
 
 	if (to_left)

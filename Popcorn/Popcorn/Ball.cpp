@@ -117,7 +117,7 @@ void ABall::Advance(double max_speed)
 
 			if (prev_hits_count >= max_hits_count)
 			{
-				Ball_Direction += M_PI / 8.0;
+				Ball_Direction += AsConfig::Min_Ball_Angle;
 				prev_hits_count = 0;
 			}
 		}
@@ -349,11 +349,31 @@ void ABall::Set_Direction(double new_direction)
 {
 	const double pi_2 = 2.0 * M_PI;
 
+	// 1. Переводим угол в диапазон от 0 до 2пи
 	while (new_direction > pi_2)
 		new_direction -= pi_2;
 
 	while (new_direction < 0.0)
 		new_direction += pi_2;
+
+	// 2. Не позволим мячику приближаться к вертикальной горизонтали слишком близко
+	// 2.1 Слева
+	// 2.1.1 Сверху
+	if (new_direction < AsConfig::Min_Ball_Angle)
+		new_direction = AsConfig::Min_Ball_Angle;
+
+	// 2.1.2 Снизу
+	if (new_direction > pi_2 - AsConfig::Min_Ball_Angle)
+		new_direction = pi_2 - AsConfig::Min_Ball_Angle;
+
+	// 2.2 Справа
+	// 2.2.1 Сверху
+	if (new_direction > M_PI - AsConfig::Min_Ball_Angle and new_direction < M_PI)
+		new_direction = M_PI - AsConfig::Min_Ball_Angle;
+
+	// 2.2.2 Снизу
+	if (new_direction >= M_PI and new_direction < M_PI + AsConfig::Min_Ball_Angle)
+		new_direction = M_PI + AsConfig::Min_Ball_Angle;
 
 	Ball_Direction = new_direction;
 }
@@ -458,8 +478,8 @@ void ABall::Redraw_Ball()
 	Ball_Rect.right = (int)((Center_X_Pos + Radius) * AsConfig::Global_Scale);
 	Ball_Rect.bottom = (int)((Center_Y_Pos + Radius) * AsConfig::Global_Scale);
 
-	InvalidateRect(AsConfig::Hwnd, &Prev_Ball_Rect, FALSE);
-	InvalidateRect(AsConfig::Hwnd, &Ball_Rect, FALSE);
+	AsConfig::Invalidate_Rect(Prev_Ball_Rect);
+	AsConfig::Invalidate_Rect(Ball_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Draw_Parashute(HDC hdc, RECT &paint_area)
@@ -532,8 +552,8 @@ void ABall::Draw_Parashute(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void ABall::Redraw_Parashute()
 {
-	InvalidateRect(AsConfig::Hwnd, &Prev_Parashute_Rect, FALSE);
-	InvalidateRect(AsConfig::Hwnd, &Parashute_Rect, FALSE);
+	AsConfig::Invalidate_Rect(Prev_Parashute_Rect);
+	AsConfig::Invalidate_Rect(Parashute_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Clear_Parashute(HDC hdc)
