@@ -117,7 +117,7 @@ int AsEngine::On_Timer()
 		if (Platform.Get_State() == EPS_Missing)
 		{
 			Game_State = EGS_Restart_Level;
-			Platform.Set_State(EPS_Roll_In);
+			Platform.Set_State(EPS_Rolling);
 		}
 		break;
 
