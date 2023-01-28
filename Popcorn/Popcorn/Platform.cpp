@@ -12,8 +12,9 @@ AsPlatform::~AsPlatform()
 }
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-: X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Substate_Glue(EPSG_Unknown), 
-  Platform_Substate_Meltdown(EPSM_Unknown), Platform_Substate_Rolling(EPSR_Unknown), Platform_Moving_State(EPMS_Stop),
+: X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Regular), Platform_Substate_Regular(EPlatform_Substate_Regular::Missing),
+  Platform_Substate_Glue(EPSG_Unknown), Platform_Substate_Meltdown(EPSM_Unknown), Platform_Substate_Rolling(EPSR_Unknown), 
+  Platform_Moving_State(EPMS_Stop),
   Inner_Width(Normal_Platform_Inner_Width),Rolling_Step(0), Speed(0.0), Glue_Spot_Height_Ratio(0.0), 
   Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0), Normal_Platform_Image(0), Width(Normal_Width), 
   Platform_Rect{}, Prev_Platform_Rect{}, 
@@ -99,7 +100,8 @@ void AsPlatform::Advance(double max_speed) // смещение платформ�
 	}
 
 	// Смещаем приклеенные мячики
-	if (Platform_State == EPS_Ready or (Platform_State == EPS_Glue and Platform_Substate_Glue == EPSG_Active) )
+	if ( (Platform_State == EPS_Regular and Platform_Substate_Regular == EPlatform_Substate_Regular::Ready) or 
+		 (Platform_State == EPS_Glue and Platform_Substate_Glue == EPSG_Active) )
 	{
 		if (Platform_Moving_State = EPMS_Moving_Left)
 			Ball_Set->Advance_On_Platform(M_PI, fabs(Speed), max_speed);
@@ -156,9 +158,9 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 
 	switch (Platform_State)
 	{
-	case EPS_Ready:
-	case EPS_Normal:
-		Draw_Normal_State(hdc, paint_area);
+	case EPS_Regular:
+		if (Platform_Substate_Regular == EPlatform_Substate_Regular::Ready or Platform_Substate_Regular == EPlatform_Substate_Regular::Normal)
+			Draw_Normal_State(hdc, paint_area);
 		break;
 
 	case EPS_Meltdown:
@@ -185,8 +187,11 @@ void AsPlatform::Clear(HDC hdc, RECT& paint_area)
 
 	switch (Platform_State)
 	{
-	case EPS_Ready:
-	case EPS_Normal:
+	case EPS_Regular:
+		if (Platform_Substate_Regular == EPlatform_Substate_Regular::Missing)
+			break;
+		// else - no break
+
 	case EPS_Rolling:
 	case EPS_Glue:
 		AsConfig::BG_Color.Select(hdc);
@@ -218,13 +223,8 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 
 	switch (new_state)
 	{
-	case EPS_Normal:
-		if (Platform_State == EPS_Glue)
-		{
-			Platform_Substate_Glue = EPSG_Finalize;
-			while ( Ball_Set->Release_Next_Ball() ) {};
-			return;
-		}
+	case EPS_Regular:
+		AsConfig::Throw(); // состояние EPS_Regular неявно устанавливается Set_State(EPlatform_Substate_Regular new_state)
 		break;
 
 	case EPS_Meltdown:
@@ -258,6 +258,36 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 	Platform_State = new_state;
 }
 //------------------------------------------------------------------------------------------------------------
+void AsPlatform::Set_State(EPlatform_Substate_Regular new_state)
+{
+	if (Platform_State == EPS_Regular and Platform_Substate_Regular == new_state)
+		return;
+	
+	if (new_state == EPlatform_Substate_Regular::Normal)
+	{
+		if (Platform_State == EPS_Glue)
+		{
+			Platform_Substate_Glue = EPSG_Finalize;
+			while ( Ball_Set->Release_Next_Ball() ) {};
+			return;
+		}
+	}
+	
+	Platform_State = EPS_Regular;
+	Platform_Substate_Regular = new_state;
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsPlatform::Has_State(EPlatform_Substate_Regular new_state)
+{
+	if (Platform_State != EPS_Regular)
+		return false;
+
+	if (Platform_Substate_Regular == new_state)
+		return true;
+	
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
 void AsPlatform::Redraw_Platform(bool update_rect)
 {
 	int platform_width;
@@ -286,7 +316,7 @@ void AsPlatform::Redraw_Platform(bool update_rect)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Move(bool to_left, bool is_key_down)
 {
-	if ( ! (Platform_State == EPS_Normal or Platform_State == EPS_Glue) )
+	if ( ! Has_State(EPlatform_Substate_Regular::Normal) or Platform_State == EPS_Glue)
 		return;
 
 	if (to_left)
@@ -321,17 +351,14 @@ void AsPlatform::On_Space_Key(bool is_key_down)
 	if (! is_key_down)
 		return;
 
-	switch ( Get_State() )
+	if (Has_State(EPlatform_Substate_Regular::Ready) )
 	{
-	case EPS_Ready:
 		Ball_Set->Release_From_Platform(Get_Middle_Pos() );
-		Set_State(EPS_Normal);
-		break;
-
-	case EPS_Glue:
-		Ball_Set->Release_Next_Ball();
-		break;
+		Set_State(EPlatform_Substate_Regular::Normal);
 	}
+	else
+		if (Platform_State == EPS_Glue)
+			Ball_Set->Release_Next_Ball();
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Hit_By(AFalling_Letter *falling_letter)
@@ -397,7 +424,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 
 	AsConfig::Round_Rect(hdc, inner_rect, 3);
 
-	if (Normal_Platform_Image == 0 and Platform_State == EPS_Ready)
+	if (Normal_Platform_Image == 0 and Has_State(EPlatform_Substate_Regular::Ready) )
 		Get_Normal_Platform_Image(hdc);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -472,7 +499,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 	}
 
 	if (moved_columns_count == 0)
-		Platform_State = EPS_Missing;  // Вся платформа сдвинулась за пределы окна
+		Set_State(EPlatform_Substate_Regular::Missing); // Вся платформа сдвинулась за пределы окна
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Rolling_State(HDC hdc, RECT &paint_area)
@@ -620,7 +647,7 @@ void AsPlatform::Act_For_Rolling_State()
 		if (Inner_Width >= Normal_Platform_Inner_Width)
 		{
 			Inner_Width = Normal_Platform_Inner_Width;
-			Platform_State = EPS_Ready;
+			Set_State(EPlatform_Substate_Regular::Ready);
 			Platform_Substate_Rolling = EPSR_Unknown;
 			Redraw_Platform();
 		}
@@ -648,7 +675,7 @@ void AsPlatform::Act_For_Glue_State()
 			Glue_Spot_Height_Ratio -= Glue_Spot_Height_Ratio_Step;
 		else
 		{
-			Platform_State = EPS_Normal;
+			Set_State(EPlatform_Substate_Regular::Normal);
 			Platform_Substate_Glue = EPSG_Unknown;
 		}
 		Redraw_Platform(false);

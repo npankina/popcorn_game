@@ -7,12 +7,19 @@
 //------------------------------------------------------------------------------------------------------------
 enum EPlatform_State
 {
-	EPS_Missing,
-	EPS_Ready,
-	EPS_Normal,
+	EPS_Regular,
 	EPS_Meltdown,
 	EPS_Rolling,
 	EPS_Glue
+};
+//------------------------------------------------------------------------------------------------------------
+enum class EPlatform_Substate_Regular : unsigned char
+{
+	Unknown,
+
+	Missing,
+	Ready,
+	Normal
 };
 //------------------------------------------------------------------------------------------------------------
 enum EPlatform_Substate_Meltdown
@@ -68,6 +75,8 @@ public:
 	void Init(AsBall_Set *ball_set);
 	EPlatform_State Get_State();
 	void Set_State(EPlatform_State new_state);
+	void Set_State(EPlatform_Substate_Regular new_state);
+	bool Has_State(EPlatform_Substate_Regular new_state);
 	void Redraw_Platform(bool update_rect = true);
 	void Move(bool to_left, bool is_key_down);
 	void On_Space_Key(bool is_key_down);
@@ -92,6 +101,7 @@ private:
 	bool Get_Platform_Image_Stroke_Color(int x, int y, const AColor **color, int &stroke_len);
 
 	EPlatform_State Platform_State;
+	EPlatform_Substate_Regular Platform_Substate_Regular;
 	EPlatform_Substate_Glue Platform_Substate_Glue;
 	EPlatform_Substate_Meltdown Platform_Substate_Meltdown;
 	EPlatform_Substate_Rolling Platform_Substate_Rolling;

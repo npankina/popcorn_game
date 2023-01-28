@@ -114,7 +114,7 @@ int AsEngine::On_Timer()
 
 
 	case EGS_Lost_Ball:
-		if (Platform.Get_State() == EPS_Missing)
+		if (Platform.Has_State(EPlatform_Substate_Regular::Missing) )
 		{
 			Game_State = EGS_Restart_Level;
 			Platform.Set_State(EPS_Rolling);
@@ -123,7 +123,7 @@ int AsEngine::On_Timer()
 
 
 	case EGS_Restart_Level:
-		if (Platform.Get_State() == EPS_Ready)
+		if (Platform.Has_State(EPlatform_Substate_Regular::Ready) )
 		{
 			Game_State = EGS_Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos() );
@@ -145,7 +145,7 @@ void AsEngine::Act()
 	Platform.Act();
 	Level.Act();
 
-	if (Platform.Get_State() != EPS_Ready)
+	if ( ! Platform.Has_State(EPlatform_Substate_Regular::Ready) )
 		Ball_Set.Act();
 
 	while (Level.Get_Next_Falling_letter(index, &falling_letter) )
