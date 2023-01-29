@@ -117,7 +117,7 @@ int AsEngine::On_Timer()
 		if (Platform.Has_State(EPlatform_Substate_Regular::Missing) )
 		{
 			Game_State = EGS_Restart_Level;
-			Platform.Set_State(EPS_Rolling);
+			Platform.Set_State(EPlatform_State::Rolling);
 		}
 		break;
 
@@ -163,7 +163,7 @@ void AsEngine::Play_Level()
 	{
 		Game_State = EGS_Lost_Ball;
 		Level.Stop();
-		Platform.Set_State(EPS_Meltdown);
+		Platform.Set_State(EPlatform_State::Meltdown);
 	}
 	else
 		Ball_Set.Accelerate();
@@ -217,17 +217,17 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 	switch(falling_letter->Letter_Type)
 	{
 	case ELT_O: // "Отмена"
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
 	case ELT_I: // "Инверсия"
 		Ball_Set.Inverse();
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
 	case ELT_C: // "Скорость"
 		Ball_Set.Reset_Speed();
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
 	//case ELT_M: // "Монстры"
@@ -236,11 +236,11 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 	case ELT_G: // "Жизнь"
 		if (Life_Counter < AsConfig::Max_Life_Count)
 			++Life_Counter; // !!! отобразить на индикаторе
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
 	case ELT_K: // "Клей"
-		Platform.Set_State(EPS_Glue);
+		Platform.Set_State(EPlatform_State::Glue);
 		break;
 
 	//case ELT_W: // "Шире"
@@ -249,7 +249,7 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 	case ELT_P: // "Пол"
 		AsConfig::Level_Has_Floor = true;
 		Border.Redraw_Floor();
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		// !!! отобразить пол на индикаторе
 		break;
 
@@ -257,7 +257,7 @@ void AsEngine::On_Falling_letter(AFalling_Letter *falling_letter)
 		//break;
 
 	case ELT_T: // "Три"
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		Ball_Set.Tripple_Balls();
 		break;
 

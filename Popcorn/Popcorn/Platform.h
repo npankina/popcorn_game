@@ -5,12 +5,12 @@
 
 
 //------------------------------------------------------------------------------------------------------------
-enum EPlatform_State
+enum class EPlatform_State : unsigned char
 {
-	EPS_Regular,
-	EPS_Meltdown,
-	EPS_Rolling,
-	EPS_Glue
+	Regular,
+	Meltdown,
+	Rolling,
+	Glue
 };
 //------------------------------------------------------------------------------------------------------------
 enum class EPlatform_Substate_Regular : unsigned char
@@ -22,37 +22,37 @@ enum class EPlatform_Substate_Regular : unsigned char
 	Normal
 };
 //------------------------------------------------------------------------------------------------------------
-enum EPlatform_Substate_Meltdown
+enum class EPlatform_Substate_Meltdown : unsigned char
 {
-	EPSM_Unknown,
+	Unknown,
 
-	EPSM_Init,
-	EPSM_Active
+	Init,
+	Active
 };
 //------------------------------------------------------------------------------------------------------------
-enum EPlatform_Substate_Rolling
+enum class EPlatform_Substate_Rolling : unsigned char
 {
-	EPSR_Unknown,
+	Unknown,
 
-	EPSR_Roll_In,
-	EPSR_Expand_Roll_In,
+	Roll_In,
+	Expand_Roll_In,
 };
 //------------------------------------------------------------------------------------------------------------
-enum EPlatform_Substate_Glue
+enum class EPlatform_Substate_Glue : unsigned char
 {
-	EPSG_Unknown,
+	Unknown,
 
-	EPSG_Init,
-	EPSG_Active,
-	EPSG_Finalize
+	Init,
+	Active,
+	Finalize
 };
 //------------------------------------------------------------------------------------------------------------
-enum EPlatform_Moving_State
+enum class EPlatform_Moving_State : unsigned char
 {
-	EPMS_Stopping,
-	EPMS_Stop,
-	EPMS_Moving_Left,
-	EPMS_Moving_Right
+	Stopping,
+	Stop,
+	Moving_Left,
+	Moving_Right
 };
 //------------------------------------------------------------------------------------------------------------
 class AsPlatform: public AHit_Checker, public AMover, public AGraphics_Object
