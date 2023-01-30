@@ -55,6 +55,25 @@ enum class EPlatform_Moving_State : unsigned char
 	Moving_Right
 };
 //------------------------------------------------------------------------------------------------------------
+class AsPlatform_State
+{
+public:
+	AsPlatform_State();
+
+	operator EPlatform_State() const;
+	void operator =(EPlatform_State new_state);
+
+	EPlatform_Substate_Regular Regular;
+	EPlatform_Substate_Glue Glue;
+	EPlatform_Substate_Meltdown Meltdown;
+	EPlatform_Substate_Rolling Rolling;
+
+	EPlatform_Moving_State Moving;
+
+private:
+	EPlatform_State Current_State;
+};
+//------------------------------------------------------------------------------------------------------------
 class AsPlatform: public AHit_Checker, public AMover, public AGraphics_Object
 {
 public:
@@ -100,13 +119,6 @@ private:
 	bool Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball);
 	bool Get_Platform_Image_Stroke_Color(int x, int y, const AColor **color, int &stroke_len);
 
-	EPlatform_State Platform_State;
-	EPlatform_Substate_Regular Platform_Substate_Regular;
-	EPlatform_Substate_Glue Platform_Substate_Glue;
-	EPlatform_Substate_Meltdown Platform_Substate_Meltdown;
-	EPlatform_Substate_Rolling Platform_Substate_Rolling;
-	EPlatform_Moving_State Platform_Moving_State;
-
 	double X_Pos;
 
 	int Inner_Width;
@@ -120,6 +132,8 @@ private:
 
 	static const int Normal_Width = 28;
 	int Meltdown_Platform_Y_Pos[Normal_Width * AsConfig::Global_Scale];
+
+	AsPlatform_State Platform_State;
 
 	RECT Platform_Rect, Prev_Platform_Rect;
 	AColor Highlight_Color, Platform_Circle_Color, Platform_Inner_Color;
