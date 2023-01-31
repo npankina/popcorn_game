@@ -10,7 +10,8 @@ enum class EPlatform_State : unsigned char
 	Regular,
 	Meltdown,
 	Rolling,
-	Glue
+	Glue,
+	Expanding
 };
 //------------------------------------------------------------------------------------------------------------
 enum class EPlatform_Substate_Regular : unsigned char
@@ -47,6 +48,15 @@ enum class EPlatform_Substate_Glue : unsigned char
 	Finalize
 };
 //------------------------------------------------------------------------------------------------------------
+enum class EPlatform_Substate_Expanding : unsigned char
+{
+	Unknown,
+
+	Init,
+	Active,
+	Finalize
+};
+//------------------------------------------------------------------------------------------------------------
 enum class EPlatform_Moving_State : unsigned char
 {
 	Stopping,
@@ -61,12 +71,13 @@ public:
 	AsPlatform_State();
 
 	operator EPlatform_State() const;
-	void operator =(EPlatform_State new_state);
+	void operator = (EPlatform_State new_state);
 
 	EPlatform_Substate_Regular Regular;
 	EPlatform_Substate_Glue Glue;
 	EPlatform_Substate_Meltdown Meltdown;
 	EPlatform_Substate_Rolling Rolling;
+	EPlatform_Substate_Expanding Expanding;
 
 	EPlatform_Moving_State Moving;
 
@@ -113,6 +124,7 @@ private:
 	void Draw_Roll_In_State(HDC hdc, RECT &paint_area);
 	void Draw_Glue_State(HDC hdc, RECT &paint_area);
 	void Draw_Glue_Spot(HDC hdc, int width, int height, int x_offset = 0);
+	void Draw_Expanding_State(HDC hdc, RECT &paint_area);
 	void Act_For_Meltdown_State();
 	void Act_For_Rolling_State();
 	void Act_For_Glue_State();
@@ -125,6 +137,7 @@ private:
 	int Rolling_Step;
 	double Speed; // количество пикселов на которые смещается платформа за кадр
 	double Glue_Spot_Height_Ratio;
+	double Expanding_Platform_Width;
 	bool Left_Key_Down, Right_Key_Down;
 	
 	int Normal_Platform_Image_Width, Normal_Platform_Image_Height;
@@ -143,11 +156,13 @@ private:
 	static const int Circle_Size = 7;
 	static const int X_Step = 6;
 	static const int Normal_Platform_Inner_Width = Normal_Width - Circle_Size;
+	static const int Expanding_Platform_Inner_Width = 12;
 	static const int Meltdown_Speed = 3;
 	static const int Max_Rolling_Step = 16;
 	static const int Roll_In_Platform_End_X_Pos = 99;
 	static const int Rolling_Platform_Speed = 3;
 
 	static const double Max_Glue_Spot_Height_Ratio, Min_Glue_Spot_Height_Ratio, Glue_Spot_Height_Ratio_Step;
+	static const double Min_Expanding_Platform_Width, Max_Expanding_Platform_Width, Expanding_Platform_Width_Step;
 };
 //------------------------------------------------------------------------------------------------------------
