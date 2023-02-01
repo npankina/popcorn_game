@@ -149,7 +149,7 @@ private:
 	AsPlatform_State Platform_State;
 
 	RECT Platform_Rect, Prev_Platform_Rect;
-	AColor Highlight_Color, Platform_Circle_Color, Platform_Inner_Color;
+	AColor Highlight_Color, Platform_Circle_Color, Platform_Inner_Color, Truss_Color;
 	AsBall_Set *Ball_Set;
 
 	static const int Height = 7;

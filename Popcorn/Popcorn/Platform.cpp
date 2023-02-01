@@ -42,7 +42,8 @@ AsPlatform::AsPlatform()
 : X_Pos(AsConfig::Border_X_Offset), Inner_Width(Normal_Platform_Inner_Width),Rolling_Step(0), Speed(0.0), 
   Glue_Spot_Height_Ratio(0.0), Expanding_Platform_Width(0.0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0), 
   Normal_Platform_Image(0), Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Color(255, 255, 255), 
-  Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Ball_Set(0), Left_Key_Down(false), Right_Key_Down(false)
+  Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Truss_Color(Platform_Inner_Color, AsConfig::Global_Scale),
+  Ball_Set(0), Left_Key_Down(false), Right_Key_Down(false)
 {}
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -645,35 +646,80 @@ void AsPlatform::Draw_Expanding_State(HDC hdc, RECT &paint_area)
 {
 	double x = X_Pos;
 	int y = AsConfig::Platform_Y_Pos;
+	int arc_mid_x;
+	int truss_x, truss_top_y, truss_bottom_y;
 	const int scale = AsConfig::Global_Scale;
 	const double d_scale = AsConfig::D_Global_Scale;
-	RECT inner_rect{}, rect{};
+	RECT inner_rect{}, rect{}, arc_rect{};
 
 	// 1. Рисуем боковые шарики
+	// 1.1 Левый шарик
 	Platform_Circle_Color.Select(hdc);
 
-	rect.left = (int)(x * d_scale);
+	rect.left = (int)x * scale;
 	rect.top = y * scale;
-	rect.right = (int)((x + Circle_Size) * d_scale - 1.0);
-	rect.bottom = (y + Circle_Size) * scale - 1;
+	rect.right = ( (int)x + Circle_Size) * scale;
+	rect.bottom = (y + Circle_Size) * scale;
 
-	Ellipse(hdc, rect.left, rect.top, rect.right, rect.bottom);
+	Ellipse(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 
-	rect.left = (int)((x + Expanding_Platform_Width - (double)Circle_Size) * d_scale);
-	rect.right = rect.left + Circle_Size * scale;
+	Truss_Color.Select(hdc);
+	
+	arc_rect.left = rect.left + 4 * scale + 2;
+	arc_rect.top = rect.top + scale + 1;
+	arc_rect.right = rect.left + (4 + 3) * scale + 2;
+	arc_rect.bottom = rect.bottom - scale - 1;
 
-	Ellipse(hdc, rect.left,rect.top, rect.right, rect.bottom);
+	arc_mid_x = arc_rect.left + (arc_rect.right - arc_rect.left) / 2;
 
-	// 2. Рисуем блик
-	Draw_Circle_Highlight(hdc, (int)(x * d_scale), y * scale);
+	AsConfig::BG_Color.Select(hdc);
+	Ellipse(hdc, arc_rect.left, arc_rect.top, arc_rect.right - 1, arc_rect.bottom - 1);
 
-	// 3. Рисуем среднюю часть
-	Platform_Inner_Color.Select(hdc);
+	Truss_Color.Select(hdc);
+	Arc(hdc, arc_rect.left, arc_rect.top, arc_rect.right - 1, arc_rect.bottom - 1,
+			 arc_mid_x, arc_rect.top, arc_mid_x, arc_rect.bottom);
 
+	// 1.2 Рисуем блик
+	Draw_Circle_Highlight(hdc, (int)x * scale, y * scale);
+
+	// 1.3 Фермы
 	inner_rect.left = (int)( (x + (Expanding_Platform_Width - (double)Expanding_Platform_Inner_Width) / 2.0) * d_scale);
 	inner_rect.top = (y + 1) * scale;
 	inner_rect.right = inner_rect.left + Expanding_Platform_Inner_Width * scale;
 	inner_rect.bottom = (y + 1 + 5) * scale;
+
+	// 1.3.1 Фермы слева
+	Truss_Color.Select(hdc);
+	truss_x = inner_rect.left + 1;
+	truss_top_y = inner_rect.top + 1;
+	truss_bottom_y = inner_rect.bottom - scale + 1;
+
+	MoveToEx(hdc, truss_x, truss_top_y, 0);
+	LineTo(hdc, truss_x - 4 * scale - 1, truss_bottom_y);
+	LineTo(hdc, truss_x - 8 * scale, truss_top_y);
+
+	MoveToEx(hdc, truss_x, truss_bottom_y, 0);
+	LineTo(hdc, truss_x - 4 * scale - 1, truss_top_y);
+	LineTo(hdc, truss_x - 8 * scale, truss_bottom_y);
+
+
+	// 1.3.2 Фермы справа
+
+
+	// 1.4 Правый шарик
+	Platform_Circle_Color.Select(hdc);
+
+	rect.left = (int)((x + Expanding_Platform_Width - (double)Circle_Size) * d_scale);
+	rect.right = rect.left + Circle_Size * scale;
+
+	Ellipse(hdc, rect.left,rect.top, rect.right - 1, rect.bottom - 1);
+
+	
+
+	// 3. Рисуем среднюю часть
+	Platform_Inner_Color.Select(hdc);
+
+	
 
 	Rectangle(hdc, inner_rect.left, inner_rect.top, inner_rect.right, inner_rect.bottom);
 
@@ -681,7 +727,6 @@ void AsPlatform::Draw_Expanding_State(HDC hdc, RECT &paint_area)
 
 	// 2. Центральная часть
 
-	// 3. Фермы
 
 }
 //------------------------------------------------------------------------------------------------------------
