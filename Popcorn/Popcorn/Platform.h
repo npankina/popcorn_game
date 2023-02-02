@@ -124,6 +124,8 @@ private:
 	void Draw_Roll_In_State(HDC hdc, RECT &paint_area);
 	void Draw_Glue_State(HDC hdc, RECT &paint_area);
 	void Draw_Glue_Spot(HDC hdc, int width, int height, int x_offset = 0);
+	void Draw_Expanding_Platform_Ball(HDC hdc, bool is_left_side);
+	void Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left_side);
 	void Draw_Expanding_State(HDC hdc, RECT &paint_area);
 	void Act_For_Meltdown_State();
 	void Act_For_Rolling_State();

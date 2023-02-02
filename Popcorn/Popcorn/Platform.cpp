@@ -642,29 +642,37 @@ void AsPlatform::Draw_Glue_Spot(HDC hdc, int width, int height, int x_offset)
 		spot_rect.left, platform_top - 1, spot_rect.right - 1, platform_top - 1); // по 2 координаты - хорды
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform::Draw_Expanding_State(HDC hdc, RECT &paint_area)
-{
+void AsPlatform::Draw_Expanding_Platform_Ball(HDC hdc, bool is_left_side)
+{// Рисование бокового шарика расширяющейся платформы
+	
 	double x = X_Pos;
 	int y = AsConfig::Platform_Y_Pos;
-	int arc_mid_x;
-	int truss_x, truss_top_y, truss_bottom_y;
 	const int scale = AsConfig::Global_Scale;
 	const double d_scale = AsConfig::D_Global_Scale;
-	RECT inner_rect{}, rect{}, arc_rect{};
+	int arc_mid_x;
+	int arc_start_y, arc_end_y;
+	int arc_right_offset;
+	RECT rect{}, arc_rect{};
 
-	// 1. Рисуем боковые шарики
-	// 1.1 Левый шарик
-	Platform_Circle_Color.Select(hdc);
-
-	rect.left = (int)x * scale;
+	if (is_left_side)
+		rect.left = (int)x * scale;
+	else
+		rect.left = (int)((x + Expanding_Platform_Width - (double)Circle_Size) * d_scale);
 	rect.top = y * scale;
-	rect.right = ( (int)x + Circle_Size) * scale;
+	rect.right = rect.left + Circle_Size * scale;
 	rect.bottom = (y + Circle_Size) * scale;
 
+
+	Platform_Circle_Color.Select(hdc);
 	Ellipse(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 
+	// Переходник на ферму
+	//Rectangle(hdc, rect.left + 4 * scale, rect.top, rect.right - scale + 1, rect.bottom - 1);
+
+	// Ферма
 	Truss_Color.Select(hdc);
-	
+
+
 	arc_rect.left = rect.left + 4 * scale + 2;
 	arc_rect.top = rect.top + scale + 1;
 	arc_rect.right = rect.left + (4 + 3) * scale + 2;
@@ -672,25 +680,48 @@ void AsPlatform::Draw_Expanding_State(HDC hdc, RECT &paint_area)
 
 	arc_mid_x = arc_rect.left + (arc_rect.right - arc_rect.left) / 2;
 
+	if (is_left_side)
+	{
+		arc_start_y = arc_rect.top;
+		arc_end_y = arc_rect.bottom;
+	}
+	else
+	{
+		arc_start_y = arc_rect.bottom;
+		arc_end_y = arc_rect.top;
+
+		arc_right_offset = (Circle_Size - 2) * scale + 1;
+		arc_rect.left -= arc_right_offset;
+		arc_rect.right -= arc_right_offset;
+		arc_mid_x -= arc_right_offset;
+	}
+
+	// Вставка фонового цвета под дугой фермы
 	AsConfig::BG_Color.Select(hdc);
 	Ellipse(hdc, arc_rect.left, arc_rect.top, arc_rect.right - 1, arc_rect.bottom - 1);
 
+	// Дуга фурмы
 	Truss_Color.Select(hdc);
 	Arc(hdc, arc_rect.left, arc_rect.top, arc_rect.right - 1, arc_rect.bottom - 1,
-			 arc_mid_x, arc_rect.top, arc_mid_x, arc_rect.bottom);
+		arc_mid_x, arc_start_y, arc_mid_x, arc_end_y);
 
 	// 1.2 Рисуем блик
 	Draw_Circle_Highlight(hdc, (int)x * scale, y * scale);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left_side)
+{// Рисование фермы расширяющейся платформы
 
-	// 1.3 Фермы
-	inner_rect.left = (int)( (x + (Expanding_Platform_Width - (double)Expanding_Platform_Inner_Width) / 2.0) * d_scale);
-	inner_rect.top = (y + 1) * scale;
-	inner_rect.right = inner_rect.left + Expanding_Platform_Inner_Width * scale;
-	inner_rect.bottom = (y + 1 + 5) * scale;
+	const double d_scale = AsConfig::D_Global_Scale;
+	const int scale = AsConfig::Global_Scale;
+	int truss_x;
+	int truss_top_y, truss_bottom_y;
 
-	// 1.3.1 Фермы слева
 	Truss_Color.Select(hdc);
+
 	truss_x = inner_rect.left + 1;
+	if (!is_left_side)
+		truss_x += (Expanding_Platform_Inner_Width + 8 - 1) * scale + 1;
 	truss_top_y = inner_rect.top + 1;
 	truss_bottom_y = inner_rect.bottom - scale + 1;
 
@@ -701,18 +732,42 @@ void AsPlatform::Draw_Expanding_State(HDC hdc, RECT &paint_area)
 	MoveToEx(hdc, truss_x, truss_bottom_y, 0);
 	LineTo(hdc, truss_x - 4 * scale - 1, truss_top_y);
 	LineTo(hdc, truss_x - 8 * scale, truss_bottom_y);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Expanding_State(HDC hdc, RECT &paint_area)
+{
+	double x = X_Pos;
+	int y = AsConfig::Platform_Y_Pos;
+	const int scale = AsConfig::Global_Scale;
+	const double d_scale = AsConfig::D_Global_Scale;
+	RECT inner_rect{};
 
+	inner_rect.left = (int)( (x + (Expanding_Platform_Width - (double)Expanding_Platform_Inner_Width) / 2.0) * d_scale);
+	inner_rect.top = (y + 1) * scale;
+	inner_rect.right = inner_rect.left + Expanding_Platform_Inner_Width * scale;
+	inner_rect.bottom = (y + 1 + 5) * scale;
 
-	// 1.3.2 Фермы справа
+	// 1. Левая сторона
+	// 1.1. Шарик
+	Draw_Expanding_Platform_Ball(hdc, true);
 
+	// 1.2. Фермы 
+	Draw_Expanding_Truss(hdc, inner_rect, true);
 
-	// 1.4 Правый шарик
-	Platform_Circle_Color.Select(hdc);
+	
+	// 2. Правая сторона
+	// 2.1. Шарик
+	Draw_Expanding_Platform_Ball(hdc, false);
 
-	rect.left = (int)((x + Expanding_Platform_Width - (double)Circle_Size) * d_scale);
-	rect.right = rect.left + Circle_Size * scale;
+	// 2.2. Фермы 
+	Draw_Expanding_Truss(hdc, inner_rect, false);
 
-	Ellipse(hdc, rect.left,rect.top, rect.right - 1, rect.bottom - 1);
+	//Platform_Circle_Color.Select(hdc);
+	////Draw_Expanding_Truss(hdc, inner_rect);
+
+	//rect.right = rect.left + Circle_Size * scale;
+
+	//Ellipse(hdc, rect.left,rect.top, rect.right - 1, rect.bottom - 1);
 
 	
 
