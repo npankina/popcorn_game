@@ -193,7 +193,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_TIMER:
-		if (wParam == AsEngine::Timer_ID)
+		if (wParam == Timer_ID)
 			return Engine.On_Timer();
 		break;
 

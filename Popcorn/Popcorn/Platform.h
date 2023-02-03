@@ -5,7 +5,7 @@
 
 
 //------------------------------------------------------------------------------------------------------------
-enum class EPlatform_State : unsigned char
+enum class EPlatform_State: unsigned char
 {
 	Regular,
 	Meltdown,
@@ -14,7 +14,7 @@ enum class EPlatform_State : unsigned char
 	Expanding
 };
 //------------------------------------------------------------------------------------------------------------
-enum class EPlatform_Substate_Regular : unsigned char
+enum class EPlatform_Substate_Regular: unsigned char
 {
 	Unknown,
 
@@ -23,7 +23,7 @@ enum class EPlatform_Substate_Regular : unsigned char
 	Normal
 };
 //------------------------------------------------------------------------------------------------------------
-enum class EPlatform_Substate_Meltdown : unsigned char
+enum class EPlatform_Substate_Meltdown: unsigned char
 {
 	Unknown,
 
@@ -31,15 +31,15 @@ enum class EPlatform_Substate_Meltdown : unsigned char
 	Active
 };
 //------------------------------------------------------------------------------------------------------------
-enum class EPlatform_Substate_Rolling : unsigned char
+enum class EPlatform_Substate_Rolling: unsigned char
 {
 	Unknown,
 
 	Roll_In,
-	Expand_Roll_In,
+	Expand_Roll_In
 };
 //------------------------------------------------------------------------------------------------------------
-enum class EPlatform_Substate_Glue : unsigned char
+enum class EPlatform_Substate_Glue: unsigned char
 {
 	Unknown,
 
@@ -48,7 +48,7 @@ enum class EPlatform_Substate_Glue : unsigned char
 	Finalize
 };
 //------------------------------------------------------------------------------------------------------------
-enum class EPlatform_Substate_Expanding : unsigned char
+enum class EPlatform_Substate_Expanding: unsigned char
 {
 	Unknown,
 
@@ -57,7 +57,7 @@ enum class EPlatform_Substate_Expanding : unsigned char
 	Finalize
 };
 //------------------------------------------------------------------------------------------------------------
-enum class EPlatform_Moving_State : unsigned char
+enum class EPlatform_Moving_State: unsigned char
 {
 	Stopping,
 	Stop,
@@ -74,9 +74,10 @@ public:
 	void operator = (EPlatform_State new_state);
 
 	EPlatform_Substate_Regular Regular;
-	EPlatform_Substate_Glue Glue;
+
 	EPlatform_Substate_Meltdown Meltdown;
 	EPlatform_Substate_Rolling Rolling;
+	EPlatform_Substate_Glue Glue;
 	EPlatform_Substate_Expanding Expanding;
 
 	EPlatform_Moving_State Moving;
@@ -92,79 +93,78 @@ public:
 	AsPlatform();
 
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
-	virtual void Advance(double max_speed);
-	virtual double Get_Speed();
+
 	virtual void Begin_Movement();
 	virtual void Finish_Movement();
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+
 
 	virtual void Act();
-	virtual void Draw(HDC hdc, RECT& paint_area);
-	virtual void Clear(HDC hdc, RECT& paint_area);
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
 	void Init(AsBall_Set *ball_set);
 	EPlatform_State Get_State();
 	void Set_State(EPlatform_State new_state);
-	void Set_State(EPlatform_Substate_Regular new_state);
-	bool Has_State(EPlatform_Substate_Regular new_state);
+	void Set_State(EPlatform_Substate_Regular new_regular_state);
+	bool Has_State(EPlatform_Substate_Regular regular_state);
 	void Redraw_Platform(bool update_rect = true);
-	void Move(bool to_left, bool is_key_down);
-	void On_Space_Key(bool is_key_down);
+	void Move(bool to_left, bool key_down);
+	void On_Space_Key(bool key_down);
 	bool Hit_By(AFalling_Letter *falling_letter);
 	double Get_Middle_Pos();
-	void Get_Normal_Platform_Image(HDC hdc);
 
 	int Width;
+	double X_Pos;
 
 private:
+	void Act_For_Meltdown_State();
+	void Act_For_Rolling_State();
+	void Act_For_Glue_State();
 	void Draw_Circle_Highlight(HDC hdc, int x, int y);
 	void Draw_Normal_State(HDC hdc, RECT &paint_area);
 	void Draw_Meltdown_State(HDC hdc, RECT &paint_area);
 	void Draw_Rolling_State(HDC hdc, RECT &paint_area);
 	void Draw_Roll_In_State(HDC hdc, RECT &paint_area);
 	void Draw_Glue_State(HDC hdc, RECT &paint_area);
-	void Draw_Glue_Spot(HDC hdc, int width, int height, int x_offset = 0);
-	void Draw_Expanding_Platform_Ball(HDC hdc, bool is_left_side);
-	void Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left_side);
+	void Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height);
 	void Draw_Expanding_State(HDC hdc, RECT &paint_area);
-	void Act_For_Meltdown_State();
-	void Act_For_Rolling_State();
-	void Act_For_Glue_State();
+	void Draw_Expanding_Platform_Ball(HDC hdc, bool is_left);
+	void Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left);
 	bool Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball);
 	bool Get_Platform_Image_Stroke_Color(int x, int y, const AColor **color, int &stroke_len);
+	void Get_Normal_Platform_Image(HDC hdc);
 
-	double X_Pos;
-
+	AsPlatform_State Platform_State;
+	bool Left_Key_Down, Right_Key_Down;
 	int Inner_Width;
 	int Rolling_Step;
-	double Speed; // количество пикселов на которые смещается платформа за кадр
+	double Speed;
 	double Glue_Spot_Height_Ratio;
 	double Expanding_Platform_Width;
-	bool Left_Key_Down, Right_Key_Down;
-	
+	AsBall_Set *Ball_Set;
+
 	int Normal_Platform_Image_Width, Normal_Platform_Image_Height;
-	int *Normal_Platform_Image; // указатель на массив
+	int *Normal_Platform_Image;  // Пиксели изображения платформы на фоне
 
 	static const int Normal_Width = 28;
 	int Meltdown_Platform_Y_Pos[Normal_Width * AsConfig::Global_Scale];
 
-	AsPlatform_State Platform_State;
-
 	RECT Platform_Rect, Prev_Platform_Rect;
-	AColor Highlight_Color, Platform_Circle_Color, Platform_Inner_Color, Truss_Color;
-	AsBall_Set *Ball_Set;
 
+	AColor Highlight_Color, Platform_Circle_Color, Platform_Inner_Color, Truss_Color;
+	static const double Max_Glue_Spot_Height_Ratio, Min_Glue_Spot_Height_Ratio, Glue_Spot_Height_Ratio_Step;
+	static const double Max_Expanding_Platform_Width, Min_Expanding_Platform_Width, Expanding_Platform_Width_Step;
 	static const int Height = 7;
 	static const int Circle_Size = 7;
-	static const int X_Step = 6;
 	static const int Normal_Platform_Inner_Width = Normal_Width - Circle_Size;
 	static const int Expanding_Platform_Inner_Width = 12;
 	static const int Meltdown_Speed = 3;
 	static const int Max_Rolling_Step = 16;
 	static const int Roll_In_Platform_End_X_Pos = 99;
 	static const int Rolling_Platform_Speed = 3;
-
-	static const double Max_Glue_Spot_Height_Ratio, Min_Glue_Spot_Height_Ratio, Glue_Spot_Height_Ratio_Step;
-	static const double Min_Expanding_Platform_Width, Max_Expanding_Platform_Width, Expanding_Platform_Width_Step;
+	static const int X_Step = 6;
 };
 //------------------------------------------------------------------------------------------------------------

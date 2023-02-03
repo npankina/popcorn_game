@@ -1,4 +1,4 @@
-﻿#include "Active_Brick.h"
+#include "Active_Brick.h"
 
 // AActive_Brick
 //------------------------------------------------------------------------------------------------------------
@@ -9,7 +9,8 @@ void AActive_Brick::Get_Level_Pos(int &dest_brick_x, int &dest_brick_y)
 }
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick::~AActive_Brick()
-{}
+{
+}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick::AActive_Brick(EBrick_Type brick_type, int level_x, int level_y)
 : Brick_Type(brick_type), Level_X(level_x), Level_Y(level_y), Brick_Rect{}
@@ -20,14 +21,13 @@ AActive_Brick::AActive_Brick(EBrick_Type brick_type, int level_x, int level_y)
 	Brick_Rect.bottom = Brick_Rect.top + AsConfig::Brick_Height * AsConfig::Global_Scale;
 }
 //------------------------------------------------------------------------------------------------------------
-void AActive_Brick::Clear(HDC hdc, RECT& paint_area)
-{}
+void AActive_Brick::Clear(HDC hdc, RECT &paint_area)
+{
+}
 //------------------------------------------------------------------------------------------------------------
 double AActive_Brick::Get_Brick_X_Pos(bool of_center)
 {
-	double pos;
-
-	pos = (double)(AsConfig::Level_X_Offset + Level_X * AsConfig::Cell_Width);
+	double pos = (double)(AsConfig::Level_X_Offset + Level_X * AsConfig::Cell_Width);
 
 	if (of_center)
 		pos += (double)AsConfig::Brick_Width / 2.0;
@@ -37,9 +37,7 @@ double AActive_Brick::Get_Brick_X_Pos(bool of_center)
 //------------------------------------------------------------------------------------------------------------
 double AActive_Brick::Get_Brick_Y_Pos(bool of_center)
 {
-	double pos;
-
-	pos = (double)(AsConfig::Level_Y_Offset + Level_Y * AsConfig::Cell_Height);
+	double pos = (double)(AsConfig::Level_Y_Offset + Level_Y * AsConfig::Cell_Height);
 
 	if (of_center)
 		pos += (double)AsConfig::Brick_Height / 2.0;
@@ -52,17 +50,18 @@ double AActive_Brick::Get_Brick_Y_Pos(bool of_center)
 
 
 // AActive_Brick_Red_Blue
-//------------------------------------------------------------------------------------------------------------
-AColor AActive_Brick_Red_Blue::Fading_Blue_Brick_Colors[Max_Fade_Step];
+
 AColor AActive_Brick_Red_Blue::Fading_Red_Brick_Colors[Max_Fade_Step];
+AColor AActive_Brick_Red_Blue::Fading_Blue_Brick_Colors[Max_Fade_Step];
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Red_Blue::~AActive_Brick_Red_Blue()
-{}
+{
+}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Red_Blue::AActive_Brick_Red_Blue(EBrick_Type brick_type, int level_x, int level_y)
 : AActive_Brick(brick_type, level_x, level_y), Fade_Step(0)
 {
-	if ( !(brick_type == EBT_Blue or brick_type == EBT_Red) )
+	if (! (brick_type == EBT_Red || brick_type == EBT_Blue) )
 		AsConfig::Throw();
 }
 //------------------------------------------------------------------------------------------------------------
@@ -98,7 +97,7 @@ void AActive_Brick_Red_Blue::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AActive_Brick_Red_Blue::Is_Finished()
 {
-	if (Fade_Step >= Max_Fade_Step)
+	if (Fade_Step >= Max_Fade_Step - 1)
 		return true;
 	else
 		return false;
@@ -218,7 +217,8 @@ bool AActive_Brick_Unbreakable::Is_Finished()
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Unbreakable::Draw_In_Level(HDC hdc, RECT &brick_rect)
-{ // Вывод неактивного кирпича на уровне
+{// Вывод неактивного кирпича на уровне
+
 	AsConfig::White_Color.Select(hdc);
 	AsConfig::Round_Rect(hdc, brick_rect);
 }
@@ -230,11 +230,13 @@ void AActive_Brick_Unbreakable::Draw_In_Level(HDC hdc, RECT &brick_rect)
 // AActive_Brick_Multihit
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Multihit::~AActive_Brick_Multihit()
-{}
+{
+}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Multihit::AActive_Brick_Multihit(int level_x, int level_y)
 : AActive_Brick(EBT_Multihit_1, level_x, level_y), Rotation_Step(0)
-{}
+{
+}
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Multihit::Act()
 {
@@ -250,10 +252,10 @@ void AActive_Brick_Multihit::Draw(HDC hdc, RECT &paint_area)
 	int step;
 	const int scale = AsConfig::Global_Scale;
 	double rotation_angle, x_ratio;
-	RECT zero_rect{};
-	XFORM xform{}, old_xform{};
+	RECT zero_rect;
+	XFORM xform, old_xform;
 
-	// 1. Очистка фона
+	// 1. Очищаем фон
 	AsConfig::BG_Color.Select(hdc);
 	AsConfig::Round_Rect(hdc, Brick_Rect);
 
@@ -301,11 +303,11 @@ bool AActive_Brick_Multihit::Is_Finished()
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Multihit::Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
-{ // Вывод неактивного кирпича на уровне
+{// Вывод неактивного кирпича на уровне
 
 	const int scale = AsConfig::Global_Scale;
 
-	// 1. Рисование фона
+	// 1. Рисуем фон
 	AsConfig::White_Color.Select(hdc);
 	AsConfig::Round_Rect(hdc, brick_rect);
 
@@ -313,8 +315,8 @@ void AActive_Brick_Multihit::Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Typ
 	Rectangle(hdc, brick_rect.left + scale, brick_rect.top + scale, brick_rect.right - scale - 1, brick_rect.bottom - scale - 1);
 
 
-	// 2. Рисование внутренних прямоугольников
-	switch(brick_type)
+	// 2. Рисуем внутренние прямоугольники
+	switch (brick_type)
 	{
 	case EBT_Multihit_1:
 		Draw_Stage(hdc, brick_rect, 2, 10);
@@ -344,7 +346,8 @@ void AActive_Brick_Multihit::Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Typ
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Multihit::Draw_Stage(HDC hdc, RECT &brick_rect, int x, int width)
-{
+{// Рисуем внутренний прямоугольник
+
 	const int scale = AsConfig::Global_Scale;
 	RECT stage_rect{};
 
@@ -367,22 +370,18 @@ void AActive_Brick_Multihit::Draw_Stage(HDC hdc, RECT &brick_rect, int x, int wi
 // AActive_Brick_Teleport
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Teleport::~AActive_Brick_Teleport()
-{}
+{
+}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Teleport::AActive_Brick_Teleport(int level_x, int level_y, ABall *ball, AActive_Brick_Teleport *destination_teleport)
-: AActive_Brick(EBT_Teleport, level_x, level_y), Teleport_State(ETS_Started), Animation_Step(0),Ball(0),
-  Destination_Teleport(destination_teleport)
+: AActive_Brick(EBT_Teleport, level_x, level_y), Teleport_State(ETS_Starting), Animation_Step(0), Ball(0), Destination_Teleport(destination_teleport)
 {
 	Set_Ball(ball);
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Teleport::Act()
 {
-	/*if (AsConfig::Current_Timer_Tick % 10 != 0)
-		return;*/
-
-	double ball_x = 0.0;
-	double ball_y = 0.0;
+	double ball_x = 0, ball_y = 0;
 	double direction;
 
 	//if (AsConfig::Current_Timer_Tick % 5 != 0)
@@ -395,11 +394,11 @@ void AActive_Brick_Teleport::Act()
 	}
 	else
 	{
-		switch(Teleport_State)
+		switch (Teleport_State)
 		{
-		case ETS_Started:
+		case ETS_Starting:
 			Animation_Step = 0;
-			Teleport_State = ETS_Finished;
+			Teleport_State = ETS_Finishing;
 
 			if (Destination_Teleport != 0)
 			{
@@ -408,12 +407,12 @@ void AActive_Brick_Teleport::Act()
 			}
 			break;
 
-		case ETS_Finished:
+		case ETS_Finishing:
 			Teleport_State = ETS_Done;
 
 			if (Ball != 0)
 			{
-				switch(Reliase_Direction)
+				switch (Release_Direction)
 				{
 				case EDT_Left:
 					ball_x = Get_Brick_X_Pos(false) - ABall::Radius;
@@ -434,7 +433,7 @@ void AActive_Brick_Teleport::Act()
 					ball_x = Get_Brick_X_Pos(true);
 					ball_y = Get_Brick_Y_Pos(false) + (double)AsConfig::Brick_Height + ABall::Radius;
 					break;
-				
+
 				default:
 					AsConfig::Throw();
 				}
@@ -443,11 +442,11 @@ void AActive_Brick_Teleport::Act()
 				Ball->Set_State(EBS_Normal, ball_x, ball_y);
 				Ball->Set_Direction(direction);
 
-				Ball = 0; // Ставим мячику статус - отсутствует в телепорте
+				Ball = 0;  // Отмечаем мячик как отсутствующий в телепорте
 				AsConfig::Invalidate_Rect(Brick_Rect);
 			}
 			break;
-	
+
 		}
 	}
 }
@@ -456,13 +455,13 @@ void AActive_Brick_Teleport::Draw(HDC hdc, RECT &paint_area)
 {
 	int step;
 
-	switch(Teleport_State)
+	switch (Teleport_State)
 	{
-	case ETS_Started:
+	case ETS_Starting:
 		step = Animation_Step;
 		break;
 
-	case ETS_Finished:
+	case ETS_Finishing:
 		step = Max_Animation_Step - Animation_Step;
 		break;
 
@@ -485,12 +484,10 @@ bool AActive_Brick_Teleport::Is_Finished()
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Teleport::Draw_In_Level(HDC hdc, RECT &brick_rect, int step)
-{ // Вывод неактивного кирпича на уровне
+{// Вывод неактивного кирпича на уровне
 
 	const int scale = AsConfig::Global_Scale;
-	int top_x = brick_rect.left + 3 * scale + 1;
 	int top_y = brick_rect.top + step / 2 + 1;
-	int low_x = brick_rect.left + 11 * scale + 1;
 	int low_y = brick_rect.top + 6 * scale - step / 2 + 1;
 
 	// Фон
@@ -499,7 +496,7 @@ void AActive_Brick_Teleport::Draw_In_Level(HDC hdc, RECT &brick_rect, int step)
 
 	// Портал
 	AsConfig::Teleport_Portal_Color.Select(hdc);
-	Ellipse(hdc, top_x, top_y, low_x, low_y);
+	Ellipse(hdc, brick_rect.left + 3 * scale + 1, top_y, brick_rect.left + 11 * scale + 1, low_y);
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Teleport::Set_Ball(ABall *ball)
@@ -532,7 +529,7 @@ AAdvertisement::~AAdvertisement()
 		{
 			region = Brick_Regions[i * Width + j];
 
-			if ( region != 0)
+			if (region != 0)
 				DeleteObject(region);
 		}
 
@@ -540,18 +537,17 @@ AAdvertisement::~AAdvertisement()
 }
 //------------------------------------------------------------------------------------------------------------
 AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
-: Level_X(level_x), Level_Y(level_y), Width(width), Height(height),  
-  Ball_X(0), Ball_Y(0), Ball_Y_Offset(0), Empty_Region(0), Brick_Regions(0),
-  Ball_Width(Ball_Size * AsConfig::Global_Scale), Ball_Height(Ball_Size * AsConfig::Global_Scale),
-  Falling_Speed(0.0), Accseleration_Step(0.3), Deformation_Ratio(0.0)
+: Level_X(level_x), Level_Y(level_y), Width(width), Height(height), Empty_Region(0), Ball_X(0), Ball_Y(0),
+  Ball_Width(Ball_Size * AsConfig::Global_Scale), Ball_Height(Ball_Size * AsConfig::Global_Scale), Ball_Y_Offset(0),
+  Falling_Speed(0.0), Acceleration_Step(0.2), Brick_Regions(0)
 {
-	const int scale = AsConfig::Global_Scale;
 	//int i, j;
+	const int scale = AsConfig::Global_Scale;
 
 	Empty_Region = CreateRectRgn(0, 0, 0, 0);
 
 	Brick_Regions = new HRGN[Width * Height];
-	memset(Brick_Regions, 0, sizeof(HRGN) * Width * Height); // сбросили массив в 0
+	memset(Brick_Regions, 0, sizeof(HRGN) * Width * Height);
 
 	Ad_Rect.left = (AsConfig::Level_X_Offset + Level_X * AsConfig::Cell_Width) * scale;
 	Ad_Rect.top = (AsConfig::Level_Y_Offset + Level_Y * AsConfig::Cell_Height) * scale;
@@ -573,21 +569,24 @@ void AAdvertisement::Act()
 	int cell_height = AsConfig::Cell_Height * AsConfig::Global_Scale;
 	RECT rect{};
 
-	// Заказ перерисовки области открытой части рекламы
-	for (i = 0; i < Height; i++) // y
-		for (j = 0; j < Width; j++) // x
-			if (Brick_Regions[i * Width + j] != 0) // строка * ширину + смещение внутри этой строки
+	//if (AsConfig::Current_Timer_Tick % 3 != 0)
+	//	return;
+
+	// 1. Заказываем перерисовку фрагментов, над которыми пропали кирпичи
+	for (i = 0; i < Height; i++)
+		for (j = 0; j < Width; j++)
+			if (Brick_Regions[i * Width + j] != 0)
 			{
-				rect.left = Ad_Rect.left + j * cell_width; // смещение области рекламы на х ячеек 
-				rect.top = Ad_Rect.top + i * cell_height; // смещение на y ячеек по высоте
+				rect.left = Ad_Rect.left + j * cell_width;
+				rect.top = Ad_Rect.top + i * cell_height;
 				rect.right = rect.left + cell_width;
 				rect.bottom = rect.top + cell_height;
 
 				AsConfig::Invalidate_Rect(rect);
 			}
 
-	// Смещаем шарик
-	Falling_Speed += Accseleration_Step;
+	// 2. Смещаем шарик
+	Falling_Speed += Acceleration_Step;
 	Ball_Y_Offset = High_Ball_Threshold - (int)(Falling_Speed * Falling_Speed);
 
 	if (Ball_Y_Offset <= Low_Ball_Threshold + Deformation_Height)
@@ -595,31 +594,35 @@ void AAdvertisement::Act()
 	else
 		Deformation_Ratio = 1.0;
 
-
-	if (Ball_Y_Offset > High_Ball_Threshold or Ball_Y_Offset < Low_Ball_Threshold)
-		Accseleration_Step = -Accseleration_Step;
-
+	if (Ball_Y_Offset > High_Ball_Threshold || Ball_Y_Offset < Low_Ball_Threshold)
+		Acceleration_Step = -Acceleration_Step;
+}
+//------------------------------------------------------------------------------------------------------------
+void AAdvertisement::Clear(HDC hdc, RECT &paint_area)
+{
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 {
 	int i, j;
 	int x, y;
+	int ball_width, ball_height;
+	int shadow_width, shadow_height;
 	int deformation;
-	int ball_width, ball_hight;
-	int shadow_width, shadow_hight;
+
 	const int scale = AsConfig::Global_Scale;
-	RECT inresection_rect{};
+
 	HRGN region;
-	POINT table_points[4] = 
+	RECT intersection_rect;
+	POINT table_points[4] =
 	{
-		{Ad_Rect.left + 1, Ad_Rect.top + 15 * scale},
-		{Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale},
-		{Ad_Rect.left + 30 * scale + 1, Ad_Rect.top + 15 * scale},
-		{Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale}
+		{ Ad_Rect.left + 1, Ad_Rect.top + 15 * scale },
+		{ Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale },
+		{ Ad_Rect.left + 30 * scale + 1, Ad_Rect.top + 15 * scale },
+		{ Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale }
 	};
-	
-	if ( !IntersectRect(&inresection_rect, &paint_area, &Ad_Rect) )
+
+	if (! IntersectRect(&intersection_rect, &paint_area, &Ad_Rect) )
 		return;
 
 	SelectClipRgn(hdc, Empty_Region);
@@ -628,8 +631,9 @@ void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 		for (j = 0; j < Width; j++)
 		{
 			region = Brick_Regions[i * Width + j];
-			if ( region != 0)
-				ExtSelectClipRgn(hdc, region, RGN_OR); // выбираем регион
+
+			if (region != 0)
+				ExtSelectClipRgn(hdc, region, RGN_OR);  // Выбираем регион
 		}
 
 	// 1. Рамкой стираем предыдущее изображение
@@ -643,8 +647,7 @@ void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 	AsConfig::White_Color.Select(hdc);
 	Polygon(hdc, table_points, 4);
 
-	// 2. Тень под шариком
-	// 2.1 Эллипс размер 8х6, пока шарик над столом
+
 
 	// 3. Тень под шариком
 	// 3.1. Синий эллипс 8х6, пока шарик полностью над "столом"
@@ -670,7 +673,7 @@ void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 
 	// 4. Борта стола
 	// 4.2. Синяя кайма толщиной в 1 игровой пиксель
-	AsConfig::Advertising_Blue_Table_Color.Select(hdc);
+	AsConfig::Advertisement_Blue_Table.Select(hdc);
 
 	MoveToEx(hdc, Ad_Rect.left + scale - 1, Ad_Rect.top + 15 * scale, 0);
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale);
@@ -679,7 +682,7 @@ void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 	LineTo(hdc, Ad_Rect.left + scale - 1, Ad_Rect.top + 15 * scale);
 
 	// 4.3. Красный борт толщиной в 1 игровой пиксель
-	AsConfig::Advertising_Red_Color.Select(hdc);
+	AsConfig::Advertisement_Red_Table.Select(hdc);
 
 	MoveToEx(hdc, Ad_Rect.left + scale, Ad_Rect.top + 16 * scale, 0);
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 21 * scale);
@@ -708,9 +711,7 @@ void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 	SelectClipRgn(hdc, 0);
 }
 //------------------------------------------------------------------------------------------------------------
-void AAdvertisement::Clear(HDC hdc, RECT& paint_area)
-{} // заглушка виртуального метода базового класса - нужна для возможности создавать объекты
-//------------------------------------------------------------------------------------------------------------
+
 bool AAdvertisement::Is_Finished()
 {
 	return false;  // Реклама не заканчивается никогда! ;-)
@@ -737,14 +738,13 @@ void AAdvertisement::Show_Under_Brick(int level_x, int level_y)
 	rect.right = rect.left + cell_width;
 	rect.bottom = rect.top + cell_height;
 
-
-	Brick_Regions[y * Width + x] = CreateRectRgnIndirect(&rect); // вычисляем адрес соответствующий байту внутри нашей маски
+	Brick_Regions[y * Width + x] = CreateRectRgnIndirect(&rect);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AAdvertisement::Has_Brick_At(int level_x, int level_y)
 {
-	if (level_x >= Level_X and level_x <= Level_X + Width)
-		if (level_y >= Level_Y and level_y <= Level_Y + Height)
+	if (level_x >= Level_X && level_x <= Level_X + Width)
+		if (level_y >= Level_Y && level_y <= Level_Y + Height)
 			return true;
 
 	return false;
@@ -757,7 +757,8 @@ bool AAdvertisement::Has_Brick_At(int level_x, int level_y)
 // AActive_Brick_Ad
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Ad::~AActive_Brick_Ad()
-{}
+{
+}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Ad::AActive_Brick_Ad(int level_x, int level_y, AAdvertisement *advertisement)
 : AActive_Brick(EBT_Unbreakable, level_x, level_y), Advertisement(advertisement)
