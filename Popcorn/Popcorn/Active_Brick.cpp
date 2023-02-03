@@ -258,7 +258,7 @@ void AActive_Brick_Multihit::Draw(HDC hdc, RECT &paint_area)
 	AsConfig::Round_Rect(hdc, Brick_Rect);
 
 
-	// 2. Настраиваем матрицу "переворота" сотни
+	// 2. Настраиваем матрицу поворота буквы
 	step = Rotation_Step % Steps_Per_Turn;
 	rotation_angle = M_PI_4 / 2.0 * (double)step;
 	x_ratio = cos(rotation_angle);
@@ -493,9 +493,11 @@ void AActive_Brick_Teleport::Draw_In_Level(HDC hdc, RECT &brick_rect, int step)
 	int low_x = brick_rect.left + 11 * scale + 1;
 	int low_y = brick_rect.top + 6 * scale - step / 2 + 1;
 
+	// Фон
 	AsConfig::Red_Color.Select(hdc);
 	AsConfig::Round_Rect(hdc, brick_rect);
 
+	// Портал
 	AsConfig::Teleport_Portal_Color.Select(hdc);
 	Ellipse(hdc, top_x, top_y, low_x, low_y);
 }
@@ -599,7 +601,7 @@ void AAdvertisement::Act()
 
 }
 //------------------------------------------------------------------------------------------------------------
-void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
+void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 {
 	int i, j;
 	int x, y;
@@ -630,70 +632,78 @@ void AAdvertisement::Draw(HDC hdc, RECT& paint_area)
 				ExtSelectClipRgn(hdc, region, RGN_OR); // выбираем регион
 		}
 
-	// 0. Рамка
-	// 0.1 Тонкая пунктирная рамка скругленная по краям
+	// 1. Рамкой стираем предыдущее изображение
+	// 1.1. Тонкая синяя рамка со скруглёнными краями
 	AsConfig::BG_Color.Select(hdc);
 	AsConfig::Blue_Color.Select_Pen(hdc);
 	AsConfig::Round_Rect(hdc, Ad_Rect);
 
-	// 1. Стол
-	// 1.1 Белая поверхность
+	// 2. Стол
+	// 2.1. Белая поверхность
 	AsConfig::White_Color.Select(hdc);
 	Polygon(hdc, table_points, 4);
 
 	// 2. Тень под шариком
 	// 2.1 Эллипс размер 8х6, пока шарик над столом
-	deformation = (int)( (1 - Deformation_Ratio) * (double)scale * 2.0 );
+
+	// 3. Тень под шариком
+	// 3.1. Синий эллипс 8х6, пока шарик полностью над "столом"
+	AsConfig::Blue_Color.Select(hdc);
 
 	shadow_width = Ball_Width - 4 * scale;
-	shadow_hight = 4 * scale;
+	shadow_height = 4 * scale;
+
+	deformation = (int)( (1.0 - Deformation_Ratio) * (double)scale * 2.0);
 
 	ball_width = shadow_width + deformation;
-	ball_hight = shadow_hight - deformation;
+	ball_height = shadow_height - deformation;
 
 	x = Ball_X - ball_width / 2;
-	y = Ball_Y - ball_hight / 2 + Ball_Y_Offset / 6 + 9 * scale;
+	y = Ball_Y - ball_height / 2 + Ball_Y_Offset / 6 + 9 * scale;
 
 	AsConfig::Blue_Color.Select(hdc);
-	Ellipse(hdc, x, y, x + ball_width, y + ball_hight);
-	
+	Ellipse(hdc, x, y, x + ball_width, y + ball_height);
 
-	// Каемки стола
-	// 3.1 Синяя кайма толщиной в 1 пиксел
+
+	// 3.2. Уезжает вниз, когда шарик в верхней точке
+	// 3.3. Увеличивается, когда шарик плющится
+
+	// 4. Борта стола
+	// 4.2. Синяя кайма толщиной в 1 игровой пиксель
 	AsConfig::Advertising_Blue_Table_Color.Select(hdc);
+
 	MoveToEx(hdc, Ad_Rect.left + scale - 1, Ad_Rect.top + 15 * scale, 0);
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale);
 	LineTo(hdc, Ad_Rect.left + 30 * scale, Ad_Rect.top + 15 * scale);
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale);
 	LineTo(hdc, Ad_Rect.left + scale - 1, Ad_Rect.top + 15 * scale);
 
-	// 3.2 Розовая кайма толщиной в 2 пиксела
+	// 4.3. Красный борт толщиной в 1 игровой пиксель
 	AsConfig::Advertising_Red_Color.Select(hdc);
+
 	MoveToEx(hdc, Ad_Rect.left + scale, Ad_Rect.top + 16 * scale, 0);
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 21 * scale);
 	LineTo(hdc, Ad_Rect.left + 30 * scale - 1, Ad_Rect.top + 16 * scale);
 
-	// 4. Шарик
-	// 4.1 Эллипс 12х12
 
+
+	// 5. Шарик
+	// 5.1. Красный эллипс 12х12
 	ball_width = Ball_Width + deformation;
-	ball_hight = Ball_Height - deformation;
+	ball_height = Ball_Height - deformation;
 
 	x = Ball_X - ball_width / 2;
-	y = Ball_Y - ball_hight / 2 - Ball_Y_Offset;
+	y = Ball_Y - ball_height / 2 - Ball_Y_Offset;
 
 	AsConfig::Red_Color.Select(hdc);
-	Ellipse(hdc, x, y, x + ball_width, y + ball_hight);
+	Ellipse(hdc, x, y, x + ball_width, y + ball_height);
 
-	// 5.2 Блик сверху
+	// 6.2. Блик сверху
 	AsConfig::Letter_Color.Select(hdc);
-	Arc(hdc, x + scale + 1, y + scale + 1, 
-			 x + ball_width - scale, y + ball_hight - scale,
-			 x + 4 * scale, y + scale, 
-			 x + scale, y + 3 * scale);
+	Arc(hdc, x + scale + 1, y + scale + 1, x + ball_width - scale, y + ball_height - scale,  x + 4 * scale, y + scale, x + scale, y + 3 * scale);
 
-	// 5.3 Летает сверху-вниз (по затухающей траектории)
-	// 5.4 Сплющивается внизу до 16х9
+	// 6.3. Летает вверх/вниз (по затухающей траектории)
+	// 6.4. Сплющивается внизу до 16х9
 
 	SelectClipRgn(hdc, 0);
 }
@@ -703,27 +713,29 @@ void AAdvertisement::Clear(HDC hdc, RECT& paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AAdvertisement::Is_Finished()
 {
-	return false; // Реклама не заканчивается до окончания уровня
+	return false;  // Реклама не заканчивается никогда! ;-)
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Show_Under_Brick(int level_x, int level_y)
 {
 	int x, y;
+	int cell_width = AsConfig::Cell_Width * AsConfig::Global_Scale;
+	int cell_height = AsConfig::Cell_Height * AsConfig::Global_Scale;
 	RECT rect{};
 
 	x = level_x - Level_X;
 	y = level_y - Level_Y;
 
-	if (x < 0 or x > Width)
+	if (x < 0 or x >= Width)
 		AsConfig::Throw();
 
-	if (y < 0 or y > Height)
+	if (y < 0 or y >= Height)
 		AsConfig::Throw();
 
-	rect.left = Ad_Rect.left + x * AsConfig::Cell_Width * AsConfig::Global_Scale;
-	rect.top = Ad_Rect.top + y * AsConfig::Cell_Height * AsConfig::Global_Scale;
-	rect.right = rect.left + AsConfig::Cell_Width * AsConfig::Global_Scale;
-	rect.bottom = rect.top + AsConfig::Cell_Height * AsConfig::Global_Scale;
+	rect.left = Ad_Rect.left + x * cell_width;
+	rect.top = Ad_Rect.top + y * cell_height;
+	rect.right = rect.left + cell_width;
+	rect.bottom = rect.top + cell_height;
 
 
 	Brick_Regions[y * Width + x] = CreateRectRgnIndirect(&rect); // вычисляем адрес соответствующий байту внутри нашей маски
@@ -756,47 +768,42 @@ AActive_Brick_Ad::AActive_Brick_Ad(int level_x, int level_y, AAdvertisement *adv
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Ad::Act()
 {
-	/*if (Animation_Step <= Max_Animation_Step)
-	{
-		++Animation_Step;*/
-		AsConfig::Invalidate_Rect(Brick_Rect);
-	//}
+	AsConfig::Invalidate_Rect(Brick_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Ad::Draw(HDC hdc, RECT &paint_area)
 {
-	/*RECT inresection_rect{};
-
-	if ( !IntersectRect(&inresection_rect, &paint_area, &Brick_Rect) )
-		return;*/
 }
 //------------------------------------------------------------------------------------------------------------
 bool AActive_Brick_Ad::Is_Finished()
 {
-	/*if (Animation_Step >= Max_Animation_Step)
-		return true;
-	else*/
+	//if (Animation_Step >= Max_Animation_Step)
+	//	return true;
+	//else
 		return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Ad::Draw_In_Level(HDC hdc, RECT &brick_rect)
-{ // Вывод неактивного кирпича на уровне
+{// Вывод неактивного кирпича на уровне
 
 	int i;
-	const int scale = AsConfig::Global_Scale;
+
 	int x = brick_rect.left;
 	int y = brick_rect.top;
+	const int scale = AsConfig::Global_Scale;
 	int size = (Circle_Size - 1) * scale - 1;
 
-	// Стираем предыдущее изображение
+	// 1. Стираем предыдущее изображение
 	AsConfig::BG_Color.Select(hdc);
-	Rectangle(hdc, x, y, brick_rect.right + scale - 1, brick_rect.bottom + scale - 1);
 
-	// Рисуем шарики
+
+	Rectangle(hdc, brick_rect.left, brick_rect.top, brick_rect.right + scale - 1, brick_rect.bottom + scale - 1);
+
+	// 2. Рисуем шарики
 	for (i = 0; i < 2; i++)
 	{
 		AsConfig::Red_Color.Select(hdc);
-		Ellipse(hdc, x,y, x + 7 * scale - 1, brick_rect.bottom - 1);
+		Ellipse(hdc, x, y, x + 7 * scale - 1, brick_rect.bottom - 1);
 
 		// Рисуем блик на шарике
 		AsConfig::White_Color.Select(hdc);
