@@ -3,60 +3,85 @@
 // AsBorder
 //------------------------------------------------------------------------------------------------------------
 AsBorder::AsBorder()
-: Floor_Rect{}
+
 {
-	int scale = AsConfig::Global_Scale;
-	 
-	Floor_Rect.left = AsConfig::Level_X_Offset * scale;
-	Floor_Rect.top = AsConfig::Floor_Y_Pos * scale;
-	Floor_Rect.right = (AsConfig::Max_X_Pos - 1) * scale;
-	Floor_Rect.bottom = AsConfig::Max_Y_Pos * scale;
+	Floor_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
+	Floor_Rect.top = AsConfig::Floor_Y_Pos * AsConfig::Global_Scale;
+	Floor_Rect.right = (AsConfig::Max_X_Pos - 1) * AsConfig::Global_Scale;
+	Floor_Rect.bottom = AsConfig::Max_Y_Pos * AsConfig::Global_Scale;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBorder::Redraw_Floor()
+{
+	AsConfig::Invalidate_Rect(Floor_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
-{ // Корректируем позицию при отражении от рамки
+{// Корректируем позицию при отражении от рамки
 
 	bool got_hit = false;
-
-	// Отражение от левого края
+	
+	// 1. Левый край
 	if (next_x_pos - ball->Radius < AsConfig::Border_X_Offset)
 	{
-		ball->Reflect(false);
 		got_hit = true;
+		ball->Reflect(false);
+
 	}
 
-	// Отражение от верхнего края
+	// 2. Верхний край
 	if (next_y_pos - ball->Radius < AsConfig::Border_Y_Offset)
 	{
-		ball->Reflect(true);
 		got_hit = true;
+		ball->Reflect(true);
+
 	}
 
-	// Отражение от правого края
-	if (next_x_pos + ball->Radius > AsConfig::Max_X_Pos)
+	// 3. Правый край
+	if (next_x_pos + ball->Radius > AsConfig::Max_X_Pos + 1)
 	{
+		got_hit = true;
 		ball->Reflect(false);
-		got_hit = true;
 	}
 
-	// Отражение от нижнего края
-	if (AsConfig::Level_Has_Floor and next_y_pos + ball->Radius > AsConfig::Floor_Y_Pos)
+	// 4. Нижний край
+	if (AsConfig::Level_Has_Floor && next_y_pos + ball->Radius > AsConfig::Floor_Y_Pos)
 	{
-		ball->Reflect(true);
 		got_hit = true;
+		ball->Reflect(true);
+
 	}
-	
+
 	// Чтобы шарик смог улететь ниже пола, проверяем его max_y_pos ниже видимой границы
-	if (next_y_pos + ball->Radius > (double)AsConfig::Max_Y_Pos + ball->Radius * 4.0)
+	if (next_y_pos + ball->Radius > (double)AsConfig::Max_Y_Pos + ball->Radius * 4.0)  
 		ball->Set_State(EBS_Lost);
 
 	return got_hit;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsBorder::Act() {/* Заглушка! т.к. border сам не анимируется */}
+void AsBorder::Act()
+{
+	// Заглушка, т.к. этот метод не используется
+}
 //------------------------------------------------------------------------------------------------------------
-void AsBorder::Draw(HDC hdc, RECT& paint_area)
-{// Отрисовка рамки уровня
+void AsBorder::Clear(HDC hdc, RECT &paint_area)
+{
+	RECT intersection_rect;
+
+	if (! AsConfig::Level_Has_Floor)
+		return;
+
+	if (! IntersectRect(&intersection_rect, &paint_area, &Floor_Rect) )
+		return;
+
+	AsConfig::BG_Color.Select(hdc);
+
+	Rectangle(hdc, Floor_Rect.left, Floor_Rect.top, Floor_Rect.right - 1, Floor_Rect.bottom - 1);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBorder::Draw(HDC hdc, RECT &paint_area)
+{// Рисует рамку уровня
+
 	int i;
 
 	// 1. Линия слева
@@ -71,96 +96,78 @@ void AsBorder::Draw(HDC hdc, RECT& paint_area)
 	for (i = 0; i < 50; i++)
 		Draw_Element(hdc, paint_area, 3 + i * 4, 0, true);
 
-	// 4. Пол, если есть
+	// 4. Пол (если есть)
 	if (AsConfig::Level_Has_Floor)
 		Draw_Floor(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsBorder::Clear(HDC hdc, RECT& paint_area)
+bool AsBorder::Is_Finished()
 {
-	RECT intersection_rect;
-
-	if (! AsConfig::Level_Has_Floor)
-		return;
-
-	if (! IntersectRect(&intersection_rect, &paint_area, &Floor_Rect) )
-		return;
-
-	AsConfig::BG_Color.Select(hdc);
-	Rectangle(hdc, Floor_Rect.left, Floor_Rect.top, Floor_Rect.right - 1, Floor_Rect.bottom - 1);
-}
-//------------------------------------------------------------------------------------------------------------
-bool AsBorder::Is_Finished() { return false; /* Заглушка! т.к. border сам не анимируется */ }
-//------------------------------------------------------------------------------------------------------------
-void AsBorder::Redraw_Floor()
-{
-	AsConfig::Invalidate_Rect(Floor_Rect);
+	return false;  // Заглушка, т.к. этот метод не используется
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_border)
 {// Рисует элемент рамки уровня
 
-	RECT intersection_rect{}, rect{};
-	int scale = AsConfig::Global_Scale;
+	RECT intersection_rect, rect;
 
-	rect.left = x * scale;
-	rect.top = y * scale;
-	rect.right = (x + 4) * scale;
-	rect.bottom = (y + 4) * scale;
+	rect.left = x * AsConfig::Global_Scale;
+	rect.top = y * AsConfig::Global_Scale;
+	rect.right = (x + 4) * AsConfig::Global_Scale;
+	rect.bottom = (y + 4) * AsConfig::Global_Scale;
 
-	if ( !IntersectRect(&intersection_rect, &paint_area, &rect) )
+	if (! IntersectRect(&intersection_rect, &paint_area, &rect) )
 		return;
 
- // Вывод основной линии
+	// Основная линия
 	AsConfig::Blue_Color.Select(hdc);
 
 	if (top_border)
-		Rectangle(hdc, x * scale, (y + 1) * scale, (x + 4) * scale - 1, (y + 4) * scale - 1);
+		Rectangle(hdc, x * AsConfig::Global_Scale, (y + 1) * AsConfig::Global_Scale, (x + 4) * AsConfig::Global_Scale - 1, (y + 4) * AsConfig::Global_Scale - 1);
 	else
-		Rectangle(hdc, (x + 1) * scale, y * scale, (x + 4) * scale - 1, (y + 4) * scale - 1);
+		Rectangle(hdc, (x + 1) * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + 4) * AsConfig::Global_Scale - 1, (y + 4) * AsConfig::Global_Scale - 1);
 
-
-	// Вывод белой линии
+	// Белая кайма
 	AsConfig::White_Color.Select(hdc);
 
 	if (top_border)
-		Rectangle(hdc, x * scale, y * scale, (x + 4) * scale - 1, (y + 1) * scale - 1);
+		Rectangle(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + 4) * AsConfig::Global_Scale - 1, (y + 1) * AsConfig::Global_Scale - 1);
 	else
-		Rectangle(hdc, x * scale, y * scale, (x + 1) * scale - 1, (y + 4) * scale - 1);
+		Rectangle(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + 1) * AsConfig::Global_Scale - 1, (y + 4) * AsConfig::Global_Scale - 1);
 
-	// Черная точка
+	// Перфорация
 	AsConfig::BG_Color.Select(hdc);
 
 	if (top_border)
-		Rectangle(hdc, (x + 2) * scale, (y + 2) * scale, (x + 3) * scale - 1, (y + 3) * scale - 1);
-	else										  				   						
-		Rectangle(hdc, (x + 2) * scale, (y + 1) * scale, (x + 3) * scale - 1, (y + 2) * scale - 1);
+		Rectangle(hdc, (x + 2) * AsConfig::Global_Scale, (y + 2) * AsConfig::Global_Scale, (x + 3) * AsConfig::Global_Scale - 1, (y + 3) * AsConfig::Global_Scale - 1);
+	else
+		Rectangle(hdc, (x + 2) * AsConfig::Global_Scale, (y + 1) * AsConfig::Global_Scale, (x + 3) * AsConfig::Global_Scale - 1, (y + 2) * AsConfig::Global_Scale - 1);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw_Floor(HDC hdc, RECT &paint_area)
 {
-	int i;
+	int i, strokes_count;
 	int x_pos, y_pos;
-	int strokes_counter, stroke_len;
+
 	int line_len = 4 * AsConfig::Global_Scale;
 	int gap_len = 2 * AsConfig::Global_Scale;
+	int stroke_len = line_len + gap_len;
 	RECT intersection_rect;
 
-	if ( !IntersectRect(&intersection_rect, &paint_area, &Floor_Rect) )
+	if (! IntersectRect(&intersection_rect, &paint_area, &Floor_Rect) )
 		return;
 
-	stroke_len = line_len + gap_len;
-	strokes_counter = (Floor_Rect.right - Floor_Rect.left) / stroke_len;
-	x_pos = Floor_Rect.left;
+	strokes_count = (Floor_Rect.right - Floor_Rect.left + AsConfig::Global_Scale) / stroke_len;
+	x_pos = Floor_Rect.left + 1;
 	y_pos = Floor_Rect.top + (Floor_Rect.bottom - Floor_Rect.top) / 2;
 	AsConfig::Letter_Color.Select(hdc);
 
-	for (i = 0; i <= strokes_counter; i++)
+	for (i = 0; i < strokes_count; i++)
 	{
 		MoveToEx(hdc, x_pos, y_pos, 0);
 		LineTo(hdc, x_pos + line_len, y_pos);
 
-		x_pos += stroke_len; 
+		x_pos += stroke_len;
 	}
 }
 //------------------------------------------------------------------------------------------------------------

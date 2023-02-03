@@ -24,6 +24,8 @@ enum EGame_State
 	EGS_Restart_Level
 };
 //------------------------------------------------------------------------------------------------------------
+const int Timer_ID = WM_USER + 1;
+//------------------------------------------------------------------------------------------------------------
 class AsEngine
 {
 public:
@@ -31,27 +33,28 @@ public:
 
 	void Init_Engine(HWND hwnd);
 	void Draw_Frame(HDC hdc, RECT &paint_area);
-	int On_Key(EKey_Type key_type, bool is_key_down);
+	int On_Key(EKey_Type key_type, bool key_down);
 	int On_Timer();
 
-	static const int Timer_ID = WM_USER + 1;
+
 
 private:
-	void Act();
+
 	void Play_Level();
 	void Advance_Movers();
-	void On_Falling_letter(AFalling_Letter *falling_letter);
+	void Act();
+	void On_Falling_Letter(AFalling_Letter *falling_letter);
 
 	EGame_State Game_State;
-	double Rest_Distanse;
-	int Life_Counter;
+	double Rest_Distance;
+	int Life_Count;
 
 	AsLevel Level;
 	AsPlatform Platform;
 	AsBorder Border;
 	AsBall_Set Ball_Set;
-	
-	AMover *Movers[AsConfig::Max_Movers_Count]; // UNO (Use Not Own); Движущиеся в данный момент объекты
-	AGraphics_Object *Modules[AsConfig::Max_Modules_Count]; // UNO (Use Not Own); Главные графические модули (объекты) игры
+
+	AMover *Movers[AsConfig::Max_Movers_Count];  // UNO; Движущиеся в данный момент объекты
+	AGraphics_Object *Modules[AsConfig::Max_Modules_Count];  // UNO; Главные графические объекты (модули) игры
 };
 //------------------------------------------------------------------------------------------------------------
