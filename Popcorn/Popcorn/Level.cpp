@@ -323,7 +323,7 @@ bool AsLevel::On_Hit(int brick_x, int brick_y, ABall *ball, bool vertical_hit)
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Redraw_Brick(int brick_x, int brick_y)
 {
-	RECT brick_rect;
+	RECT brick_rect{};
 
 	brick_rect.left = (AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
 	brick_rect.top = (AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
@@ -359,10 +359,11 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 			letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
 
 			//letter_type = AFalling_Letter::Get_Random_Letter_Type();
-			if (AsConfig::Rand(2) == 0)
+			/*if (AsConfig::Rand(2) == 0)
 				letter_type = ELT_K;
 			else
-				letter_type = ELT_T;
+				letter_type = ELT_T;*/
+			letter_type = ELT_W;
 
 
 			falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);
@@ -686,7 +687,7 @@ void AsLevel::Draw_Parachute_In_Level(HDC hdc, RECT &brick_rect)
 void AsLevel::Draw_Parachute_Part(HDC hdc, RECT &brick_rect, int offset, int width)
 {
 	const int scale = AsConfig::Global_Scale;
-	RECT rect;
+	RECT rect{};
 
 	// 1. Верхний сегмент
 	rect.left = brick_rect.left + offset * scale + 1;

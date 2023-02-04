@@ -123,6 +123,7 @@ private:
 	void Act_For_Meltdown_State();
 	void Act_For_Rolling_State();
 	void Act_For_Glue_State();
+	void Act_For_Expanding_State();
 	void Draw_Circle_Highlight(HDC hdc, int x, int y);
 	void Draw_Normal_State(HDC hdc, RECT &paint_area);
 	void Draw_Meltdown_State(HDC hdc, RECT &paint_area);

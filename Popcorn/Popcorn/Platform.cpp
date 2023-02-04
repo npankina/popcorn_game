@@ -42,7 +42,7 @@ AsPlatform::AsPlatform()
   Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Color(255, 255, 255), Platform_Circle_Color(230, 25, 229),
   Platform_Inner_Color(0, 255, 255), Truss_Color(Platform_Inner_Color, AsConfig::Global_Scale)
 {
-	X_Pos = (AsConfig::Max_X_Pos - Width) / 2;
+	X_Pos = (double)(AsConfig::Max_X_Pos - Width) / 2.0;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -168,6 +168,10 @@ void AsPlatform::Act()
 
 	case EPlatform_State::Glue:
 		Act_For_Glue_State();
+		break;
+
+	case EPlatform_State::Expanding:
+		Act_For_Expanding_State();
 		break;
 	}
 }
@@ -310,8 +314,7 @@ void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 			Platform_State.Glue = EPlatform_Substate_Glue::Finalize;
 
 			while (Ball_Set->Release_Next_Ball() )
-			{
-			}
+			{}
 
 			return;
 		}
@@ -335,9 +338,6 @@ bool AsPlatform::Has_State(EPlatform_Substate_Regular regular_state)
 void AsPlatform::Redraw_Platform(bool update_rect)
 {
 	int platform_width;
-
-	//if (Platform_State.Moving != EPMS_Stop)
-	//	int yy = 0;
 
 	if (update_rect)
 	{
@@ -492,6 +492,10 @@ void AsPlatform::Act_For_Glue_State()
 		break;
 
 
+	case EPlatform_Substate_Glue::Active:
+		break;
+
+
 	case EPlatform_Substate_Glue::Finalize:
 		if (Glue_Spot_Height_Ratio > Min_Glue_Spot_Height_Ratio)
 			Glue_Spot_Height_Ratio -= Glue_Spot_Height_Ratio_Step;
@@ -503,6 +507,44 @@ void AsPlatform::Act_For_Glue_State()
 
 		Redraw_Platform(false);
 		break;
+
+	default:
+		AsConfig::Throw();
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Act_For_Expanding_State()
+{
+	switch (Platform_State.Expanding)
+	{
+	case EPlatform_Substate_Expanding::Init:
+		if (Expanding_Platform_Width < Max_Expanding_Platform_Width)
+			Expanding_Platform_Width += Expanding_Platform_Width_Step;
+		else
+			Platform_State.Expanding = EPlatform_Substate_Expanding::Active;
+
+		Redraw_Platform(false);
+		break;
+
+
+	case EPlatform_Substate_Expanding::Active:
+		break;
+
+
+	case EPlatform_Substate_Expanding::Finalize:
+		if (Expanding_Platform_Width > Min_Expanding_Platform_Width)
+			Expanding_Platform_Width -= Expanding_Platform_Width_Step;
+		else
+		{
+			Set_State(EPlatform_Substate_Regular::Normal);
+			Platform_State.Expanding = EPlatform_Substate_Expanding::Unknown;
+		}
+
+		Redraw_Platform(false);
+		break;
+
+	default:
+		AsConfig::Throw();
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -522,7 +564,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	int y = AsConfig::Platform_Y_Pos;
 	const int scale = AsConfig::Global_Scale;
 	const double d_scale = AsConfig::D_Global_Scale;
-	RECT inner_rect, rect;
+	RECT inner_rect{}, rect{};
 
 	// 1. Рисуем боковые шарики
 	Platform_Circle_Color.Select(hdc);
@@ -687,7 +729,7 @@ void AsPlatform::Draw_Glue_State(HDC hdc, RECT &paint_area)
 {// Рисуем платформу с растекающимся клеем
 
 	HRGN region;
-	RECT glue_rect;
+	RECT glue_rect{};
 
 	Draw_Normal_State(hdc, paint_area);
 
@@ -716,7 +758,7 @@ void AsPlatform::Draw_Glue_State(HDC hdc, RECT &paint_area)
 void AsPlatform::Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height)
 {// Рисуем пятно клея
 
-	RECT spot_rect;
+	RECT spot_rect{};
 	int platform_top = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
 	int spot_height = (int)( (double)height * AsConfig::D_Global_Scale * Glue_Spot_Height_Ratio);
 
@@ -736,7 +778,7 @@ void AsPlatform::Draw_Expanding_State(HDC hdc, RECT &paint_area)
 	int y = AsConfig::Platform_Y_Pos;
 	const int scale = AsConfig::Global_Scale;
 	const double d_scale = AsConfig::D_Global_Scale;
-	RECT inner_rect;
+	RECT inner_rect{};
 
 	inner_rect.left = (int)( (x + (Expanding_Platform_Width - (double)Expanding_Platform_Inner_Width) / 2.0) * d_scale);
 	inner_rect.top = (y + 1) * scale;
@@ -782,7 +824,7 @@ void AsPlatform::Draw_Expanding_Platform_Ball(HDC hdc, bool is_left)
 	int arc_start_y, arc_end_y, arc_right_offset;
 	const int scale = AsConfig::Global_Scale;
 	const double d_scale = AsConfig::D_Global_Scale;
-	RECT rect, arc_rect;
+	RECT rect{}, arc_rect{};
 
 	// 1.1. Шарик
 	if (is_left)
