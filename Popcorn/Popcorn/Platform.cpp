@@ -338,22 +338,22 @@ bool AsPlatform::Has_State(EPlatform_Substate_Regular regular_state)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Redraw_Platform(bool update_rect)
 {
-	int platform_width;
+	double platform_width;
 
 	if (update_rect)
 	{
 		Prev_Platform_Rect = Platform_Rect;
 
 		if (Platform_State == EPlatform_State::Rolling && Platform_State.Rolling == EPlatform_Substate_Rolling::Roll_In)
-			platform_width = Circle_Size * AsConfig::Global_Scale;
+			platform_width = (double)Circle_Size;
 		else if (Platform_State == EPlatform_State::Expanding)
-			platform_width = (int)(Expanding_Platform_Width * AsConfig::D_Global_Scale);
+			platform_width = Expanding_Platform_Width;
 		else
-			platform_width = Width * AsConfig::Global_Scale;
+			platform_width = (double)Width;
 
-		Platform_Rect.left = (int)(X_Pos * AsConfig::D_Global_Scale);
+		Platform_Rect.left = X_Pos * AsConfig::D_Global_Scale;
 		Platform_Rect.top = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
-		Platform_Rect.right = Platform_Rect.left + platform_width;
+		Platform_Rect.right = (int)( (X_Pos + platform_width) * AsConfig::D_Global_Scale);
 		Platform_Rect.bottom = Platform_Rect.top + Height * AsConfig::Global_Scale;
 
 		if (Platform_State == EPlatform_State::Meltdown)
@@ -522,9 +522,15 @@ void AsPlatform::Act_For_Expanding_State()
 	{
 	case EPlatform_Substate_Expanding::Init:
 		if (Expanding_Platform_Width < Max_Expanding_Platform_Width)
+		{
 			Expanding_Platform_Width += Expanding_Platform_Width_Step;
+			X_Pos -= Expanding_Platform_Width_Step / 2.0;
+		}
 		else
+		{
 			Platform_State.Expanding = EPlatform_Substate_Expanding::Active;
+			X_Pos += Expanding_Platform_Width_Step / 2.0;
+		}
 
 		Redraw_Platform();
 		break;
