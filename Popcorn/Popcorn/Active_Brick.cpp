@@ -252,8 +252,8 @@ void AActive_Brick_Multihit::Draw(HDC hdc, RECT &paint_area)
 	int step;
 	const int scale = AsConfig::Global_Scale;
 	double rotation_angle, x_ratio;
-	RECT zero_rect;
-	XFORM xform, old_xform;
+	RECT zero_rect{};
+	XFORM xform{}, old_xform{};
 
 	// 1. Очищаем фон
 	AsConfig::BG_Color.Select(hdc);
