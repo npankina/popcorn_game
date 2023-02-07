@@ -364,6 +364,8 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 			else
 				letter_type = ELT_T;*/
 			letter_type = ELT_W;
+			//letter_type = ELT_K;
+
 
 
 			falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);
