@@ -7,6 +7,8 @@
 //------------------------------------------------------------------------------------------------------------
 enum class EPlatform_State: unsigned char
 {
+	Unknown,
+
 	Regular,
 	Meltdown,
 	Rolling,
@@ -72,6 +74,8 @@ public:
 
 	operator EPlatform_State() const;
 	void operator = (EPlatform_State new_state);
+	void Set_Next_State(EPlatform_State next_state);
+	EPlatform_State Get_Next_State();
 
 	EPlatform_Substate_Regular Regular;
 
@@ -84,6 +88,7 @@ public:
 
 private:
 	EPlatform_State Current_State;
+	EPlatform_State Next_State;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsPlatform: public AHit_Checker, public AMover, public AGraphics_Object

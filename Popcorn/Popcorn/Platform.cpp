@@ -3,7 +3,7 @@
 // AsPlatform_State
 //------------------------------------------------------------------------------------------------------------
 AsPlatform_State::AsPlatform_State()
-: Current_State(EPlatform_State::Regular), Regular(EPlatform_Substate_Regular::Missing),
+: Current_State(EPlatform_State::Regular), Next_State(EPlatform_State::Unknown), Regular(EPlatform_Substate_Regular::Missing),
   Meltdown(EPlatform_Substate_Meltdown::Unknown), Rolling(EPlatform_Substate_Rolling::Unknown),
   Glue(EPlatform_Substate_Glue::Unknown), Expanding(EPlatform_Substate_Expanding::Unknown), Moving(EPlatform_Moving_State::Stop)
 {}
@@ -16,6 +16,44 @@ AsPlatform_State::operator EPlatform_State() const
 void AsPlatform_State::operator = (EPlatform_State new_state)
 {
 	Current_State = new_state;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform_State::Set_Next_State(EPlatform_State next_state)
+{
+	if (next_state == Current_State)
+		return;
+
+	switch (Current_State)
+	{
+	case EPlatform_State::Regular: 
+		AsConfig::Throw(); // обычное состояние само не заканчивается, переключение в другое состояние должно быть явным
+		break;
+	
+	case EPlatform_State::Meltdown:
+		return; // игнорируем любое состояние после Meltdown, т.к. после него перезапускается игровой процесс
+
+	case EPlatform_State::Rolling:
+		AsConfig::Throw(); // состояние Rolling само должно переключаться в следующее
+		break;
+
+	case EPlatform_State::Glue:
+		Glue = EPlatform_Substate_Glue::Finalize;
+		break;
+
+	case EPlatform_State::Expanding:
+		Expanding = EPlatform_Substate_Expanding::Finalize;
+		break;
+
+	default:
+		AsConfig::Throw();
+	}
+
+	Next_State = next_state;
+}
+//------------------------------------------------------------------------------------------------------------
+EPlatform_State AsPlatform_State::Get_Next_State()
+{
+	return Next_State;
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -255,6 +293,11 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		break;
 
 	case EPlatform_State::Meltdown:
+		{ //--- сохраняем новое состояние платформы в переменную, чтобы отыгрывать анимацию в правильном порядке (отложенное сост.)
+			Platform_State.Set_Next_State(new_state);
+			return;
+		} //--- иначе мы применяем то состояние, которое запрошено
+
 		Speed = 0.0;
 		Platform_State.Meltdown = EPlatform_Substate_Meltdown::Init;
 		len = sizeof(Meltdown_Platform_Y_Pos) / sizeof(Meltdown_Platform_Y_Pos[0]);
@@ -271,6 +314,13 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		break;
 
 	case EPlatform_State::Glue:
+		
+		if (Platform_State != EPlatform_State::Regular)
+		{ //--- сохраняем новое состояние платформы в переменную, чтобы отыгрывать анимацию в правильном порядке
+			Platform_State.Set_Next_State(new_state);
+			return;
+		}
+
 		if (Platform_State.Glue == EPlatform_Substate_Glue::Finalize)
 			return;
 		else
@@ -281,6 +331,11 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		break;
 
 	case EPlatform_State::Expanding:
+		{ //--- сохраняем новое состояние платформы в переменную, чтобы отыгрывать анимацию в правильном порядке
+			Platform_State.Set_Next_State(new_state);
+			return;
+		}
+
 		if (Platform_State.Expanding == EPlatform_Substate_Expanding::Finalize)
 			return;
 		else
@@ -296,6 +351,8 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 {
+	EPlatform_State next_state;
+
 	if (Platform_State == EPlatform_State::Regular && Platform_State.Regular == new_regular_state)
 		return;
 
@@ -303,12 +360,27 @@ void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 	{
 		if (Platform_State == EPlatform_State::Glue)
 		{
-			Platform_State.Glue = EPlatform_Substate_Glue::Finalize;
+			if (Platform_State.Glue == EPlatform_Substate_Glue::Unknown)
+			{// Финализация состояния закончилась
+				
+				Platform_State = EPlatform_State::Regular;
 
-			while (Ball_Set->Release_Next_Ball() )
-			{}
+				next_state = Platform_State.Get_Next_State();
+				// Если есть отложенное состояние, то переведем в него, в не в Regular
+				if (next_state != EPlatform_State::Unknown) //--- значит есть какое-то отложенное состояние
+					Set_State(next_state);
+				else //--- иначе переводим платформу в запрошенное состояние
+					Platform_State.Regular = new_regular_state;
+			}
+			else
+			{// Запускаем финализацию состояния
+				Platform_State.Glue = EPlatform_Substate_Glue::Finalize;
+				while (Ball_Set->Release_Next_Ball() )
+				{}
+			}
 
 			return;
+
 		}
 	}
 
@@ -489,8 +561,8 @@ void AsPlatform::Act_For_Glue_State()
 			Glue_Spot_Height_Ratio -= Glue_Spot_Height_Ratio_Step;
 		else
 		{
-			Set_State(EPlatform_Substate_Regular::Normal);
 			Platform_State.Glue = EPlatform_Substate_Glue::Unknown;
+			Set_State(EPlatform_Substate_Regular::Normal);
 		}
 
 		Redraw_Platform();
