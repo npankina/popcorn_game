@@ -331,6 +331,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		break;
 
 	case EPlatform_State::Expanding:
+		if (Platform_State != EPlatform_State::Regular)
 		{ //--- сохраняем новое состояние платформы в переменную, чтобы отыгрывать анимацию в правильном порядке
 			Platform_State.Set_Next_State(new_state);
 			return;
@@ -358,11 +359,20 @@ void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 
 	if (new_regular_state == EPlatform_Substate_Regular::Normal)
 	{
-		if (Platform_State == EPlatform_State::Glue)
+		switch (Platform_State)
 		{
-			if (Platform_State.Glue == EPlatform_Substate_Glue::Unknown)
+		case EPlatform_State::Glue:
+			if (Platform_State.Glue == EPlatform_Substate_Glue::Unknown)	
+				Set_Next_Or_Regular_State(new_regular_state); // Финализация состояния закончилась
+			else
+				Platform_State.Glue = EPlatform_Substate_Glue::Finalize; // Запускаем финализацию состояния
+
+			return;
+
+		case EPlatform_State::Expanding:
+			if (Platform_State.Expanding == EPlatform_Substate_Expanding::Unknown)
 			{// Финализация состояния закончилась
-				
+
 				Platform_State = EPlatform_State::Regular;
 
 				next_state = Platform_State.Get_Next_State();
@@ -373,11 +383,8 @@ void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 					Platform_State.Regular = new_regular_state;
 			}
 			else
-			{// Запускаем финализацию состояния
-				Platform_State.Glue = EPlatform_Substate_Glue::Finalize;
-				while (Ball_Set->Release_Next_Ball() )
-				{}
-			}
+			// Запускаем финализацию состояния
+				Platform_State.Expanding = EPlatform_Substate_Expanding::Finalize;
 
 			return;
 
@@ -539,7 +546,8 @@ void AsPlatform::Act_For_Rolling_State()
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Act_For_Glue_State()
-{
+{// метод анимации клея
+
 	switch (Platform_State.Glue)
 	{
 	case EPlatform_Substate_Glue::Init:
@@ -558,7 +566,11 @@ void AsPlatform::Act_For_Glue_State()
 
 	case EPlatform_Substate_Glue::Finalize:
 		if (Glue_Spot_Height_Ratio > Min_Glue_Spot_Height_Ratio)
+		{
 			Glue_Spot_Height_Ratio -= Glue_Spot_Height_Ratio_Step;
+			while (Ball_Set->Release_Next_Ball() ) //--- отпускает все мячики на платформе
+			{}
+		}
 		else
 		{
 			Platform_State.Glue = EPlatform_Substate_Glue::Unknown;
@@ -578,7 +590,7 @@ void AsPlatform::Act_For_Expanding_State()
 	switch (Platform_State.Expanding)
 	{
 	case EPlatform_Substate_Expanding::Init:
-		//--- 
+		
 		if (Expanding_Platform_Width < Max_Expanding_Platform_Width)
 		{
 			Expanding_Platform_Width += Expanding_Platform_Width_Step;
@@ -605,8 +617,8 @@ void AsPlatform::Act_For_Expanding_State()
 		}
 		else
 		{
-			Set_State(EPlatform_Substate_Regular::Normal);
 			Platform_State.Expanding = EPlatform_Substate_Expanding::Unknown;
+			Set_State(EPlatform_Substate_Regular::Normal);
 		}
 
 		Redraw_Platform();
@@ -1102,5 +1114,19 @@ bool AsPlatform::Correct_Platform_Pos()
 		X_Pos = max_platform_x;
 
 	return got_correction;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state)
+{
+	EPlatform_State next_state;
+
+	Platform_State = EPlatform_State::Regular;
+
+	next_state = Platform_State.Get_Next_State();
+	// Если есть отложенное состояние, то переведем в него, в не в Regular
+	if (next_state != EPlatform_State::Unknown) //--- значит есть какое-то отложенное состояние
+		Set_State(next_state);
+	else //--- иначе переводим платформу в запрошенное состояние
+		Platform_State.Regular = new_regular_state;
 }
 //------------------------------------------------------------------------------------------------------------
