@@ -1078,6 +1078,41 @@ void AsPlatform::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 {
+	int x, y;
+	int scale = AsConfig::Global_Scale;
+	HRGN region; //--- указывает область обрезки изображения, которые выводится на экран
+
+	region = CreateRectRgnIndirect(&Platform_Rect);
+	SelectClipRgn(hdc, region); //--- установка области обрезки
+
+	// 1. Левое крыло //--- в форме полуэллипса
+	Platform_Circle_Color.Select_Pen(hdc); //--- установка цвета полуэллипса
+
+	x = (int)(X_Pos * AsConfig::D_Global_Scale);
+	y = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
+	Ellipse(hdc, x, y, x + 7 * scale - 1, y + 12 * scale - 1);
+
+	// 1.1. Перемычка
+	x += 3 * scale;
+	y += 2 * scale;
+	Rectangle(hdc, x, y, x + 6 * scale - 1, y + 5 * scale - 1);
+
+	// 2. Правое крыло //--- в форме полуэллипса
+	Platform_Circle_Color.Select_Pen(hdc); //--- установка цвета полуэллипса
+
+	//--- размер платформы = позиция по х + размер нормальной платформы - ширину крыла с поправкой на глобальный масштаб
+	x = (int)(X_Pos * AsConfig::D_Global_Scale) + Normal_Width * scale - 1;
+	y = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
+	Ellipse(hdc, x, y, x - (7 * scale - 1), y + 12 * scale - 1);
+
+	// 2.1. Перемычка
+	x -= 5 * scale;
+	y += 2 * scale;
+	Rectangle(hdc, x, y, x - (6 * scale - 1), y + 5 * scale - 1);
+
+	SelectClipRgn(hdc, 0); //--- удаление области обрезки
+	DeleteObject(region); //--- удалить объект
+
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball)
