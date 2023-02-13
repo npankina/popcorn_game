@@ -1085,16 +1085,17 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 	region = CreateRectRgnIndirect(&Platform_Rect);
 	SelectClipRgn(hdc, region); //--- установка области обрезки
 
+	//--- Рисуем зеркальное отображение правого крыла от левого
 	// 1. Левое крыло //--- в форме полуэллипса
 	Platform_Circle_Color.Select_Pen(hdc); //--- установка цвета полуэллипса
 
 	x = (int)(X_Pos * AsConfig::D_Global_Scale);
-	y = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
+	y = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
 	Ellipse(hdc, x, y, x + 7 * scale - 1, y + 12 * scale - 1);
 
 	// 1.1. Перемычка
-	x += 3 * scale;
-	y += 2 * scale;
+	x += 5 * scale;
+	y += 1 * scale;
 	Rectangle(hdc, x, y, x + 6 * scale - 1, y + 5 * scale - 1);
 
 	// 2. Правое крыло //--- в форме полуэллипса
@@ -1102,13 +1103,48 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 
 	//--- размер платформы = позиция по х + размер нормальной платформы - ширину крыла с поправкой на глобальный масштаб
 	x = (int)(X_Pos * AsConfig::D_Global_Scale) + Normal_Width * scale - 1;
-	y = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
+	y = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
+	
 	Ellipse(hdc, x, y, x - (7 * scale - 1), y + 12 * scale - 1);
 
 	// 2.1. Перемычка
 	x -= 5 * scale;
-	y += 2 * scale;
+	y += 1 * scale;
+	
 	Rectangle(hdc, x, y, x - (6 * scale - 1), y + 5 * scale - 1);
+
+	// 3. Центральная часть
+	// 3.1. Левая нога
+	Platform_Inner_Color.Select_Pen(hdc);
+
+	x = (int)( (X_Pos + 6.0) * AsConfig::D_Global_Scale);
+	y = (AsConfig::Platform_Y_Pos + 3) * AsConfig::Global_Scale;
+
+	Rectangle(hdc, x, y, x + 2 * scale - 1, y + 4 * scale - 1);
+
+	// 3.2. Правая нога
+	//Platform_Inner_Color.Select_Pen(hdc);
+
+	x = (int)(X_Pos * AsConfig::D_Global_Scale) + (Normal_Width - 6) * scale - 1;
+	y = (AsConfig::Platform_Y_Pos + 3) * AsConfig::Global_Scale;
+
+	Rectangle(hdc, x, y, x - (2 * scale - 1), y + 4 * scale - 1);
+
+	// 3.3. Кабина
+	// 3.3.1. Внешняя часть
+	Platform_Inner_Color.Select(hdc);
+
+	x = (int)( (X_Pos + 9.0) * AsConfig::D_Global_Scale);
+	y = (AsConfig::Platform_Y_Pos - 1) * AsConfig::Global_Scale;
+
+	Ellipse(hdc, x, y, x + 10 * scale - 1, y + 8 * scale - 1);
+
+	// 3.3.2. Фоновое кольцо
+	AsConfig::BG_Color.Select(hdc);
+	x += scale;
+	
+	Ellipse(hdc, x, y, x + 8 * scale - 1, y + 6 * scale - 1);
+
 
 	SelectClipRgn(hdc, 0); //--- удаление области обрезки
 	DeleteObject(region); //--- удалить объект
