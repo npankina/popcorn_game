@@ -1088,7 +1088,7 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 
 	//--- Рисуем зеркальное отображение правого крыла от левого
 	// 1. Левое крыло //--- в форме полуэллипса
-	Platform_Circle_Color.Select_Pen(hdc); //--- установка цвета полуэллипса
+	Platform_Circle_Color.Select(hdc); //--- установка цвета полуэллипса
 
 	x = (int)(X_Pos * AsConfig::D_Global_Scale);
 	y = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
@@ -1113,7 +1113,7 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 
 
 	// 2. Правое крыло //--- в форме полуэллипса
-	Platform_Circle_Color.Select_Pen(hdc); //--- установка цвета полуэллипса
+	Platform_Circle_Color.Select(hdc); //--- установка цвета полуэллипса
 
 	//--- размер платформы = позиция по х + размер нормальной платформы - ширину крыла с поправкой на глобальный масштаб
 	x = (int)(X_Pos * AsConfig::D_Global_Scale) + Normal_Width * scale - 1;
@@ -1143,7 +1143,7 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 
 	// 3. Центральная часть
 	// 3.1. Левая нога
-	Platform_Inner_Color.Select_Pen(hdc);
+	Platform_Inner_Color.Select(hdc);
 
 	x = (int)( (X_Pos + 6.0) * AsConfig::D_Global_Scale);
 	y = (AsConfig::Platform_Y_Pos + 3) * scale;
@@ -1203,7 +1203,6 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 
 	Ellipse(hdc, x, y, x + 6 * scale - 1, y + 4 * scale - 1);
 
-	
 
 
 	SelectClipRgn(hdc, 0); //--- удаление области обрезки
