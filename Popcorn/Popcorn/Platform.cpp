@@ -83,7 +83,8 @@ AsPlatform::AsPlatform()
   Right_Key_Down(false), Inner_Width(Normal_Platform_Inner_Width), Rolling_Step(0), Last_Redraw_Timer_Tick(0), Speed(0.0),
   Glue_Spot_Height_Ratio(0.0), Expanding_Platform_Width(0.0), Ball_Set(0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0),
   Normal_Platform_Image(0), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Color(255, 255, 255), Laser_Transformation_Step(0),
-  Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Truss_Color(Platform_Inner_Color, AsConfig::Global_Scale)
+  Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Truss_Color(Platform_Inner_Color, AsConfig::Global_Scale),
+  Gun_Color(Highlight_Color, AsConfig::Global_Scale)
 {
 	X_Pos = (double)(AsConfig::Max_X_Pos - Normal_Width) / 2.0;
 }
@@ -1098,6 +1099,19 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 	y += 1 * scale;
 	Rectangle(hdc, x, y, x + 6 * scale - 1, y + 5 * scale - 1);
 
+	// 1.2. Пушка
+	Gun_Color.Select(hdc);
+
+	x = (int)( (X_Pos + 3.0) * AsConfig::D_Global_Scale); //--- сверху пушка отстоит на 3 игровых пикселя
+	y = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale; //--- по у начинается с самого верху
+
+	MoveToEx(hdc, x + 1, y + 1, 0); //--- 0 указатель
+	LineTo(hdc, x + 1, y + 3 * scale + 1); //--- проводим линию сверху вниз 
+
+	// 1.3. Хвост
+	Ellipse(hdc, x - scale, y + 5 * scale + 1, x + 2 * scale - 1, y + 11 * scale);
+
+
 	// 2. Правое крыло //--- в форме полуэллипса
 	Platform_Circle_Color.Select_Pen(hdc); //--- установка цвета полуэллипса
 
@@ -1113,14 +1127,39 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 	
 	Rectangle(hdc, x, y, x - (6 * scale - 1), y + 5 * scale - 1);
 
+	// 2.2. Пушка
+	Gun_Color.Select(hdc);
+
+	x = (int)(X_Pos * AsConfig::D_Global_Scale) + (Normal_Width - 4) * scale;
+	y = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
+
+	MoveToEx(hdc, x + 1, y + 1, 0);
+	LineTo(hdc, x + 1, y + 3 * scale + 1); 
+
+	// 2.3. Хвост
+	Ellipse(hdc, x - scale, y + 5 * scale + 1, x + 2 * scale - 1, y + 11 * scale);
+
+
+
 	// 3. Центральная часть
 	// 3.1. Левая нога
 	Platform_Inner_Color.Select_Pen(hdc);
 
 	x = (int)( (X_Pos + 6.0) * AsConfig::D_Global_Scale);
-	y = (AsConfig::Platform_Y_Pos + 3) * AsConfig::Global_Scale;
+	y = (AsConfig::Platform_Y_Pos + 3) * scale;
 
-	Rectangle(hdc, x, y, x + 2 * scale - 1, y + 4 * scale - 1);
+	//Rectangle(hdc, x, y, x + 2 * scale - 1, y + 4 * scale - 1); //--- прямоугольник
+	POINT left_leg_points[7] = {
+		{x,y},
+		{x + 2 * scale, y - 2 * scale},
+		{x + 4 * scale, y - 2 * scale},
+		{x + 4 * scale, y},
+		{x + 2 * scale, y + 2 * scale},
+		{x + 2 * scale, y + 4 * scale},
+		{x, y + 4 * scale}
+	};
+
+	Polygon(hdc, left_leg_points, 7); //--- многоугольник
 
 	// 3.2. Правая нога
 	//Platform_Inner_Color.Select_Pen(hdc);
@@ -1128,7 +1167,18 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 	x = (int)(X_Pos * AsConfig::D_Global_Scale) + (Normal_Width - 6) * scale - 1;
 	y = (AsConfig::Platform_Y_Pos + 3) * AsConfig::Global_Scale;
 
-	Rectangle(hdc, x, y, x - (2 * scale - 1), y + 4 * scale - 1);
+	//Rectangle(hdc, x, y, x - (2 * scale - 1), y + 4 * scale - 1);
+	POINT right_leg_points[7] = {
+		{x,y},
+		{x - 2 * scale, y - 2 * scale},
+		{x - 4 * scale, y - 2 * scale},
+		{x - 4 * scale, y},
+		{x - 2 * scale, y + 2 * scale},
+		{x - 2 * scale, y + 4 * scale},
+		{x, y + 4 * scale}
+	};
+
+	Polygon(hdc, right_leg_points, 7); //--- многоугольник
 
 	// 3.3. Кабина
 	// 3.3.1. Внешняя часть
@@ -1139,11 +1189,21 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 
 	Ellipse(hdc, x, y, x + 10 * scale - 1, y + 8 * scale - 1);
 
-	// 3.3.2. Фоновое кольцо
+	// 3.3.2. Среднее кольцо
 	AsConfig::BG_Color.Select(hdc);
 	x += scale;
 	
 	Ellipse(hdc, x, y, x + 8 * scale - 1, y + 6 * scale - 1);
+
+	// 3.3.3 Внутренняя часть
+	AsConfig::White_Color.Select(hdc);
+
+	x += scale;
+	y += scale;
+
+	Ellipse(hdc, x, y, x + 6 * scale - 1, y + 4 * scale - 1);
+
+	
 
 
 	SelectClipRgn(hdc, 0); //--- удаление области обрезки
