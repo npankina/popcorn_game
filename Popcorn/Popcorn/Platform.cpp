@@ -1086,18 +1086,18 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 	// 1. Левое крыло
 	Draw_Laser_Wing(hdc, true);
 
-	// 2. Правое крыло
-	Draw_Laser_Wing(hdc, false);
+	//// 2. Правое крыло
+	//Draw_Laser_Wing(hdc, false);
 
 	// 3. Центральная часть
 	// 3.1. Левая нога
-	Draw_Laser_Leg(hdc, true);
+	//Draw_Laser_Leg(hdc, true);
 
-	// 3.2. Правая нога
-	Draw_Laser_Leg(hdc, false);
+	//// 3.2. Правая нога
+	//Draw_Laser_Leg(hdc, false);
 
-	// 3.3. Кабина
-	Draw_Laser_Cabin(hdc);
+	//// 3.3. Кабина
+	//Draw_Laser_Cabin(hdc);
 
 
 	SelectClipRgn(hdc, 0); //--- удаление области обрезки
@@ -1109,7 +1109,9 @@ void AsPlatform::Draw_Laser_Wing(HDC hdc, bool is_left)
 {
 	int x, y;
 	int x_offset;
-	int scale = AsConfig::Global_Scale;
+	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
+	int height, width;
+	const int scale = AsConfig::Global_Scale;
 
 	Platform_Circle_Color.Select(hdc); //--- установка цвета полуэллипса
 
@@ -1125,39 +1127,51 @@ void AsPlatform::Draw_Laser_Wing(HDC hdc, bool is_left)
 	}
 
 	y = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
-	Ellipse(hdc, x, y, x + x_offset, y + 12 * scale - 1);
+
+	//меняется размер от 7*7 до 7*12 пикселей
+	height = (7.0 + 5.0 * ratio) * AsConfig::D_Global_Scale - 1;
+
+	Ellipse(hdc, x, y, x + x_offset, y + height);
 
 
 	// 1.1. Перемычка
-	x_offset = 6 * scale - 1;
+	
+	x = (int)X_Pos;
+	y = AsConfig::Platform_Y_Pos;
 
 	if (is_left)
-		x += 5 * scale;
-	else
-	{
-		x -= 5 * scale;
-		x_offset = -x_offset;
-	}
-
-	y += 1 * scale;
-	Rectangle(hdc, x, y, x + x_offset, y + 5 * scale - 1);
+		Draw_Expanding_Rectangle(hdc, x + 3, y + 6, 1, 1, ratio, x + 5, y + 2, 6, 5);
 
 
-	// 1.2. Пушка
-	Gun_Color.Select(hdc);
+	//x_offset = 6 * scale - 1;
 
-	if (is_left)
-		x = (int)( (X_Pos + 3.0) * AsConfig::D_Global_Scale);
-	else
-		x = (int)(X_Pos * AsConfig::D_Global_Scale) + (Normal_Width - 4) * scale;
+	//if (is_left)
+	//	x += 5 * scale;
+	//else
+	//{
+	//	x -= 5 * scale;
+	//	x_offset = -x_offset;
+	//}
 
-	y = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
+	//y += 1 * scale;
+	//Rectangle(hdc, x, y, x + x_offset, y + 5 * scale - 1);
 
-	MoveToEx(hdc, x + 1, y + 1, 0);
-	LineTo(hdc, x + 1, y + 3 * scale + 1); 
 
-	// 1.3. Хвост
-	Ellipse(hdc, x - scale, y + 5 * scale + 1, x + 2 * scale - 1, y + 11 * scale);
+	//// 1.2. Пушка
+	//Gun_Color.Select(hdc);
+
+	//if (is_left)
+	//	x = (int)( (X_Pos + 3.0) * AsConfig::D_Global_Scale);
+	//else
+	//	x = (int)(X_Pos * AsConfig::D_Global_Scale) + (Normal_Width - 4) * scale;
+
+	//y = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
+
+	//MoveToEx(hdc, x + 1, y + 1, 0);
+	//LineTo(hdc, x + 1, y + 3 * scale + 1); 
+
+	//// 1.3. Хвост
+	//Ellipse(hdc, x - scale, y + 5 * scale + 1, x + 2 * scale - 1, y + 11 * scale);
 	
 }
 //------------------------------------------------------------------------------------------------------------
@@ -1221,6 +1235,11 @@ void AsPlatform::Draw_Laser_Cabin(HDC hdc)
 	y += scale;
 
 	Ellipse(hdc, x, y, x + 6 * scale - 1, y + 4 * scale - 1);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Expanding_Rectangle(HDC hdc, int start_x, int start_y, int start_width, int start_height, double ratio, int end_x, int end_y, int end_width, int end_height)
+{
+
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball)

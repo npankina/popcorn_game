@@ -154,6 +154,7 @@ private:
 	void Draw_Laser_Wing(HDC hdc, bool is_left);
 	void Draw_Laser_Leg(HDC hdc, bool is_left);
 	void Draw_Laser_Cabin(HDC hdc);
+	void Draw_Expanding_Rectangle(HDC hdc, int start_x, int start_y, int start_width, int start_height, double ratio, int end_x, int end_y, int end_width, int end_height);
 	bool Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball);
 	bool Get_Platform_Image_Stroke_Color(int x, int y, const AColor **color, int &stroke_len);
 	void Get_Normal_Platform_Image(HDC hdc);
