@@ -565,7 +565,7 @@ void AsPlatform::Act_For_Rolling_State()
 
 		if (X_Pos <= Roll_In_Platform_End_X_Pos)
 		{
-			X_Pos += Rolling_Platform_Speed;
+			X_Pos = Roll_In_Platform_End_X_Pos;
 			Platform_State.Rolling = EPlatform_Substate_Rolling::Expand_Roll_In;
 			Inner_Width = 1;
 		}
@@ -1097,7 +1097,7 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 	//Draw_Laser_Leg(hdc, false);
 
 	//// 3.3. Кабина
-	//Draw_Laser_Cabin(hdc);
+	Draw_Laser_Cabin(hdc);
 
 
 	SelectClipRgn(hdc, 0); //--- удаление области обрезки
@@ -1195,28 +1195,33 @@ void AsPlatform::Draw_Laser_Cabin(HDC hdc)
 {
 	int x, y;
 	int scale = AsConfig::Global_Scale;
+	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
 
 	// 3.3.1. Внешняя часть
 	Platform_Inner_Color.Select(hdc);
 
-	x = (int)( (X_Pos + 9.0) * AsConfig::D_Global_Scale);
-	y = (AsConfig::Platform_Y_Pos - 1) * AsConfig::Global_Scale;
+	x = (int)X_Pos;
+	y = AsConfig::Platform_Y_Pos;
 
-	Ellipse(hdc, x, y, x + 10 * scale - 1, y + 8 * scale - 1);
+	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 9, y - 1, 10, 8 - 1.0 / AsConfig::D_Global_Scale);
 
 	// 3.3.2. Среднее кольцо
 	AsConfig::BG_Color.Select(hdc);
-	x += scale;
 
-	Ellipse(hdc, x, y, x + 8 * scale - 1, y + 6 * scale - 1);
+	x = (int)X_Pos;
+	y = AsConfig::Platform_Y_Pos;
+
+	Draw_Expanding_Figure(hdc, true, x + 13, y + 1, 2, 1, ratio, x + 11, y, 6, 1);
+
+	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 10, y, 8, 5 - 1.0 / AsConfig::D_Global_Scale);
 
 	// 3.3.3 Внутренняя часть
 	AsConfig::White_Color.Select(hdc);
 
-	x += scale;
-	y += scale;
+	x = (int)X_Pos;
+	y = AsConfig::Platform_Y_Pos;
 
-	Ellipse(hdc, x, y, x + 6 * scale - 1, y + 4 * scale - 1);
+	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 11, y, 6, 4 - 1.0 / AsConfig::D_Global_Scale);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Expanding_Figure(HDC hdc, bool is_rectangle, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height)

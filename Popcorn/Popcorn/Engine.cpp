@@ -90,6 +90,7 @@ int AsEngine::On_Key(EKey_Type key_type, bool key_down)
 
 	case EKT_Space:
 		Platform.On_Space_Key(key_down);
+		Platform.Set_State(EPlatform_State::Laser);
 		break;
 	}
 

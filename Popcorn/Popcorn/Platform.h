@@ -192,7 +192,7 @@ private:
 	static const int Meltdown_Speed = 3;
 	static const int Max_Rolling_Step = 16;
 	static const int Roll_In_Platform_End_X_Pos = 99;
-	static const int Rolling_Platform_Speed = 3;
+	static const int Rolling_Platform_Speed = 13;
 	static const int X_Step = 6;
 	static const int Max_Laser_Transformation_Step = 8;
 };
