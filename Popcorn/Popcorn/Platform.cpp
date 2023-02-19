@@ -1193,35 +1193,24 @@ void AsPlatform::Draw_Laser_Leg(HDC hdc, bool is_left)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_Cabin(HDC hdc)
 {
-	int x, y;
 	int scale = AsConfig::Global_Scale;
+	double one_pixel = 1.0 / AsConfig::D_Global_Scale;
 	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
-
+	int x = (int)X_Pos;
+	int y = AsConfig::Platform_Y_Pos;
+	
 	// 3.3.1. Внешняя часть
 	Platform_Inner_Color.Select(hdc);
-
-	x = (int)X_Pos;
-	y = AsConfig::Platform_Y_Pos;
-
-	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 9, y - 1, 10, 8 - 1.0 / AsConfig::D_Global_Scale);
+	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 9, y - 1, 10, 8 - one_pixel);
 
 	// 3.3.2. Среднее кольцо
 	AsConfig::BG_Color.Select(hdc);
-
-	x = (int)X_Pos;
-	y = AsConfig::Platform_Y_Pos;
-
 	Draw_Expanding_Figure(hdc, true, x + 13, y + 1, 2, 1, ratio, x + 11, y, 6, 1);
-
-	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 10, y, 8, 5 - 1.0 / AsConfig::D_Global_Scale);
+	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 10, y, 8, 5 - one_pixel);
 
 	// 3.3.3 Внутренняя часть
 	AsConfig::White_Color.Select(hdc);
-
-	x = (int)X_Pos;
-	y = AsConfig::Platform_Y_Pos;
-
-	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 11, y, 6, 4 - 1.0 / AsConfig::D_Global_Scale);
+	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 11, y, 6, 4 - one_pixel);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Expanding_Figure(HDC hdc, bool is_rectangle, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height)
