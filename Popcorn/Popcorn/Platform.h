@@ -152,6 +152,7 @@ private:
 	void Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left);
 	void Draw_Laser_State(HDC hdc, RECT &paint_area);
 	void Draw_Laser_Wing(HDC hdc, bool is_left);
+	void Draw_Laser_Inner_part(HDC hdc);
 	void Draw_Laser_Leg(HDC hdc, bool is_left);
 	void Draw_Laser_Cabin(HDC hdc);
 	void Draw_Expanding_Figure(HDC hdc, bool is_rectangle, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height);

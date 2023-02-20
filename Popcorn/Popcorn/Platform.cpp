@@ -1079,7 +1079,7 @@ void AsPlatform::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left)
 void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 {
 	HRGN region; //--- указывает область обрезки изображения, которые выводится на экран
-
+	
 	region = CreateRectRgnIndirect(&Platform_Rect);
 	SelectClipRgn(hdc, region); //--- установка области обрезки
 
@@ -1089,20 +1089,34 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 	// 2. Правое крыло
 	Draw_Laser_Wing(hdc, false);
 
-	 //3. Центральная часть
-	 //3.1. Левая нога
-	//Draw_Laser_Leg(hdc, true);
+	// 3. Центральная часть
+	// 3.0 Нормальная средняя часть
+	Draw_Laser_Inner_part(hdc);
+	
+	// 3.1. Левая нога
+	Draw_Laser_Leg(hdc, true);
 
-	//// 3.2. Правая нога
-	//Draw_Laser_Leg(hdc, false);
+	// 3.2. Правая нога
+	Draw_Laser_Leg(hdc, false);
 
-	//// 3.3. Кабина
+	// 3.3. Кабина
 	Draw_Laser_Cabin(hdc);
 
 
 	SelectClipRgn(hdc, 0); //--- удаление области обрезки
 	DeleteObject(region); //--- удалить объект нужно обязательно!!
 
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Laser_Inner_part(HDC hdc)
+{// рисует уменьшающуюся часть обычной платформы
+ // Размер 20 х 5 => 0 x 0
+
+	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
+	int x = (int)X_Pos;
+	int y = AsConfig::Platform_Y_Pos;
+
+	Draw_Expanding_Figure(hdc, true, x + 4, y + 1, 20, 5, ratio, x + 14, y + 1, 0, 0);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_Wing(HDC hdc, bool is_left)
@@ -1162,17 +1176,19 @@ void AsPlatform::Draw_Laser_Leg(HDC hdc, bool is_left)
 	int x, y;
 	int x_scale;
 	int scale = AsConfig::Global_Scale;
+	double d_scale = AsConfig::D_Global_Scale;
+	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
 
 	Platform_Inner_Color.Select(hdc);
 
 	if (is_left)
 	{
-		x = (int)( (X_Pos + 6.0) * AsConfig::D_Global_Scale);
+		x = (int)( (X_Pos + 6.0) * d_scale);
 		x_scale = scale;
 	}
 	else
 	{
-		x = (int)(X_Pos * AsConfig::D_Global_Scale) + (Normal_Width - 6) * scale - 1;
+		x = (int)(X_Pos * d_scale) + (Normal_Width - 6) * scale - 1;
 		x_scale = -scale;
 	}
 
@@ -1184,8 +1200,8 @@ void AsPlatform::Draw_Laser_Leg(HDC hdc, bool is_left)
 		{x + 4 * x_scale, y - 2 * scale},
 		{x + 4 * x_scale, y},
 		{x + 2 * x_scale, y + 2 * scale},
-		{x + 2 * x_scale, y + 4 * scale},
-		{x, y + 4 * scale}
+		{x + 2 * x_scale, y + (int)((2.0 + 2.0 * ratio) * d_scale)},
+		{x, y + (int)(4.0 * ratio * d_scale)}
 	};
 
 	Polygon(hdc, leg_points, 7); //--- многоугольник
@@ -1193,11 +1209,11 @@ void AsPlatform::Draw_Laser_Leg(HDC hdc, bool is_left)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_Cabin(HDC hdc)
 {
+	int x = (int)X_Pos;
+	int y = AsConfig::Platform_Y_Pos;
 	int scale = AsConfig::Global_Scale;
 	double one_pixel = 1.0 / AsConfig::D_Global_Scale;
 	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
-	int x = (int)X_Pos;
-	int y = AsConfig::Platform_Y_Pos;
 	
 	// 3.3.1. Внешняя часть
 	Platform_Inner_Color.Select(hdc);
