@@ -1110,13 +1110,14 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_Inner_part(HDC hdc)
 {// рисует уменьшающуюся часть обычной платформы
- // Размер 20 х 5 => 0 x 0
+ // Размер 20 х 5 => 8 x 1
 
 	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
 	int x = (int)X_Pos;
 	int y = AsConfig::Platform_Y_Pos;
 
-	Draw_Expanding_Figure(hdc, true, x + 4, y + 1, 20, 5, ratio, x + 14, y + 1, 0, 0);
+	Platform_Inner_Color.Select(hdc);
+	Draw_Expanding_Figure(hdc, EFigure_type::Round_Rect_3x, x + 4, y + 1, 20, 5, ratio, x + 10, y + 1, 8, 1);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_Wing(HDC hdc, bool is_left)
@@ -1137,7 +1138,7 @@ void AsPlatform::Draw_Laser_Wing(HDC hdc, bool is_left)
 		x += Normal_Width - Circle_Size;
 
 	// 1. Крыло //--- в форме полуэллипса
-	Draw_Expanding_Figure(hdc, false, x, y, 7, 7, ratio, x, y + 1, 7, 12);
+	Draw_Expanding_Figure(hdc, EFigure_type::Ellipse, x, y, 7, 7, ratio, x, y + 1, 7, 12);
 
 
 	// 1.1. Перемычка
@@ -1146,7 +1147,7 @@ void AsPlatform::Draw_Laser_Wing(HDC hdc, bool is_left)
 	else
 		x_offset = -4;
 
-	Draw_Expanding_Figure(hdc, true, x + 3, y + 6, 1, 1, ratio, x + x_offset, y + 2, 6, 5);
+	Draw_Expanding_Figure(hdc, EFigure_type::Rectangle, x + 3, y + 6, 1, 1, ratio, x + x_offset, y + 2, 6, 5);
 
 
 	// 1.2. Пушка
@@ -1167,7 +1168,7 @@ void AsPlatform::Draw_Laser_Wing(HDC hdc, bool is_left)
 		LineTo(hdc, x * scale + 1, y * scale + height + 1); 
 
 		// 1.3. Хвост
-		Draw_Expanding_Figure(hdc, false, x + 1, y + 5, 0, 0, ratio, x - 1, y + 5 + 1.0 / AsConfig::D_Global_Scale, 3, 6);
+		Draw_Expanding_Figure(hdc, EFigure_type::Ellipse, x + 1, y + 5, 0, 0, ratio, x - 1, y + 5 + 1.0 / AsConfig::D_Global_Scale, 3, 6);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -1217,33 +1218,52 @@ void AsPlatform::Draw_Laser_Cabin(HDC hdc)
 	
 	// 3.3.1. Внешняя часть
 	Platform_Inner_Color.Select(hdc);
-	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 9, y - 1, 10, 8 - one_pixel);
+	Draw_Expanding_Figure(hdc, EFigure_type::Ellipse, x + 13, y + 1, 2, 1, ratio, x + 9, y - 1, 10, 8 - one_pixel);
 
 	// 3.3.2. Среднее кольцо
 	AsConfig::BG_Color.Select(hdc);
-	Draw_Expanding_Figure(hdc, true, x + 13, y + 1, 2, 1, ratio, x + 11, y, 6, 1);
-	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 10, y, 8, 5 - one_pixel);
+	Draw_Expanding_Figure(hdc, EFigure_type::Rectangle, x + 13, y + 1, 2, 1, ratio, x + 11, y, 6, 1);
+	Draw_Expanding_Figure(hdc, EFigure_type::Ellipse, x + 13, y + 1, 2, 1, ratio, x + 10, y, 8, 5 - one_pixel);
 
 	// 3.3.3 Внутренняя часть
 	AsConfig::White_Color.Select(hdc);
-	Draw_Expanding_Figure(hdc, false, x + 13, y + 1, 2, 1, ratio, x + 11, y, 6, 4 - one_pixel);
+	Draw_Expanding_Figure(hdc, EFigure_type::Ellipse, x + 13, y + 1, 2, 1, ratio, x + 11, y, 6, 4 - one_pixel);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform::Draw_Expanding_Figure(HDC hdc, bool is_rectangle, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height)
+void AsPlatform::Draw_Expanding_Figure(HDC hdc, EFigure_type figure_type, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height)
 {
 	const int d_scale = AsConfig::D_Global_Scale;
 	int x, y;
 	int width, height;
+	RECT rect;
 		
 	x = Get_Expanding_Value(start_x, end_x, ratio);
 	y = Get_Expanding_Value(start_y, end_y, ratio);
 	width = Get_Expanding_Value(start_width, end_width, ratio);
 	height = Get_Expanding_Value(start_height, end_height, ratio);
 
-	if (is_rectangle)
-		Rectangle(hdc, x, y, x + width - 1, y + height);
-	else
+	switch (figure_type)
+	{
+	case EFigure_type::Ellipse:
 		Ellipse(hdc, x, y, x + width - 1, y + height);
+		break;
+
+	case EFigure_type::Rectangle:
+		Rectangle(hdc, x, y, x + width - 1, y + height);
+		break;
+
+	case EFigure_type::Round_Rect_3x:
+		rect.left = x;
+		rect.top = y;
+		rect.right = rect.left + width;
+		rect.bottom = rect.top + height + 1;
+
+		AsConfig::Round_Rect(hdc, rect, 3);
+		break;
+
+	default:
+		AsConfig::Throw();
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 int AsPlatform::Get_Expanding_Value(double start, double end, double ratio)

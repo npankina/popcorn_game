@@ -77,6 +77,13 @@ enum class EPlatform_Moving_State: unsigned char
 	Moving_Right
 };
 //------------------------------------------------------------------------------------------------------------
+enum class EFigure_type: unsigned char
+{
+	Ellipse,
+	Rectangle,
+	Round_Rect_3x
+};
+//------------------------------------------------------------------------------------------------------------
 class AsPlatform_State
 {
 public:
@@ -155,7 +162,7 @@ private:
 	void Draw_Laser_Inner_part(HDC hdc);
 	void Draw_Laser_Leg(HDC hdc, bool is_left);
 	void Draw_Laser_Cabin(HDC hdc);
-	void Draw_Expanding_Figure(HDC hdc, bool is_rectangle, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height);
+	void Draw_Expanding_Figure(HDC hdc, EFigure_type figure_type, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height);
 	int Get_Expanding_Value(double start, double end, double ratio);
 	bool Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball);
 	bool Get_Platform_Image_Stroke_Color(int x, int y, const AColor **color, int &stroke_len);
@@ -193,8 +200,8 @@ private:
 	static const int Meltdown_Speed = 3;
 	static const int Max_Rolling_Step = 16;
 	static const int Roll_In_Platform_End_X_Pos = 99;
-	static const int Rolling_Platform_Speed = 13;
+	static const int Rolling_Platform_Speed = 3;
 	static const int X_Step = 6;
-	static const int Max_Laser_Transformation_Step = 8;
+	static const int Max_Laser_Transformation_Step = 20;
 };
 //------------------------------------------------------------------------------------------------------------
