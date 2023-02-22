@@ -1102,10 +1102,8 @@ void AsPlatform::Draw_Laser_State(HDC hdc, RECT &paint_area)
 	// 3.3. Кабина
 	Draw_Laser_Cabin(hdc);
 
-
 	SelectClipRgn(hdc, 0); //--- удаление области обрезки
 	DeleteObject(region); //--- удалить объект нужно обязательно!!
-
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_Inner_part(HDC hdc)
@@ -1122,17 +1120,19 @@ void AsPlatform::Draw_Laser_Inner_part(HDC hdc)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_Wing(HDC hdc, bool is_left)
 {
-	int x, y;
+	double x, y;
 	int x_offset;
 	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
-	int height, width;
+	double height;
 	int half_max_step = Max_Laser_Transformation_Step / 2;
 	const int scale = AsConfig::Global_Scale;
+	const double d_scale = AsConfig::D_Global_Scale;
+
 
 	Platform_Circle_Color.Select(hdc); //--- установка цвета полуэллипса
 
 	y = AsConfig::Platform_Y_Pos;
-	x = (int)X_Pos;
+	x = X_Pos;
 
 	if (!is_left)
 		x += Normal_Width - Circle_Size;
@@ -1158,24 +1158,24 @@ void AsPlatform::Draw_Laser_Wing(HDC hdc, bool is_left)
 		ratio = (double)(Laser_Transformation_Step - half_max_step) / (double)half_max_step;
 
 		if (is_left)
-			x = (int)(X_Pos + 3.0);
+			x = X_Pos + 3.0;
 		else
-			x = (int)X_Pos + (Normal_Width - 4);
+			x = X_Pos + (Normal_Width - 4);
 
-		height = (int)(3.0 * (1.0 - ratio) * AsConfig::D_Global_Scale);
+		height = 3.0 * (1.0 - ratio) * d_scale;
 
-		MoveToEx(hdc, x * scale + 1, y * scale + 3 * scale + 1, 0);
-		LineTo(hdc, x * scale + 1, y * scale + height + 1); 
+		MoveToEx(hdc, (int)(x * d_scale + 1.0), (int)(y * d_scale + 3.0 * d_scale + 1.0), 0);
+		LineTo(hdc, (int)(x * d_scale + 1.0), (int)(y * d_scale + height + 1.0)); 
 
 		// 1.3. Хвост
-		Draw_Expanding_Figure(hdc, EFigure_type::Ellipse, x + 1, y + 5, 0, 0, ratio, x - 1, y + 5 + 1.0 / AsConfig::D_Global_Scale, 3, 6);
+		Draw_Expanding_Figure(hdc, EFigure_type::Ellipse, x + 1, y + 5, 0, 0, ratio, x - 1, y + 5 + 1.0 / d_scale, 3, 6);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_Leg(HDC hdc, bool is_left)
 {
-	int x, y;
-	int x_scale;
+	double x, y;
+	double x_scale;
 	int scale = AsConfig::Global_Scale;
 	double d_scale = AsConfig::D_Global_Scale;
 	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
@@ -1184,25 +1184,25 @@ void AsPlatform::Draw_Laser_Leg(HDC hdc, bool is_left)
 
 	if (is_left)
 	{
-		x = (int)( (X_Pos + 6.0) * d_scale);
+		x = (X_Pos + 6.0) * d_scale;
 		x_scale = scale;
 	}
 	else
 	{
-		x = (int)(X_Pos * d_scale) + (Normal_Width - 6) * scale - 1;
+		x = X_Pos * d_scale + (Normal_Width - 6) * d_scale - 1.0;
 		x_scale = -scale;
 	}
 
 	y = (AsConfig::Platform_Y_Pos + 3) * scale;
 
 	POINT leg_points[7] = {
-		{x,y},
-		{x + 2 * x_scale, y - 2 * scale},
-		{x + 4 * x_scale, y - 2 * scale},
-		{x + 4 * x_scale, y},
-		{x + 2 * x_scale, y + 2 * scale},
-		{x + 2 * x_scale, y + (int)((2.0 + 2.0 * ratio) * d_scale)},
-		{x, y + (int)(4.0 * ratio * d_scale)}
+		{(int)x, (int)y},
+		{(int)(x + 2.0 * x_scale), (int)(y - 2.0 * scale)},
+		{(int)(x + 4.0 * x_scale), (int)(y - 2.0 * scale)},
+		{(int)(x + 4.0 * x_scale), (int)y},
+		{(int)(x + 2.0 * x_scale), (int)(y + 2.0 * scale)},
+		{(int)(x + 2.0 * x_scale), (int)(y + (2.0 + 2.0 * ratio) * d_scale)},
+		{(int)x, (int)(y + 4.0 * ratio * d_scale)}
 	};
 
 	Polygon(hdc, leg_points, 7); //--- многоугольник
@@ -1210,8 +1210,8 @@ void AsPlatform::Draw_Laser_Leg(HDC hdc, bool is_left)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Laser_Cabin(HDC hdc)
 {
-	int x = (int)X_Pos;
-	int y = AsConfig::Platform_Y_Pos;
+	double x = X_Pos;
+	double y = AsConfig::Platform_Y_Pos;
 	int scale = AsConfig::Global_Scale;
 	double one_pixel = 1.0 / AsConfig::D_Global_Scale;
 	double ratio = (double)Laser_Transformation_Step / (double)Max_Laser_Transformation_Step;
@@ -1232,10 +1232,10 @@ void AsPlatform::Draw_Laser_Cabin(HDC hdc)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Expanding_Figure(HDC hdc, EFigure_type figure_type, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height)
 {
-	const int d_scale = AsConfig::D_Global_Scale;
+	const double d_scale = AsConfig::D_Global_Scale;
 	int x, y;
 	int width, height;
-	RECT rect;
+	RECT rect{};
 		
 	x = Get_Expanding_Value(start_x, end_x, ratio);
 	y = Get_Expanding_Value(start_y, end_y, ratio);

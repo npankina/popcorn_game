@@ -493,7 +493,7 @@ void ABall::Draw_Parachute(HDC hdc, RECT &paint_area)
 	int arc_x;
 	int line_y;
 	int ball_center_x, ball_center_y;
-	RECT intersection_rect, sub_arc, other_arc;
+	RECT intersection_rect{}, sub_arc{}, other_arc{};
 
 	if (! IntersectRect(&intersection_rect, &paint_area, &Parachute_Rect) )
 		return;
