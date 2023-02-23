@@ -42,32 +42,41 @@ enum class EPlatform_Substate_Rolling: unsigned char
 	Expand_Roll_In
 };
 //------------------------------------------------------------------------------------------------------------
-enum class EPlatform_Substate_Glue: unsigned char
+enum class EPlatform_Transformation: unsigned char
 {
 	Unknown,
-
+	
 	Init,
 	Active,
 	Finalize
 };
 //------------------------------------------------------------------------------------------------------------
-enum class EPlatform_Substate_Expanding: unsigned char
-{
-	Unknown,
-
-	Init,
-	Active,
-	Finalize
-};
-//------------------------------------------------------------------------------------------------------------
-enum class EPlatform_Substate_Laser: unsigned char
-{
-	Unknown,
-
-	Init,
-	Active,
-	Finalize
-};
+//enum class EPlatform_Substate_Glue: unsigned char
+//{
+//	Unknown,
+//
+//	Init,
+//	Active,
+//	Finalize
+//};
+////------------------------------------------------------------------------------------------------------------
+//enum class EPlatform_Substate_Expanding: unsigned char
+//{
+//	Unknown,
+//
+//	Init,
+//	Active,
+//	Finalize
+//};
+////------------------------------------------------------------------------------------------------------------
+//enum class EPlatform_Substate_Laser: unsigned char
+//{
+//	Unknown,
+//
+//	Init,
+//	Active,
+//	Finalize
+//};
 //------------------------------------------------------------------------------------------------------------
 enum class EPlatform_Moving_State: unsigned char
 {
@@ -85,7 +94,7 @@ enum class EFigure_type: unsigned char
 };
 //------------------------------------------------------------------------------------------------------------
 class AsPlatform_State
-{
+{// Инкапсулирует все состояния платформы
 public:
 	AsPlatform_State();
 
@@ -98,9 +107,9 @@ public:
 
 	EPlatform_Substate_Meltdown Meltdown;
 	EPlatform_Substate_Rolling Rolling;
-	EPlatform_Substate_Glue Glue;
-	EPlatform_Substate_Expanding Expanding;
-	EPlatform_Substate_Laser Laser;
+	EPlatform_Transformation Glue;
+	EPlatform_Transformation Expanding;
+	EPlatform_Transformation Laser;
 
 	EPlatform_Moving_State Moving;
 
