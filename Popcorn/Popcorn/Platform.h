@@ -151,6 +151,7 @@ public:
 	double X_Pos;
 
 private:
+	bool Set_Transformation_State(EPlatform_State new_state, EPlatform_Transformation &transformation_state);
 	void Act_For_Meltdown_State();
 	void Act_For_Rolling_State();
 	void Act_For_Glue_State();

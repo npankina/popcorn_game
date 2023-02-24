@@ -5,7 +5,7 @@
 AsPlatform_State::AsPlatform_State()
 : Current_State(EPlatform_State::Regular), Next_State(EPlatform_State::Unknown), Regular(EPlatform_Substate_Regular::Missing),
   Meltdown(EPlatform_Substate_Meltdown::Unknown), Rolling(EPlatform_Substate_Rolling::Unknown),
-  Glue(EPlatform_Substate_Glue::Unknown), Expanding(EPlatform_Substate_Expanding::Unknown), Laser(EPlatform_Substate_Laser::Unknown),
+  Glue(EPlatform_Transformation::Unknown), Expanding(EPlatform_Transformation::Unknown), Laser(EPlatform_Transformation::Unknown),
   Moving(EPlatform_Moving_State::Stop)
 {}
 //------------------------------------------------------------------------------------------------------------
@@ -38,15 +38,15 @@ void AsPlatform_State::Set_Next_State(EPlatform_State next_state)
 		break;
 
 	case EPlatform_State::Glue:
-		Glue = EPlatform_Substate_Glue::Finalize;
+		Glue = EPlatform_Transformation::Finalize;
 		break;
 
 	case EPlatform_State::Laser:
-		Laser = EPlatform_Substate_Laser::Finalize;
+		Laser = EPlatform_Transformation::Finalize;
 		break;
 
 	case EPlatform_State::Expanding:
-		Expanding = EPlatform_Substate_Expanding::Finalize;
+		Expanding = EPlatform_Transformation::Finalize;
 		break;
 
 	default:
@@ -131,7 +131,7 @@ _on_hit:
 	if (ball->Get_State() == EBS_On_Parachute)
 		ball->Set_State(EBS_Off_Parachute);
 
-	if (Platform_State == EPlatform_State::Glue && Platform_State.Glue == EPlatform_Substate_Glue::Active)
+	if (Platform_State == EPlatform_State::Glue && Platform_State.Glue == EPlatform_Transformation::Active)
 	{
 		ball->Get_Center(ball_x, ball_y);
 		ball->Set_State(EBS_On_Platform, ball_x, ball_y);
@@ -174,7 +174,7 @@ void AsPlatform::Advance(double max_speed)
 
 	// Смещаем приклеенные мячики
 	if ( (Platform_State == EPlatform_State::Regular && Platform_State.Regular == EPlatform_Substate_Regular::Ready)
-		|| (Platform_State == EPlatform_State::Glue && Platform_State.Glue == EPlatform_Substate_Glue::Active) )
+		|| (Platform_State == EPlatform_State::Glue && Platform_State.Glue == EPlatform_Transformation::Active) )
 	{
 		if (Platform_State.Moving == EPlatform_Moving_State::Moving_Left)
 			Ball_Set->On_Platform_Advance(M_PI, fabs(Speed), max_speed);
@@ -328,52 +328,34 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		Rolling_Step = Max_Rolling_Step - 1;
 		break;
 
-	case EPlatform_State::Glue:
-		
-		if (Platform_State != EPlatform_State::Regular)
-		{ //--- сохраняем новое состояние платформы в переменную, чтобы отыгрывать анимацию в правильном порядке
-			Platform_State.Set_Next_State(new_state);
-			return;
-		}
 
-		if (Platform_State.Glue == EPlatform_Substate_Glue::Finalize)
+	case EPlatform_State::Glue:
+		if ( Set_Transformation_State(new_state, Platform_State.Glue) )
 			return;
 		else
 		{
-			Platform_State.Glue = EPlatform_Substate_Glue::Init;
+			Platform_State.Glue = EPlatform_Transformation::Init;
 			Glue_Spot_Height_Ratio = Min_Glue_Spot_Height_Ratio;
 		}
 		break;
+		
 
 	case EPlatform_State::Laser:
-
-		if (Platform_State != EPlatform_State::Regular)
-		{
-			Platform_State.Set_Next_State(new_state);
-			return;
-		}
-
-		if (Platform_State.Laser == EPlatform_Substate_Laser::Finalize)
+		if ( Set_Transformation_State(new_state, Platform_State.Laser) )
 			return;
 		else
 		{
-			Platform_State.Laser = EPlatform_Substate_Laser::Init;
+			Platform_State.Laser = EPlatform_Transformation::Init;
 			Laser_Transformation_Step = 0;
 		}
 		break;
 
 	case EPlatform_State::Expanding:
-		if (Platform_State != EPlatform_State::Regular)
-		{ //--- сохраняем новое состояние платформы в переменную, чтобы отыгрывать анимацию в правильном порядке
-			Platform_State.Set_Next_State(new_state);
-			return;
-		}
-
-		if (Platform_State.Expanding == EPlatform_Substate_Expanding::Finalize)
+		if ( Set_Transformation_State(new_state, Platform_State.Expanding) )
 			return;
 		else
 		{
-			Platform_State.Expanding = EPlatform_Substate_Expanding::Init;
+			Platform_State.Expanding = EPlatform_Transformation::Init;
 			Expanding_Platform_Width = Min_Expanding_Platform_Width;
 		}
 		break;
@@ -385,6 +367,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 {
 	EPlatform_State next_state;
+	EPlatform_Transformation *transformation_state;
 
 	if (Platform_State == EPlatform_State::Regular && Platform_State.Regular == new_regular_state)
 		return;
@@ -394,40 +377,24 @@ void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 		switch (Platform_State)
 		{
 		case EPlatform_State::Glue:
-			if (Platform_State.Glue == EPlatform_Substate_Glue::Unknown)	
-				Set_Next_Or_Regular_State(new_regular_state); // Финализация состояния закончилась
-			else
-				Platform_State.Glue = EPlatform_Substate_Glue::Finalize; // Запускаем финализацию состояния
-
-			return;
+			transformation_state = &Platform_State.Glue;
+			break;
 
 		case EPlatform_State::Laser:
-			if (Platform_State.Laser == EPlatform_Substate_Laser::Unknown)	
-				Set_Next_Or_Regular_State(new_regular_state); // Финализация состояния закончилась
-			else
-				Platform_State.Laser = EPlatform_Substate_Laser::Finalize; // Запускаем финализацию состояния
-
-			return;
+			transformation_state = &Platform_State.Laser;
+			break;
 
 		case EPlatform_State::Expanding:
-			if (Platform_State.Expanding == EPlatform_Substate_Expanding::Unknown)
-			{
-				Platform_State = EPlatform_State::Regular;
-
-				next_state = Platform_State.Get_Next_State();
-				// Если есть отложенное состояние, то переведем в него, в не в Regular
-				if (next_state != EPlatform_State::Unknown) //--- значит есть какое-то отложенное состояние
-					Set_State(next_state);
-				else //--- иначе переводим платформу в запрошенное состояние
-					Platform_State.Regular = new_regular_state;
-			}
-			else
-			// Запускаем финализацию состояния
-				Platform_State.Expanding = EPlatform_Substate_Expanding::Finalize;
-
-			return;
-
+			transformation_state = &Platform_State.Expanding;
+			break;
 		}
+
+		if (*transformation_state == EPlatform_Transformation::Unknown)	
+			Set_Next_Or_Regular_State(new_regular_state); // Финализация состояния закончилась
+		else
+			*transformation_state = EPlatform_Transformation::Finalize; // Запускаем финализацию состояния
+		
+		return;
 	}
 
 	Platform_State = EPlatform_State::Regular;
@@ -537,6 +504,23 @@ double AsPlatform::Get_Middle_Pos()
 	return X_Pos + Get_Current_Platform_Width() / 2.0;
 }
 //------------------------------------------------------------------------------------------------------------
+bool AsPlatform::Set_Transformation_State(EPlatform_State new_state, EPlatform_Transformation &transformation_state)
+{
+	if (Platform_State != EPlatform_State::Regular)
+	{ 
+		Platform_State.Set_Next_State(new_state);
+		return true;
+	}
+
+	if (transformation_state == EPlatform_Transformation::Finalize)
+		return true;
+	else
+	{
+		transformation_state = EPlatform_Transformation::Init;
+		return false;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
 void AsPlatform::Act_For_Meltdown_State()
 {
 	switch (Platform_State.Meltdown)
@@ -593,7 +577,7 @@ void AsPlatform::Act_For_Laser_State()
 {
 	switch (Platform_State.Laser)
 	{
-	case EPlatform_Substate_Laser::Init:
+	case EPlatform_Transformation::Init:
 		if (Laser_Transformation_Step < Max_Laser_Transformation_Step)
 			++Laser_Transformation_Step;
 		else
