@@ -51,33 +51,6 @@ enum class EPlatform_Transformation: unsigned char
 	Finalize
 };
 //------------------------------------------------------------------------------------------------------------
-//enum class EPlatform_Substate_Glue: unsigned char
-//{
-//	Unknown,
-//
-//	Init,
-//	Active,
-//	Finalize
-//};
-////------------------------------------------------------------------------------------------------------------
-//enum class EPlatform_Substate_Expanding: unsigned char
-//{
-//	Unknown,
-//
-//	Init,
-//	Active,
-//	Finalize
-//};
-////------------------------------------------------------------------------------------------------------------
-//enum class EPlatform_Substate_Laser: unsigned char
-//{
-//	Unknown,
-//
-//	Init,
-//	Active,
-//	Finalize
-//};
-//------------------------------------------------------------------------------------------------------------
 enum class EPlatform_Moving_State: unsigned char
 {
 	Stopping,
