@@ -91,6 +91,18 @@ private:
 	EPlatform_State Next_State; // Переходим в это состояние из AsPlatform::Set_State
 };
 //------------------------------------------------------------------------------------------------------------
+class AsPlatform_Glue
+{
+public:
+	void Act_For_Glue_State();
+	void Draw_Glue_State(HDC hdc, RECT &paint_area);
+	void Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height);
+
+private:
+	double Glue_Spot_Height_Ratio;
+	static const double Max_Glue_Spot_Height_Ratio, Min_Glue_Spot_Height_Ratio, Glue_Spot_Height_Ratio_Step;
+};
+//------------------------------------------------------------------------------------------------------------
 class AsPlatform: public AHit_Checker, public AMover, public AGraphics_Object
 {
 public:
@@ -127,7 +139,7 @@ private:
 	bool Set_Transformation_State(EPlatform_State new_state, EPlatform_Transformation &transformation_state);
 	void Act_For_Meltdown_State();
 	void Act_For_Rolling_State();
-	void Act_For_Glue_State();
+	//void Act_For_Glue_State();
 	void Act_For_Laser_State();
 	void Act_For_Expanding_State();
 	void Draw_Circle_Highlight(HDC hdc, int x, int y);
@@ -135,8 +147,8 @@ private:
 	void Draw_Meltdown_State(HDC hdc, RECT &paint_area);
 	void Draw_Rolling_State(HDC hdc, RECT &paint_area);
 	void Draw_Roll_In_State(HDC hdc, RECT &paint_area);
-	void Draw_Glue_State(HDC hdc, RECT &paint_area);
-	void Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height);
+	//void Draw_Glue_State(HDC hdc, RECT &paint_area);
+	//void Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height);
 	void Draw_Expanding_State(HDC hdc, RECT &paint_area);
 	void Draw_Expanding_Platform_Ball(HDC hdc, bool is_left);
 	void Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left);
@@ -155,13 +167,15 @@ private:
 	void Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state);
 
 	AsPlatform_State Platform_State;
+	AsPlatform_Glue Platform_Glue;
+
 	bool Left_Key_Down, Right_Key_Down;
 	int Inner_Width;
 	int Rolling_Step;
 	int Laser_Transformation_Step;
 	int Last_Redraw_Timer_Tick;
 	double Speed;
-	double Glue_Spot_Height_Ratio;
+	//double Glue_Spot_Height_Ratio;
 	double Expanding_Platform_Width;
 	AsBall_Set *Ball_Set;
 
@@ -174,7 +188,7 @@ private:
 	RECT Platform_Rect, Prev_Platform_Rect;
 
 	AColor Highlight_Color, Platform_Circle_Color, Platform_Inner_Color, Truss_Color, Gun_Color;
-	static const double Max_Glue_Spot_Height_Ratio, Min_Glue_Spot_Height_Ratio, Glue_Spot_Height_Ratio_Step;
+	//static const double Max_Glue_Spot_Height_Ratio, Min_Glue_Spot_Height_Ratio, Glue_Spot_Height_Ratio_Step;
 	static const double Max_Expanding_Platform_Width, Min_Expanding_Platform_Width, Expanding_Platform_Width_Step;
 	static const int Height = 7;
 	static const int Circle_Size = 7;

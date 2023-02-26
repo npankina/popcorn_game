@@ -64,6 +64,97 @@ EPlatform_State AsPlatform_State::Get_Next_State()
 
 
 
+// AsPlatform_Glue
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform_Glue::Act_For_Glue_State()
+{// метод анимации клея
+
+	switch (Platform_State.Glue)
+	{
+	case EPlatform_Transformation::Init:
+		if (Glue_Spot_Height_Ratio < Max_Glue_Spot_Height_Ratio)
+			Glue_Spot_Height_Ratio += Glue_Spot_Height_Ratio_Step;
+		else
+			Platform_State.Glue = EPlatform_Transformation::Active;
+
+		Redraw_Platform();
+		break;
+
+
+	case EPlatform_Transformation::Active:
+		break;
+
+
+	case EPlatform_Transformation::Finalize:
+		if (Glue_Spot_Height_Ratio > Min_Glue_Spot_Height_Ratio)
+		{
+			Glue_Spot_Height_Ratio -= Glue_Spot_Height_Ratio_Step;
+			while (Ball_Set->Release_Next_Ball() ) //--- отпускает все мячики на платформе
+			{}
+		}
+		else
+		{
+			Platform_State.Glue = EPlatform_Transformation::Unknown;
+			Set_State(EPlatform_Substate_Regular::Normal);
+		}
+
+		Redraw_Platform();
+		break;
+
+	default:
+		AsConfig::Throw();
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform_Glue::Draw_Glue_State(HDC hdc, RECT &paint_area)
+{// Рисуем платформу с растекающимся клеем
+
+	HRGN region;
+	RECT glue_rect{};
+
+	Draw_Normal_State(hdc, paint_area);
+
+	glue_rect.left = (int)( (X_Pos + 5.0) * AsConfig::D_Global_Scale);
+	glue_rect.top = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
+	glue_rect.right = glue_rect.left + Normal_Platform_Inner_Width * AsConfig::Global_Scale;
+	glue_rect.bottom = glue_rect.top + (Height - 2) * AsConfig::Global_Scale;
+
+	region = CreateRectRgnIndirect(&glue_rect);
+	SelectClipRgn(hdc, region);
+
+	AsConfig::BG_Color.Select(hdc);
+	Draw_Glue_Spot(hdc, 0, 9, 5);
+	Draw_Glue_Spot(hdc, 6, 6, 5);
+	Draw_Glue_Spot(hdc, 9, 9, 6);
+
+	AsConfig::White_Color.Select(hdc);
+	Draw_Glue_Spot(hdc, 0, 9, 4);
+	Draw_Glue_Spot(hdc, 6, 6, 4);
+	Draw_Glue_Spot(hdc, 9, 9, 5);
+
+	SelectClipRgn(hdc, 0);
+	DeleteObject(region);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform_Glue::Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height)
+{// Рисуем пятно клея
+
+	RECT spot_rect{};
+	int platform_top = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
+	int spot_height = (int)( (double)height * AsConfig::D_Global_Scale * Glue_Spot_Height_Ratio);
+
+	// Рисуем полуэллипс как "пятно" клея
+	spot_rect.left = (int)( (X_Pos + 5.0 + (double)x_offset) * AsConfig::D_Global_Scale);
+	spot_rect.top = platform_top - spot_height;
+	spot_rect.right = spot_rect.left + width * AsConfig::Global_Scale;
+	spot_rect.bottom = platform_top + spot_height - AsConfig::Global_Scale;
+
+	Chord(hdc, spot_rect.left, spot_rect.top, spot_rect.right - 1, spot_rect.bottom - 1,  spot_rect.left, platform_top - 1, spot_rect.right - 1, platform_top - 1);
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
 
 // AsPlatform
 const double AsPlatform::Max_Glue_Spot_Height_Ratio = 1.0;
@@ -611,45 +702,45 @@ void AsPlatform::Act_For_Laser_State()
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform::Act_For_Glue_State()
-{// метод анимации клея
-
-	switch (Platform_State.Glue)
-	{
-	case EPlatform_Transformation::Init:
-		if (Glue_Spot_Height_Ratio < Max_Glue_Spot_Height_Ratio)
-			Glue_Spot_Height_Ratio += Glue_Spot_Height_Ratio_Step;
-		else
-			Platform_State.Glue = EPlatform_Transformation::Active;
-
-		Redraw_Platform();
-		break;
-
-
-	case EPlatform_Transformation::Active:
-		break;
-
-
-	case EPlatform_Transformation::Finalize:
-		if (Glue_Spot_Height_Ratio > Min_Glue_Spot_Height_Ratio)
-		{
-			Glue_Spot_Height_Ratio -= Glue_Spot_Height_Ratio_Step;
-			while (Ball_Set->Release_Next_Ball() ) //--- отпускает все мячики на платформе
-			{}
-		}
-		else
-		{
-			Platform_State.Glue = EPlatform_Transformation::Unknown;
-			Set_State(EPlatform_Substate_Regular::Normal);
-		}
-
-		Redraw_Platform();
-		break;
-
-	default:
-		AsConfig::Throw();
-	}
-}
+//void AsPlatform::Act_For_Glue_State()
+//{// метод анимации клея
+//
+//	switch (Platform_State.Glue)
+//	{
+//	case EPlatform_Transformation::Init:
+//		if (Glue_Spot_Height_Ratio < Max_Glue_Spot_Height_Ratio)
+//			Glue_Spot_Height_Ratio += Glue_Spot_Height_Ratio_Step;
+//		else
+//			Platform_State.Glue = EPlatform_Transformation::Active;
+//
+//		Redraw_Platform();
+//		break;
+//
+//
+//	case EPlatform_Transformation::Active:
+//		break;
+//
+//
+//	case EPlatform_Transformation::Finalize:
+//		if (Glue_Spot_Height_Ratio > Min_Glue_Spot_Height_Ratio)
+//		{
+//			Glue_Spot_Height_Ratio -= Glue_Spot_Height_Ratio_Step;
+//			while (Ball_Set->Release_Next_Ball() ) //--- отпускает все мячики на платформе
+//			{}
+//		}
+//		else
+//		{
+//			Platform_State.Glue = EPlatform_Transformation::Unknown;
+//			Set_State(EPlatform_Substate_Regular::Normal);
+//		}
+//
+//		Redraw_Platform();
+//		break;
+//
+//	default:
+//		AsConfig::Throw();
+//	}
+//}
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Act_For_Expanding_State()
 {
@@ -872,51 +963,51 @@ void AsPlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
 	Draw_Circle_Highlight(hdc, x, y);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform::Draw_Glue_State(HDC hdc, RECT &paint_area)
-{// Рисуем платформу с растекающимся клеем
-
-	HRGN region;
-	RECT glue_rect{};
-
-	Draw_Normal_State(hdc, paint_area);
-
-	glue_rect.left = (int)( (X_Pos + 5.0) * AsConfig::D_Global_Scale);
-	glue_rect.top = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
-	glue_rect.right = glue_rect.left + Normal_Platform_Inner_Width * AsConfig::Global_Scale;
-	glue_rect.bottom = glue_rect.top + (Height - 2) * AsConfig::Global_Scale;
-
-	region = CreateRectRgnIndirect(&glue_rect);
-	SelectClipRgn(hdc, region);
-
-	AsConfig::BG_Color.Select(hdc);
-	Draw_Glue_Spot(hdc, 0, 9, 5);
-	Draw_Glue_Spot(hdc, 6, 6, 5);
-	Draw_Glue_Spot(hdc, 9, 9, 6);
-
-	AsConfig::White_Color.Select(hdc);
-	Draw_Glue_Spot(hdc, 0, 9, 4);
-	Draw_Glue_Spot(hdc, 6, 6, 4);
-	Draw_Glue_Spot(hdc, 9, 9, 5);
-
-	SelectClipRgn(hdc, 0);
-	DeleteObject(region);
-}
+//void AsPlatform::Draw_Glue_State(HDC hdc, RECT &paint_area)
+//{// Рисуем платформу с растекающимся клеем
+//
+//	HRGN region;
+//	RECT glue_rect{};
+//
+//	Draw_Normal_State(hdc, paint_area);
+//
+//	glue_rect.left = (int)( (X_Pos + 5.0) * AsConfig::D_Global_Scale);
+//	glue_rect.top = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
+//	glue_rect.right = glue_rect.left + Normal_Platform_Inner_Width * AsConfig::Global_Scale;
+//	glue_rect.bottom = glue_rect.top + (Height - 2) * AsConfig::Global_Scale;
+//
+//	region = CreateRectRgnIndirect(&glue_rect);
+//	SelectClipRgn(hdc, region);
+//
+//	AsConfig::BG_Color.Select(hdc);
+//	Draw_Glue_Spot(hdc, 0, 9, 5);
+//	Draw_Glue_Spot(hdc, 6, 6, 5);
+//	Draw_Glue_Spot(hdc, 9, 9, 6);
+//
+//	AsConfig::White_Color.Select(hdc);
+//	Draw_Glue_Spot(hdc, 0, 9, 4);
+//	Draw_Glue_Spot(hdc, 6, 6, 4);
+//	Draw_Glue_Spot(hdc, 9, 9, 5);
+//
+//	SelectClipRgn(hdc, 0);
+//	DeleteObject(region);
+//}
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform::Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height)
-{// Рисуем пятно клея
-
-	RECT spot_rect{};
-	int platform_top = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
-	int spot_height = (int)( (double)height * AsConfig::D_Global_Scale * Glue_Spot_Height_Ratio);
-
-	// Рисуем полуэллипс как "пятно" клея
-	spot_rect.left = (int)( (X_Pos + 5.0 + (double)x_offset) * AsConfig::D_Global_Scale);
-	spot_rect.top = platform_top - spot_height;
-	spot_rect.right = spot_rect.left + width * AsConfig::Global_Scale;
-	spot_rect.bottom = platform_top + spot_height - AsConfig::Global_Scale;
-
-	Chord(hdc, spot_rect.left, spot_rect.top, spot_rect.right - 1, spot_rect.bottom - 1,  spot_rect.left, platform_top - 1, spot_rect.right - 1, platform_top - 1);
-}
+//void AsPlatform::Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height)
+//{// Рисуем пятно клея
+//
+//	RECT spot_rect{};
+//	int platform_top = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
+//	int spot_height = (int)( (double)height * AsConfig::D_Global_Scale * Glue_Spot_Height_Ratio);
+//
+//	// Рисуем полуэллипс как "пятно" клея
+//	spot_rect.left = (int)( (X_Pos + 5.0 + (double)x_offset) * AsConfig::D_Global_Scale);
+//	spot_rect.top = platform_top - spot_height;
+//	spot_rect.right = spot_rect.left + width * AsConfig::Global_Scale;
+//	spot_rect.bottom = platform_top + spot_height - AsConfig::Global_Scale;
+//
+//	Chord(hdc, spot_rect.left, spot_rect.top, spot_rect.right - 1, spot_rect.bottom - 1,  spot_rect.left, platform_top - 1, spot_rect.right - 1, platform_top - 1);
+//}
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Expanding_State(HDC hdc, RECT &paint_area)
 {// Рисуем расширяющуюся платформу
