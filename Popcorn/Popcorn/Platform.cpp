@@ -66,19 +66,23 @@ EPlatform_State AsPlatform_State::Get_Next_State()
 
 // AsPlatform_Glue
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform_Glue::Act_For_Glue_State()
+AsPlatform_Glue::AsPlatform_Glue()
+: Glue_Spot_Height_Ratio(0.0)
+//------------------------------------------------------------------------------------------------------------
+bool AsPlatform_Glue::Act_For_Glue_State(EPlatform_Transformation &glue_state)
 {// метод анимации клея
 
-	switch (Platform_State.Glue)
+	switch (glue_state)
 	{
 	case EPlatform_Transformation::Init:
 		if (Glue_Spot_Height_Ratio < Max_Glue_Spot_Height_Ratio)
 			Glue_Spot_Height_Ratio += Glue_Spot_Height_Ratio_Step;
 		else
-			Platform_State.Glue = EPlatform_Transformation::Active;
+			glue_state = EPlatform_Transformation::Active;
 
-		Redraw_Platform();
-		break;
+		//Redraw_Platform();
+		//break;
+		return true;
 
 
 	case EPlatform_Transformation::Active:
@@ -94,16 +98,19 @@ void AsPlatform_Glue::Act_For_Glue_State()
 		}
 		else
 		{
-			Platform_State.Glue = EPlatform_Transformation::Unknown;
+			glue_state = EPlatform_Transformation::Unknown;
 			Set_State(EPlatform_Substate_Regular::Normal);
 		}
 
-		Redraw_Platform();
-		break;
+		//Redraw_Platform();
+		//break;
+		return true;
 
 	default:
 		AsConfig::Throw();
 	}
+
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform_Glue::Draw_Glue_State(HDC hdc, RECT &paint_area)
@@ -293,7 +300,8 @@ void AsPlatform::Act()
 		break;
 
 	case EPlatform_State::Glue:
-		Act_For_Glue_State();
+		if ( Platform_Glue.Act_For_Glue_State(Platform_State.Glue) )
+			Redraw_Platform();
 		break;
 
 	case EPlatform_State::Laser:

@@ -94,7 +94,7 @@ private:
 class AsPlatform_Glue
 {
 public:
-	void Act_For_Glue_State();
+	bool Act_For_Glue_State(EPlatform_Transformation &glue_state);
 	void Draw_Glue_State(HDC hdc, RECT &paint_area);
 	void Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height);
 
