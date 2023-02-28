@@ -75,6 +75,7 @@ public:
 	void operator = (EPlatform_State new_state);
 	void Set_Next_State(EPlatform_State next_state);
 	EPlatform_State Get_Next_State();
+	EPlatform_State Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state);
 
 	EPlatform_Substate_Regular Regular;
 
@@ -94,11 +95,11 @@ private:
 class AsPlatform_Glue
 {
 public:
-	bool Act_For_Glue_State(EPlatform_Transformation &glue_state);
+	bool Act_For_Glue_State(EPlatform_Transformation &glue_state, AsBall_Set *ball_set);
 	void Draw_Glue_State(HDC hdc, RECT &paint_area);
 	void Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height);
 
-private:
+//private:
 	double Glue_Spot_Height_Ratio;
 	static const double Max_Glue_Spot_Height_Ratio, Min_Glue_Spot_Height_Ratio, Glue_Spot_Height_Ratio_Step;
 };
@@ -164,7 +165,7 @@ private:
 	void Get_Normal_Platform_Image(HDC hdc);
 	double Get_Current_Platform_Width();
 	bool Correct_Platform_Pos();
-	void Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state);
+	//EPlatform_State Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state);
 
 	AsPlatform_State Platform_State;
 	AsPlatform_Glue Platform_Glue;

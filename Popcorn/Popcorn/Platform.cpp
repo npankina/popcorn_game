@@ -61,15 +61,36 @@ EPlatform_State AsPlatform_State::Get_Next_State()
 	return Next_State;
 }
 //------------------------------------------------------------------------------------------------------------
+EPlatform_State AsPlatform_State::Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state)
+{// Возврат: если не Unknown, надо перейти в это состояние
+
+	EPlatform_State next_state;
+
+	Current_State = EPlatform_State::Regular;
+
+	// Если есть отложенное состояние, то переведем в него, иначе в Regular
+	next_state = Get_Next_State();
+
+	if (next_state == EPlatform_State::Unknown)
+		Regular = new_regular_state;
+
+	return next_state;
+}
+//------------------------------------------------------------------------------------------------------------
+
 
 
 
 // AsPlatform_Glue
+const double AsPlatform_Glue::Max_Glue_Spot_Height_Ratio = 1.0;
+const double AsPlatform_Glue::Min_Glue_Spot_Height_Ratio = 0.4;
+const double AsPlatform_Glue::Glue_Spot_Height_Ratio_Step = 0.05;
 //------------------------------------------------------------------------------------------------------------
 AsPlatform_Glue::AsPlatform_Glue()
 : Glue_Spot_Height_Ratio(0.0)
+{}
 //------------------------------------------------------------------------------------------------------------
-bool AsPlatform_Glue::Act_For_Glue_State(EPlatform_Transformation &glue_state)
+bool AsPlatform_Glue::Act_For_Glue_State(EPlatform_Transformation &glue_state, AsBall_Set *ball_set)
 {// метод анимации клея
 
 	switch (glue_state)
@@ -93,7 +114,7 @@ bool AsPlatform_Glue::Act_For_Glue_State(EPlatform_Transformation &glue_state)
 		if (Glue_Spot_Height_Ratio > Min_Glue_Spot_Height_Ratio)
 		{
 			Glue_Spot_Height_Ratio -= Glue_Spot_Height_Ratio_Step;
-			while (Ball_Set->Release_Next_Ball() ) //--- отпускает все мячики на платформе
+			while (ball_set->Release_Next_Ball() ) //--- отпускает все мячики на платформе
 			{}
 		}
 		else
@@ -164,9 +185,9 @@ void AsPlatform_Glue::Draw_Glue_Spot(HDC hdc, int x_offset, int width, int heigh
 
 
 // AsPlatform
-const double AsPlatform::Max_Glue_Spot_Height_Ratio = 1.0;
-const double AsPlatform::Min_Glue_Spot_Height_Ratio = 0.4;
-const double AsPlatform::Glue_Spot_Height_Ratio_Step = 0.05;
+//const double AsPlatform::Max_Glue_Spot_Height_Ratio = 1.0;
+//const double AsPlatform::Min_Glue_Spot_Height_Ratio = 0.4;
+//const double AsPlatform::Glue_Spot_Height_Ratio_Step = 0.05;
 const double AsPlatform::Max_Expanding_Platform_Width = 40.0;
 const double AsPlatform::Min_Expanding_Platform_Width = (double)Normal_Width;
 const double AsPlatform::Expanding_Platform_Width_Step = 1.0;
@@ -179,7 +200,7 @@ AsPlatform::~AsPlatform()
 AsPlatform::AsPlatform()
 : X_Pos(AsConfig::Border_X_Offset), Left_Key_Down(false),
   Right_Key_Down(false), Inner_Width(Normal_Platform_Inner_Width), Rolling_Step(0), Last_Redraw_Timer_Tick(0), Speed(0.0),
-  Glue_Spot_Height_Ratio(0.0), Expanding_Platform_Width(0.0), Ball_Set(0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0),
+  /*Glue_Spot_Height_Ratio(0.0),*/ Expanding_Platform_Width(0.0), Ball_Set(0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0),
   Normal_Platform_Image(0), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Color(255, 255, 255), Laser_Transformation_Step(0),
   Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Truss_Color(Platform_Inner_Color, AsConfig::Global_Scale),
   Gun_Color(Highlight_Color, AsConfig::Global_Scale)
@@ -300,7 +321,7 @@ void AsPlatform::Act()
 		break;
 
 	case EPlatform_State::Glue:
-		if ( Platform_Glue.Act_For_Glue_State(Platform_State.Glue) )
+		if (Platform_Glue.Act_For_Glue_State(Platform_State.Glue, Ball_Set) )
 			Redraw_Platform();
 		break;
 
@@ -434,7 +455,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		else
 		{
 			Platform_State.Glue = EPlatform_Transformation::Init;
-			Glue_Spot_Height_Ratio = Min_Glue_Spot_Height_Ratio;
+			AsPlatform_Glue::Glue_Spot_Height_Ratio = AsPlatform_Glue::Min_Glue_Spot_Height_Ratio;
 		}
 		break;
 		
@@ -466,6 +487,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 {
 	EPlatform_Transformation *transformation_state = 0;
+	EPlatform_State next_state;
 
 	if (Platform_State == EPlatform_State::Regular && Platform_State.Regular == new_regular_state)
 		return;
@@ -489,9 +511,13 @@ void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 
 		if (transformation_state != 0)
 		{
-
 			if (*transformation_state == EPlatform_Transformation::Unknown)	
-				Set_Next_Or_Regular_State(new_regular_state); // Финализация состояния закончилась
+			{// Финализация состояния закончилась
+
+				next_state = Platform_State.Set_Next_Or_Regular_State(new_regular_state);
+				if (next_state != EPlatform_State::Unknown)
+					Set_State(next_state);
+			}
 			else
 				*transformation_state = EPlatform_Transformation::Finalize; // Запускаем финализацию состояния
 		
@@ -1482,17 +1508,19 @@ bool AsPlatform::Correct_Platform_Pos()
 	return got_correction;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform::Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state)
-{
-	EPlatform_State next_state;
-
-	Platform_State = EPlatform_State::Regular;
-
-	next_state = Platform_State.Get_Next_State();
-	// Если есть отложенное состояние, то переведем в него, в не в Regular
-	if (next_state != EPlatform_State::Unknown) //--- значит есть какое-то отложенное состояние
-		Set_State(next_state);
-	else //--- иначе переводим платформу в запрошенное состояние
-		Platform_State.Regular = new_regular_state;
-}
-//------------------------------------------------------------------------------------------------------------
+//EPlatform_State AsPlatform::Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state)
+//{// Возврат: если не Unknown, надо перейти в это состояние
+//
+//	EPlatform_State next_state;
+//
+//	Platform_State = EPlatform_State::Regular;
+//
+//	// Если есть отложенное состояние, то переведем в него, иначе в Regular
+//	next_state = Platform_State.Get_Next_State();
+//	
+//	if (next_state == EPlatform_State::Unknown)
+//		Platform_State.Regular = new_regular_state;
+//
+//	return next_state;
+//}
+////------------------------------------------------------------------------------------------------------------
