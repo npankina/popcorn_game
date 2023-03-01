@@ -76,6 +76,7 @@ public:
 	void Set_Next_State(EPlatform_State next_state);
 	EPlatform_State Get_Next_State();
 	EPlatform_State Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state);
+	EPlatform_State Set_State(EPlatform_Substate_Regular new_regular_state);
 
 	EPlatform_Substate_Regular Regular;
 
@@ -126,7 +127,7 @@ public:
 	void Init(AsBall_Set *ball_set);
 	EPlatform_State Get_State();
 	void Set_State(EPlatform_State new_state);
-	void Set_State(EPlatform_Substate_Regular new_regular_state);
+	//void Set_State(EPlatform_Substate_Regular new_regular_state);
 	bool Has_State(EPlatform_Substate_Regular regular_state);
 	void Redraw_Platform();
 	void Move(bool to_left, bool key_down);

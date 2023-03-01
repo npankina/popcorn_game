@@ -77,6 +77,50 @@ EPlatform_State AsPlatform_State::Set_Next_Or_Regular_State(EPlatform_Substate_R
 	return next_state;
 }
 //------------------------------------------------------------------------------------------------------------
+EPlatform_State AsPlatform_State::Set_State(EPlatform_Substate_Regular new_regular_state)
+{
+	EPlatform_Transformation *transformation_state = 0;
+
+	if (Current_State == EPlatform_State::Regular && Regular == new_regular_state)
+		return EPlatform_State::Unknown;
+
+	if (new_regular_state == EPlatform_Substate_Regular::Normal)
+	{
+		switch (Current_State)
+		{
+		case EPlatform_State::Glue:
+			transformation_state = &Glue;
+			break;
+
+		case EPlatform_State::Laser:
+			transformation_state = &Laser;
+			break;
+
+		case EPlatform_State::Expanding:
+			transformation_state = &Expanding;
+			break;
+		}
+
+		if (transformation_state != 0)
+		{
+			if (*transformation_state == EPlatform_Transformation::Unknown)	
+			// Финализация состояния закончилась
+				return Set_Next_Or_Regular_State(new_regular_state);
+				/*if (next_state != EPlatform_State::Unknown)
+				Set_State(next_state);*/
+			else
+				*transformation_state = EPlatform_Transformation::Finalize; // Запускаем финализацию состояния
+
+			return EPlatform_State::Unknown;
+		}
+	}
+
+	Current_State = EPlatform_State::Regular;
+	Regular = new_regular_state;
+
+	return EPlatform_State::Unknown;
+}
+//------------------------------------------------------------------------------------------------------------
 
 
 
@@ -484,50 +528,50 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 	Platform_State = new_state;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
-{
-	EPlatform_Transformation *transformation_state = 0;
-	EPlatform_State next_state;
-
-	if (Platform_State == EPlatform_State::Regular && Platform_State.Regular == new_regular_state)
-		return;
-
-	if (new_regular_state == EPlatform_Substate_Regular::Normal)
-	{
-		switch (Platform_State)
-		{
-		case EPlatform_State::Glue:
-			transformation_state = &Platform_State.Glue;
-			break;
-
-		case EPlatform_State::Laser:
-			transformation_state = &Platform_State.Laser;
-			break;
-
-		case EPlatform_State::Expanding:
-			transformation_state = &Platform_State.Expanding;
-			break;
-		}
-
-		if (transformation_state != 0)
-		{
-			if (*transformation_state == EPlatform_Transformation::Unknown)	
-			{// Финализация состояния закончилась
-
-				next_state = Platform_State.Set_Next_Or_Regular_State(new_regular_state);
-				if (next_state != EPlatform_State::Unknown)
-					Set_State(next_state);
-			}
-			else
-				*transformation_state = EPlatform_Transformation::Finalize; // Запускаем финализацию состояния
-		
-			return;
-		}
-	}
-
-	Platform_State = EPlatform_State::Regular;
-	Platform_State.Regular = new_regular_state;
-}
+//void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
+//{
+//	EPlatform_Transformation *transformation_state = 0;
+//	EPlatform_State next_state;
+//
+//	if (Platform_State == EPlatform_State::Regular && Platform_State.Regular == new_regular_state)
+//		return;
+//
+//	if (new_regular_state == EPlatform_Substate_Regular::Normal)
+//	{
+//		switch (Platform_State)
+//		{
+//		case EPlatform_State::Glue:
+//			transformation_state = &Platform_State.Glue;
+//			break;
+//
+//		case EPlatform_State::Laser:
+//			transformation_state = &Platform_State.Laser;
+//			break;
+//
+//		case EPlatform_State::Expanding:
+//			transformation_state = &Platform_State.Expanding;
+//			break;
+//		}
+//
+//		if (transformation_state != 0)
+//		{
+//			if (*transformation_state == EPlatform_Transformation::Unknown)	
+//			{// Финализация состояния закончилась
+//
+//				next_state = Platform_State.Set_Next_Or_Regular_State(new_regular_state);
+//				if (next_state != EPlatform_State::Unknown)
+//					Set_State(next_state);
+//			}
+//			else
+//				*transformation_state = EPlatform_Transformation::Finalize; // Запускаем финализацию состояния
+//		
+//			return;
+//		}
+//	}
+//
+//	Platform_State = EPlatform_State::Regular;
+//	Platform_State.Regular = new_regular_state;
+//}
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Has_State(EPlatform_Substate_Regular regular_state)
 {
