@@ -573,6 +573,15 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 //	Platform_State.Regular = new_regular_state;
 //}
 //------------------------------------------------------------------------------------------------------------
+void AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
+{
+	EPlatform_State next_state;
+	next_state = Platform_State.Set_State(new_regular_state);
+
+	if (next_state != EPlatform_State::Unknown)
+		Set_State(next_state);
+}
+//------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Has_State(EPlatform_Substate_Regular regular_state)
 {
 	if (Platform_State != EPlatform_State::Regular)
