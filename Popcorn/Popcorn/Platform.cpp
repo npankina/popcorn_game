@@ -147,8 +147,6 @@ bool AsPlatform_Glue::Act_For_Glue_State(EPlatform_Transformation &glue_state, A
 		else
 			glue_state = EPlatform_Transformation::Active;
 
-		//Redraw_Platform();
-		//break;
 		return true;
 
 
@@ -169,8 +167,6 @@ bool AsPlatform_Glue::Act_For_Glue_State(EPlatform_Transformation &glue_state, A
 			next_state = Platform_State->Set_State(EPlatform_Substate_Regular::Normal);
 		}
 
-		//Redraw_Platform();
-		//break;
 		return true;
 
 	default:
@@ -180,18 +176,16 @@ bool AsPlatform_Glue::Act_For_Glue_State(EPlatform_Transformation &glue_state, A
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform_Glue::Draw_Glue_State(HDC hdc, RECT &paint_area)
+void AsPlatform_Glue::Draw_Glue_State(HDC hdc, double x_pos)
 {// Рисуем платформу с растекающимся клеем
 
 	HRGN region;
 	RECT glue_rect{};
 
-	Draw_Normal_State(hdc, paint_area);
-
-	glue_rect.left = (int)( (X_Pos + 5.0) * AsConfig::D_Global_Scale);
+	glue_rect.left = (int)( (x_pos + 5.0) * AsConfig::D_Global_Scale);
 	glue_rect.top = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
-	glue_rect.right = glue_rect.left + Normal_Platform_Inner_Width * AsConfig::Global_Scale;
-	glue_rect.bottom = glue_rect.top + (Height - 2) * AsConfig::Global_Scale;
+	glue_rect.right = glue_rect.left + AsPlatform::Normal_Platform_Inner_Width * AsConfig::Global_Scale;
+	glue_rect.bottom = glue_rect.top + (AsPlatform::Height - 2) * AsConfig::Global_Scale;
 
 	region = CreateRectRgnIndirect(&glue_rect);
 	SelectClipRgn(hdc, region);
@@ -437,7 +431,8 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 		break;
 
 	case EPlatform_State::Glue:
-		Draw_Glue_State(hdc, paint_area);
+		Draw_Normal_State(hdc, paint_area);
+		Platform_Glue.Draw_Glue_State(hdc);
 		break;
 
 	case EPlatform_State::Laser:
