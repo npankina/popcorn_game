@@ -191,20 +191,20 @@ void AsPlatform_Glue::Draw_Glue_State(HDC hdc, double x_pos)
 	SelectClipRgn(hdc, region);
 
 	AsConfig::BG_Color.Select(hdc);
-	Draw_Glue_Spot(hdc, 0, 9, 5);
-	Draw_Glue_Spot(hdc, 6, 6, 5);
-	Draw_Glue_Spot(hdc, 9, 9, 6);
+	Draw_Glue_Spot(hdc, x_pos, 0, 9, 5);
+	Draw_Glue_Spot(hdc, x_pos, 6, 6, 5);
+	Draw_Glue_Spot(hdc, x_pos, 9, 9, 6);
 
 	AsConfig::White_Color.Select(hdc);
-	Draw_Glue_Spot(hdc, 0, 9, 4);
-	Draw_Glue_Spot(hdc, 6, 6, 4);
-	Draw_Glue_Spot(hdc, 9, 9, 5);
+	Draw_Glue_Spot(hdc, x_pos, 0, 9, 4);
+	Draw_Glue_Spot(hdc, x_pos, 6, 6, 4);
+	Draw_Glue_Spot(hdc, x_pos, 9, 9, 5);
 
 	SelectClipRgn(hdc, 0);
 	DeleteObject(region);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform_Glue::Draw_Glue_Spot(HDC hdc, int x_offset, int width, int height)
+void AsPlatform_Glue::Draw_Glue_Spot(HDC hdc, double x_pos, int x_offset, int width, int height)
 {// Рисуем пятно клея
 
 	RECT spot_rect{};
@@ -212,7 +212,7 @@ void AsPlatform_Glue::Draw_Glue_Spot(HDC hdc, int x_offset, int width, int heigh
 	int spot_height = (int)( (double)height * AsConfig::D_Global_Scale * Glue_Spot_Height_Ratio);
 
 	// Рисуем полуэллипс как "пятно" клея
-	spot_rect.left = (int)( (X_Pos + 5.0 + (double)x_offset) * AsConfig::D_Global_Scale);
+	spot_rect.left = (int)( (x_pos + 5.0 + (double)x_offset) * AsConfig::D_Global_Scale);
 	spot_rect.top = platform_top - spot_height;
 	spot_rect.right = spot_rect.left + width * AsConfig::Global_Scale;
 	spot_rect.bottom = platform_top + spot_height - AsConfig::Global_Scale;
@@ -432,7 +432,7 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 
 	case EPlatform_State::Glue:
 		Draw_Normal_State(hdc, paint_area);
-		Platform_Glue.Draw_Glue_State(hdc);
+		Platform_Glue.Draw_Glue_State(hdc, X_Pos);
 		break;
 
 	case EPlatform_State::Laser:
