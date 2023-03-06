@@ -100,6 +100,7 @@ public:
 
 	bool Act_For_Glue_State(EPlatform_Transformation &glue_state, AsBall_Set *ball_set, EPlatform_State &next_state);
 	void Draw_Glue_State(HDC hdc, double x_pos);
+	void Reset();
 
 private:
 	void Draw_Glue_Spot(HDC hdc, double x_pos, int x_offset, int width, int height);

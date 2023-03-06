@@ -204,6 +204,11 @@ void AsPlatform_Glue::Draw_Glue_State(HDC hdc, double x_pos)
 	DeleteObject(region);
 }
 //------------------------------------------------------------------------------------------------------------
+void AsPlatform_Glue::Reset()
+{
+	Glue_Spot_Height_Ratio = Min_Glue_Spot_Height_Ratio;
+}
+//------------------------------------------------------------------------------------------------------------
 void AsPlatform_Glue::Draw_Glue_Spot(HDC hdc, double x_pos, int x_offset, int width, int height)
 {// Рисуем пятно клея
 
@@ -240,7 +245,7 @@ AsPlatform::~AsPlatform()
 AsPlatform::AsPlatform()
 : X_Pos(AsConfig::Border_X_Offset), Left_Key_Down(false),
   Right_Key_Down(false), Inner_Width(Normal_Platform_Inner_Width), Rolling_Step(0), Last_Redraw_Timer_Tick(0), Speed(0.0),
-  /*Glue_Spot_Height_Ratio(0.0),*/ Expanding_Platform_Width(0.0), Ball_Set(0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0),
+  Expanding_Platform_Width(0.0), Ball_Set(0), Platform_Glue(Platform_State), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0),
   Normal_Platform_Image(0), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Color(255, 255, 255), Laser_Transformation_Step(0),
   Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Truss_Color(Platform_Inner_Color, AsConfig::Global_Scale),
   Gun_Color(Highlight_Color, AsConfig::Global_Scale)
@@ -501,7 +506,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		else
 		{
 			Platform_State.Glue = EPlatform_Transformation::Init;
-			AsPlatform_Glue::Glue_Spot_Height_Ratio = AsPlatform_Glue::Min_Glue_Spot_Height_Ratio;
+			Platform_Glue.Reset();
 		}
 		break;
 		
