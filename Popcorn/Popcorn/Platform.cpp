@@ -134,7 +134,7 @@ AsPlatform_Glue::AsPlatform_Glue(AsPlatform_State &platform_state)
 : Glue_Spot_Height_Ratio(0.0), Platform_State(&platform_state)
 {}
 //------------------------------------------------------------------------------------------------------------
-bool AsPlatform_Glue::Act_For_Glue_State(EPlatform_Transformation &glue_state, AsBall_Set *ball_set, EPlatform_State &next_state)
+bool AsPlatform_Glue::Act(EPlatform_Transformation &glue_state, AsBall_Set *ball_set, EPlatform_State &next_state)
 {// метод анимации клея
 
 	next_state = EPlatform_State::Unknown;
@@ -176,7 +176,7 @@ bool AsPlatform_Glue::Act_For_Glue_State(EPlatform_Transformation &glue_state, A
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform_Glue::Draw_Glue_State(HDC hdc, double x_pos)
+void AsPlatform_Glue::Draw(HDC hdc, double x_pos)
 {// Рисуем платформу с растекающимся клеем
 
 	HRGN region;
@@ -368,7 +368,7 @@ void AsPlatform::Act()
 		break;
 
 	case EPlatform_State::Glue:
-		if (Platform_Glue.Act_For_Glue_State(Platform_State.Glue, Ball_Set, next_state) )
+		if (Platform_Glue.Act(Platform_State.Glue, Ball_Set, next_state) )
 			Redraw_Platform();
 
 		if (next_state != EPlatform_State::Unknown)
@@ -437,7 +437,7 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 
 	case EPlatform_State::Glue:
 		Draw_Normal_State(hdc, paint_area);
-		Platform_Glue.Draw_Glue_State(hdc, X_Pos);
+		Platform_Glue.Draw(hdc, X_Pos);
 		break;
 
 	case EPlatform_State::Laser:
@@ -506,7 +506,8 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		else
 		{
 			Platform_State.Glue = EPlatform_Transformation::Init;
-			Platform_Glue.Reset();
+			Platform_Glue.Reset() 
+				Glue_Spot_Height_Ratio = Min_Glue_Spot_Height_Ratio;
 		}
 		break;
 		

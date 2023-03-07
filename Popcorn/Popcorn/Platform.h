@@ -98,8 +98,8 @@ class AsPlatform_Glue
 public:
 	AsPlatform_Glue(AsPlatform_State &platform_state);
 
-	bool Act_For_Glue_State(EPlatform_Transformation &glue_state, AsBall_Set *ball_set, EPlatform_State &next_state);
-	void Draw_Glue_State(HDC hdc, double x_pos);
+	bool Act(EPlatform_Transformation &glue_state, AsBall_Set *ball_set, EPlatform_State &next_state);
+	void Draw(HDC hdc, double x_pos);
 	void Reset();
 
 private:
