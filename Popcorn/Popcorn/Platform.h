@@ -116,10 +116,10 @@ class AsPlatform_Expanding
 public:
 	AsPlatform_Expanding(AsPlatform_State &platform_state);
 	bool Act_For_Expanding_State(double &x_pos, EPlatform_State &next_state, bool &correct_pos);
-	void Draw_Expanding_State(HDC hdc, RECT &paint_area);
+	void Draw_Expanding_State(HDC hdc, double x);
 
 private:
-	void Draw_Expanding_Platform_Ball(HDC hdc, bool is_left);
+	void Draw_Expanding_Platform_Ball(HDC hdc, double x, bool is_left);
 	void Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left);
 
 	AsPlatform_State *Platform_State;
@@ -214,7 +214,6 @@ private:
 
 	RECT Platform_Rect, Prev_Platform_Rect;
 
-	AColor Highlight_Color, Platform_Circle_Color, Platform_Inner_Color, Truss_Color, Gun_Color;
 	//static const double Max_Expanding_Platform_Width, Min_Expanding_Platform_Width, Expanding_Platform_Width_Step;
 	//static const int Expanding_Platform_Inner_Width = 12;
 	static const int Meltdown_Speed = 3;
