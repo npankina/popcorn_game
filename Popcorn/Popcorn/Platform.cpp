@@ -134,18 +134,18 @@ AsPlatform_Glue::AsPlatform_Glue(AsPlatform_State &platform_state)
 : Glue_Spot_Height_Ratio(0.0), Platform_State(&platform_state)
 {}
 //------------------------------------------------------------------------------------------------------------
-bool AsPlatform_Glue::Act(EPlatform_Transformation &glue_state, AsBall_Set *ball_set, EPlatform_State &next_state)
+bool AsPlatform_Glue::Act(AsBall_Set *ball_set, EPlatform_State &next_state)
 {// метод анимации клея
 
 	next_state = EPlatform_State::Unknown;
 
-	switch (glue_state)
+	switch (Platform_State->Glue)
 	{
 	case EPlatform_Transformation::Init:
 		if (Glue_Spot_Height_Ratio < Max_Glue_Spot_Height_Ratio)
 			Glue_Spot_Height_Ratio += Glue_Spot_Height_Ratio_Step;
 		else
-			glue_state = EPlatform_Transformation::Active;
+			Platform_State->Glue = EPlatform_Transformation::Active;
 
 		return true;
 
@@ -163,7 +163,7 @@ bool AsPlatform_Glue::Act(EPlatform_Transformation &glue_state, AsBall_Set *ball
 		}
 		else
 		{
-			glue_state = EPlatform_Transformation::Unknown;
+			Platform_State->Glue = EPlatform_Transformation::Unknown;
 			next_state = Platform_State->Set_State(EPlatform_Substate_Regular::Normal);
 		}
 
@@ -233,23 +233,30 @@ const double AsPlatform_Expanding::Max_Expanding_Platform_Width = 40.0;
 const double AsPlatform_Expanding::Min_Expanding_Platform_Width = (double)AsPlatform::Normal_Width;
 const double AsPlatform_Expanding::Expanding_Platform_Width_Step = 1.0;
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform_Expanding::Act_For_Expanding_State()
+AsPlatform_Expanding::AsPlatform_Expanding(AsPlatform_State &platform_state)
+: Platform_State(&platform_state), Expanding_Platform_Width(0.0)
+{}
+//------------------------------------------------------------------------------------------------------------
+bool AsPlatform_Expanding::Act_For_Expanding_State(double &x_pos, EPlatform_State &next_state, bool &correct_pos)
 {
-	switch (Platform_State.Expanding)
+	next_state = EPlatform_State::Unknown;
+	correct_pos = false;
+
+	switch (Platform_State->Expanding)
 	{
 	case EPlatform_Transformation::Init:
 
 		if (Expanding_Platform_Width < Max_Expanding_Platform_Width)
 		{
 			Expanding_Platform_Width += Expanding_Platform_Width_Step;
-			X_Pos -= Expanding_Platform_Width_Step / 2.0;
-			Correct_Platform_Pos();
+			x_pos -= Expanding_Platform_Width_Step / 2.0;
+			//Correct_Platform_Pos();
+			correct_pos = true;
 		}
 		else
-			Platform_State.Expanding = EPlatform_Transformation::Active;
+			Platform_State->Expanding = EPlatform_Transformation::Active;
 
-		Redraw_Platform();
-		break;
+		return true;
 
 
 	case EPlatform_Transformation::Active:
@@ -260,21 +267,24 @@ void AsPlatform_Expanding::Act_For_Expanding_State()
 		if (Expanding_Platform_Width > Min_Expanding_Platform_Width)
 		{
 			Expanding_Platform_Width -= Expanding_Platform_Width_Step;
-			X_Pos += Expanding_Platform_Width_Step / 2.0;
-			Correct_Platform_Pos();
+			x_pos += Expanding_Platform_Width_Step / 2.0;
+			//Correct_Platform_Pos();
+			correct_pos = true;
 		}
 		else
 		{
-			Platform_State.Expanding = EPlatform_Transformation::Unknown;
-			Set_State(EPlatform_Substate_Regular::Normal);
+			Platform_State->Expanding = EPlatform_Transformation::Unknown;
+			next_state = Platform_State->Set_State(EPlatform_Substate_Regular::Normal);
 		}
 
-		Redraw_Platform();
-		break;
+		return true;
+
 
 	default:
 		AsConfig::Throw();
 	}
+
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform_Expanding::Draw_Expanding_State(HDC hdc, RECT &paint_area)
@@ -436,7 +446,7 @@ AsPlatform::~AsPlatform()
 AsPlatform::AsPlatform()
 : X_Pos(AsConfig::Border_X_Offset), Left_Key_Down(false),
   Right_Key_Down(false), Inner_Width(Normal_Platform_Inner_Width), Rolling_Step(0), Last_Redraw_Timer_Tick(0), Speed(0.0),
-  Expanding_Platform_Width(0.0), Ball_Set(0), Platform_Glue(Platform_State), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0),
+  Ball_Set(0), Platform_Glue(Platform_State), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0),
   Normal_Platform_Image(0), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Color(255, 255, 255), Laser_Transformation_Step(0),
   Platform_Circle_Color(230, 25, 229), Platform_Inner_Color(0, 255, 255), Truss_Color(Platform_Inner_Color, AsConfig::Global_Scale),
   Gun_Color(Highlight_Color, AsConfig::Global_Scale)
@@ -547,6 +557,8 @@ double AsPlatform::Get_Speed()
 void AsPlatform::Act()
 {
 	EPlatform_State next_state;
+	bool correct_pos;
+
 
 	switch (Platform_State)
 	{
@@ -571,7 +583,9 @@ void AsPlatform::Act()
 		break;
 
 	case EPlatform_State::Expanding:
-		Act_For_Expanding_State();
+		Platform_Expanding.Act_For_Expanding_State(X_Pos, next_state, correct_pos);
+		if (correct_pos)
+			Correct_Platform_Pos();
 		break;
 	}
 }

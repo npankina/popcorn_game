@@ -98,7 +98,7 @@ class AsPlatform_Glue
 public:
 	AsPlatform_Glue(AsPlatform_State &platform_state);
 
-	bool Act(EPlatform_Transformation &glue_state, AsBall_Set *ball_set, EPlatform_State &next_state);
+	bool Act(AsBall_Set *ball_set, EPlatform_State &next_state);
 	void Draw(HDC hdc, double x_pos);
 	void Reset();
 
@@ -108,19 +108,21 @@ private:
 	double Glue_Spot_Height_Ratio;
 	AsPlatform_State *Platform_State;
 
-
 	static const double Max_Glue_Spot_Height_Ratio, Min_Glue_Spot_Height_Ratio, Glue_Spot_Height_Ratio_Step;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsPlatform_Expanding
 {
 public:
-	void Act_For_Expanding_State();
+	AsPlatform_Expanding(AsPlatform_State &platform_state);
+	bool Act_For_Expanding_State(double &x_pos, EPlatform_State &next_state, bool &correct_pos);
 	void Draw_Expanding_State(HDC hdc, RECT &paint_area);
 
 private:
 	void Draw_Expanding_Platform_Ball(HDC hdc, bool is_left);
 	void Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left);
+
+	AsPlatform_State *Platform_State;
 
 	double Expanding_Platform_Width;
 
@@ -194,6 +196,7 @@ private:
 
 	AsPlatform_State Platform_State;
 	AsPlatform_Glue Platform_Glue;
+	AsPlatform_Expanding Platform_Expanding;
 
 	bool Left_Key_Down, Right_Key_Down;
 	int Inner_Width;
