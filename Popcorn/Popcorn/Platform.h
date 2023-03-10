@@ -132,6 +132,28 @@ private:
 	static const double Max_Expanding_Platform_Width, Min_Expanding_Platform_Width, Expanding_Platform_Width_Step;
 };
 //------------------------------------------------------------------------------------------------------------
+class AsPlatform_Laser
+{
+public:
+	AsPlatform_Laser(AsPlatform_State &platform_state);
+	bool Act(EPlatform_State &next_state);
+	void Draw_State(HDC hdc, double x_pos, RECT &platform_rect);
+	void Reset();
+
+private:
+	void Draw_Wing(HDC hdc, double x_pos, bool is_left);
+	void Draw_Inner_part(HDC hdc, double x_pos);
+	void Draw_Leg(HDC hdc, double x_pos, bool is_left);
+	void Draw_Cabin(HDC hdc, double x_pos);
+	void Draw_Expanding_Figure(HDC hdc, EFigure_type figure_type, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height);
+	int Get_Expanding_Value(double start, double end, double ratio);
+
+	AsPlatform_State *Platform_State;
+
+	int Laser_Transformation_Step;
+	static const int Max_Laser_Transformation_Step = 20;
+};
+//------------------------------------------------------------------------------------------------------------
 class AsPlatform: public AHit_Checker, public AMover, public AGraphics_Object
 {
 public:
@@ -144,7 +166,6 @@ public:
 	virtual void Finish_Movement();
 	virtual void Advance(double max_speed);
 	virtual double Get_Speed();
-
 
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT &paint_area);
@@ -173,18 +194,10 @@ private:
 	bool Set_Transformation_State(EPlatform_State new_state, EPlatform_Transformation &transformation_state);
 	void Act_For_Meltdown_State();
 	void Act_For_Rolling_State();
-	void Act_For_Laser_State();
 	void Draw_Normal_State(HDC hdc, RECT &paint_area);
 	void Draw_Meltdown_State(HDC hdc, RECT &paint_area);
 	void Draw_Rolling_State(HDC hdc, RECT &paint_area);
 	void Draw_Roll_In_State(HDC hdc, RECT &paint_area);
-	void Draw_Laser_State(HDC hdc, RECT &paint_area);
-	void Draw_Laser_Wing(HDC hdc, bool is_left);
-	void Draw_Laser_Inner_part(HDC hdc);
-	void Draw_Laser_Leg(HDC hdc, bool is_left);
-	void Draw_Laser_Cabin(HDC hdc);
-	void Draw_Expanding_Figure(HDC hdc, EFigure_type figure_type, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height);
-	int Get_Expanding_Value(double start, double end, double ratio);
 	bool Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball);
 	bool Get_Platform_Image_Stroke_Color(int x, int y, const AColor **color, int &stroke_len);
 	void Get_Normal_Platform_Image(HDC hdc);
@@ -194,11 +207,11 @@ private:
 	AsPlatform_State Platform_State;
 	AsPlatform_Glue Platform_Glue;
 	AsPlatform_Expanding Platform_Expanding;
+	AsPlatform_Laser Platform_Laser;
 
 	bool Left_Key_Down, Right_Key_Down;
 	int Inner_Width;
 	int Rolling_Step;
-	int Laser_Transformation_Step;
 	int Last_Redraw_Timer_Tick;
 	double Speed;
 	AsBall_Set *Ball_Set;
@@ -215,6 +228,5 @@ private:
 	static const int Roll_In_Platform_End_X_Pos = 99;
 	static const int Rolling_Platform_Speed = 3;
 	static const int X_Step = 6;
-	static const int Max_Laser_Transformation_Step = 20;
 };
 //------------------------------------------------------------------------------------------------------------
