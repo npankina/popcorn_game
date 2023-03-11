@@ -132,13 +132,51 @@ private:
 	static const double Max_Expanding_Platform_Width, Min_Expanding_Platform_Width, Expanding_Platform_Width_Step;
 };
 //------------------------------------------------------------------------------------------------------------
+class ALaser_Beam: public AMover, public AGraphics_Object
+{
+public:
+	ALaser_Beam();
+
+	virtual void Begin_Movement();
+	virtual void Finish_Movement();
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+};
+//------------------------------------------------------------------------------------------------------------
+class AsLaser_Beam_Set: public AMover, public AGraphics_Object
+{
+public:
+	virtual void Begin_Movement();
+	virtual void Finish_Movement();
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+private:
+	static const int Max_Laser_Beams_Count = 10;
+	ALaser_Beam Laser_Beams[Max_Laser_Beams_Count];
+};
+//------------------------------------------------------------------------------------------------------------
 class AsPlatform_Laser
 {
 public:
 	AsPlatform_Laser(AsPlatform_State &platform_state);
+	void Init(AsLaser_Beam_Set *laser_beam_set);
 	bool Act(EPlatform_State &next_state);
 	void Draw_State(HDC hdc, double x_pos, RECT &platform_rect);
 	void Reset();
+	void Fire(bool fire_on, double x_pos);
 
 private:
 	void Draw_Wing(HDC hdc, double x_pos, bool is_left);
@@ -149,8 +187,10 @@ private:
 	int Get_Expanding_Value(double start, double end, double ratio);
 
 	AsPlatform_State *Platform_State;
+	AsLaser_Beam_Set *Laser_Beam_Set; // UNO
 
 	int Laser_Transformation_Step;
+
 	static const int Max_Laser_Transformation_Step = 20;
 };
 //------------------------------------------------------------------------------------------------------------
@@ -172,7 +212,7 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
-	void Init(AsBall_Set *ball_set);
+	void Init(AsBall_Set *ball_set, AsLaser_Beam_Set *laser_beam_set);
 	EPlatform_State Get_State();
 	void Set_State(EPlatform_State new_state);
 	void Set_State(EPlatform_Substate_Regular new_regular_state);

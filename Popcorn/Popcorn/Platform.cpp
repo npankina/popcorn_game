@@ -440,11 +440,25 @@ void AsPlatform_Expanding::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool 
 
 
 
+// ALaser_Beam
+//------------------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------
+
+
+ 
+ 
 // AsPlatform_Laser
 //------------------------------------------------------------------------------------------------------------
 AsPlatform_Laser::AsPlatform_Laser(AsPlatform_State &platform_state)
-: Platform_State(&platform_state), Laser_Transformation_Step(0)
+: Platform_State(&platform_state), Laser_Transformation_Step(0), Laser_Beam_Set(0)
 {}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform_Laser::Init(AsLaser_Beam_Set *laser_beam_set)
+{
+	Laser_Beam_Set = laser_beam_set;
+}
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform_Laser::Act(EPlatform_State &next_state)
 {
@@ -516,6 +530,39 @@ void AsPlatform_Laser::Draw_State(HDC hdc, double x_pos, RECT &platform_rect)
 void AsPlatform_Laser::Reset()
 {
 	Laser_Transformation_Step = 0;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform_Laser::Fire(bool fire_on, double x_pos)
+{
+	int i;
+	ALaser_Beam *left = 0, *right = 0;
+
+	if (Platform_State->Laser != EPlatform_Transformation::Active)
+		return; // Игнорируем выстрел, пока платформа не сформируется
+
+	if (!fire_on)
+		return;
+
+	for (i = 0; i < Max_Laser_Beams_Count; i++)
+	{
+		if (Laser_Beams[i].Is_Active() )
+			continue; // луч летит дальше
+		
+		if (left == 0)
+			left = &Laser_Beams[i];
+		else
+			if (right == 0)
+			{
+				right = &Laser_Beams[i];
+				break;
+			}
+	}
+
+	if (left == 0 || right == 0)
+		AsConfig::Throw(); // Не хватило "лазерных лучей"
+
+	left->Set_At(x_pos + 3.0, AsConfig::Platform_Y_Pos);
+	right->Set_At(x_pos + (AsPlatform::Normal_Width - 4), AsConfig::Platform_Y_Pos);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform_Laser::Draw_Wing(HDC hdc, double x_pos, bool is_left)
@@ -929,9 +976,10 @@ bool AsPlatform::Is_Finished()
 	return false;  // Заглушка, т.к. этот метод не используется
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform::Init(AsBall_Set *ball_set)
+void AsPlatform::Init(AsBall_Set *ball_set, AsLaser_Beam_Set *laser_beam_set)
 {
 	Ball_Set = ball_set;
+	Platform_Laser.Init(laser_beam_set);
 }
 //------------------------------------------------------------------------------------------------------------
 EPlatform_State AsPlatform::Get_State()
@@ -1145,7 +1193,7 @@ void AsPlatform::On_Space_Key(bool key_down)
 			Ball_Set->Release_Next_Ball();
 
 		else if (Platform_State == EPlatform_State::Laser)
-			AsConfig::Throw(); // !!! надо сделать
+			Platform_Laser.Fire(key_down);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
