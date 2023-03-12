@@ -147,6 +147,10 @@ public:
 	virtual void Clear(HDC hdc, RECT &paint_area);
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
+
+	void Set_At(double x, double y);
+
+	bool Is_Active;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLaser_Beam_Set: public AMover, public AGraphics_Object
@@ -162,6 +166,7 @@ public:
 	virtual void Clear(HDC hdc, RECT &paint_area);
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
+	void Fire(bool fire_on, double x_pos);
 
 private:
 	static const int Max_Laser_Beams_Count = 10;
