@@ -39,7 +39,7 @@ public:
 	static bool Level_Has_Floor;
 	static int Current_Timer_Tick;
 
-	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color;
+	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color, Laser_Color;
 	static const AColor Unbreakable_Blue_Highlight, Unbreakable_Red_Highlight, Teleport_Portal_Color;
 	static const AColor Advertisement_Blue_Table, Advertisement_Red_Table;
 	static const AColor Platform_Inner_Color, Platform_Circle_Color, Highlight_Color, Truss_Color, Gun_Color;

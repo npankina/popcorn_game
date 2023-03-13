@@ -154,6 +154,10 @@ public:
 private:
 
 	double X_Pos, Y_Pos;
+	RECT Beam_Rect;
+
+	static const int Width = 1;
+	static const int Height = 3;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLaser_Beam_Set: public AMover, public AGraphics_Object

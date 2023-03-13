@@ -443,7 +443,7 @@ void AsPlatform_Expanding::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool 
 // ALaser_Beam
 //------------------------------------------------------------------------------------------------------------
 ALaser_Beam::ALaser_Beam()
-: Is_Active(false), X_Pos(0.0), Y_Pos(0.0)
+: Is_Active(false), X_Pos(0.0), Y_Pos(0.0), Beam_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Begin_Movement()
@@ -479,7 +479,17 @@ void ALaser_Beam::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Draw(HDC hdc, RECT &paint_area)
 {
-	// @@@ Надо сделать!
+	RECT intersection_rect;
+	int x = (int)(X_Pos * AsConfig::D_Global_Scale);
+	int y = (int)(Y_Pos * AsConfig::D_Global_Scale);
+
+	if ( !IntersectRect(&intersection_rect, &paint_area, &Beam_Rect) )
+		return;
+
+	AsConfig::Laser_Color.Select(hdc);
+
+	MoveToEx(hdc, x, y + 1, 0);
+	LineTo(hdc, x, y + Height * AsConfig::Global_Scale - 1);
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALaser_Beam::Is_Finished()
@@ -491,6 +501,13 @@ void ALaser_Beam::Set_At(double x, double y)
 {
 	X_Pos = x;
 	Y_Pos = y;
+
+	Beam_Rect.left = (int)((X_Pos - (double)Width / 2.0) * AsConfig::D_Global_Scale);
+	Beam_Rect.top = (int)(Y_Pos * AsConfig::D_Global_Scale);
+	Beam_Rect.right = Beam_Rect.left + Width * AsConfig::Global_Scale;
+	Beam_Rect.bottom = Beam_Rect.top + Height * AsConfig::Global_Scale;
+
+	AsConfig::Invalidate_Rect(Beam_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 
