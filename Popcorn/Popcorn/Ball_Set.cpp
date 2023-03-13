@@ -14,7 +14,6 @@ void AsBall_Set::Finish_Movement()
 {
 	int i;
 
-
 	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
 		Balls[i].Finish_Movement();
 }

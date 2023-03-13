@@ -443,7 +443,7 @@ void AsPlatform_Expanding::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool 
 // ALaser_Beam
 //------------------------------------------------------------------------------------------------------------
 ALaser_Beam::ALaser_Beam()
-: Is_Active(false)
+: Is_Active(false), X_Pos(0.0), Y_Pos(0.0)
 {}
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Begin_Movement()
@@ -489,7 +489,8 @@ bool ALaser_Beam::Is_Finished()
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Set_At(double x, double y)
 {
-
+	X_Pos = x;
+	Y_Pos = y;
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -500,42 +501,67 @@ void ALaser_Beam::Set_At(double x, double y)
 //------------------------------------------------------------------------------------------------------------
 void AsLaser_Beam_Set::Begin_Movement()
 {
-	// @@@ Надо сделать!
+	int i;
+
+	for (i = 0; i < Max_Laser_Beams_Count; i++)
+		Laser_Beams[i].Begin_Movement();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLaser_Beam_Set::Finish_Movement()
 {
-	// @@@ Надо сделать!
+	int i;
+
+	for (i = 0; i < Max_Laser_Beams_Count; i++)
+		Laser_Beams[i].Finish_Movement();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLaser_Beam_Set::Advance(double max_speed)
 {
-	// @@@ Надо сделать!
+	int i;
+
+	for (i = 0; i < Max_Laser_Beams_Count; i++)
+		Laser_Beams[i].Advance(max_speed);
 }
 //------------------------------------------------------------------------------------------------------------
 double AsLaser_Beam_Set::Get_Speed()
 {
-	return 0.0;// @@@ Надо сделать!
+	int i;
+	double curr_speed, max_speed = 0.0;
+
+	for (i = 0; i < Max_Laser_Beams_Count; i++)
+	{
+		curr_speed = Laser_Beams[i].Get_Speed();
+
+		if (curr_speed > max_speed)
+			max_speed = curr_speed;
+	}
+
+	return max_speed;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLaser_Beam_Set::Act()
-{
-	// @@@ Надо сделать!
+{	// Заглушка. Не используется
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLaser_Beam_Set::Clear(HDC hdc, RECT &paint_area)
 {
-	// @@@ Надо сделать!
+	int i;
+
+	for (i = 0; i < Max_Laser_Beams_Count; i++)
+		Laser_Beams[i].Clear(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLaser_Beam_Set::Draw(HDC hdc, RECT &paint_area)
 {
-	// @@@ Надо сделать!
+	int i;
+
+	for (i = 0; i < Max_Laser_Beams_Count; i++)
+		Laser_Beams[i].Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLaser_Beam_Set::Is_Finished()
 {
-	return false;// @@@ Надо сделать!
+	return false;  // Заглушка, т.к. этот метод не используется
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLaser_Beam_Set::Fire(bool fire_on, double x_pos)

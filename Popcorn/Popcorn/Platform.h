@@ -151,6 +151,9 @@ public:
 	void Set_At(double x, double y);
 
 	bool Is_Active;
+private:
+
+	double X_Pos, Y_Pos;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLaser_Beam_Set: public AMover, public AGraphics_Object
