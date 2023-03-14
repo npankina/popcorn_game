@@ -480,8 +480,8 @@ void ALaser_Beam::Clear(HDC hdc, RECT &paint_area)
 void ALaser_Beam::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
-	int x = (int)(X_Pos * AsConfig::D_Global_Scale);
-	int y = (int)(Y_Pos * AsConfig::D_Global_Scale);
+	int x = Beam_Rect.left + (Beam_Rect.right - Beam_Rect.left) / 2;
+	int y = Beam_Rect.top;
 
 	if ( !IntersectRect(&intersection_rect, &paint_area, &Beam_Rect) )
 		return;
@@ -501,6 +501,8 @@ void ALaser_Beam::Set_At(double x, double y)
 {
 	X_Pos = x;
 	Y_Pos = y;
+
+	Is_Active = true;
 
 	Beam_Rect.left = (int)((X_Pos - (double)Width / 2.0) * AsConfig::D_Global_Scale);
 	Beam_Rect.top = (int)(Y_Pos * AsConfig::D_Global_Scale);
@@ -581,7 +583,7 @@ bool AsLaser_Beam_Set::Is_Finished()
 	return false;  // Заглушка, т.к. этот метод не используется
 }
 //------------------------------------------------------------------------------------------------------------
-void AsLaser_Beam_Set::Fire(bool fire_on, double x_pos)
+void AsLaser_Beam_Set::Fire(bool fire_on, double left_x_pos, double right_x_pos)
 {
 	int i;
 	ALaser_Beam *left = 0, *right = 0;
@@ -604,8 +606,8 @@ void AsLaser_Beam_Set::Fire(bool fire_on, double x_pos)
 	if (left == 0 || right == 0)
 		AsConfig::Throw(); // Не хватило "лазерных лучей"
 
-	left->Set_At(x_pos + 3.0, AsConfig::Platform_Y_Pos);
-	right->Set_At(x_pos + (AsPlatform::Normal_Width - 4), AsConfig::Platform_Y_Pos);
+	left->Set_At(left_x_pos, AsConfig::Platform_Y_Pos - 1);
+	right->Set_At(right_x_pos, AsConfig::Platform_Y_Pos - 1);
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -697,13 +699,18 @@ void AsPlatform_Laser::Reset()
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform_Laser::Fire(bool fire_on, double x_pos)
 {
+	double left_gun_x_pos, right_gun_x_pos;
+
 	if (Platform_State->Laser != EPlatform_Transformation::Active)
 		return; // Игнорируем выстрел, пока платформа не сформируется
 
 	if (!fire_on)
 		return;
 
-	Laser_Beam_Set->Fire(fire_on, x_pos);
+	left_gun_x_pos = Get_Gun_Pos(x_pos, true) + 0.5;
+	right_gun_x_pos = Get_Gun_Pos(x_pos, false) + 0.5;
+
+	Laser_Beam_Set->Fire(fire_on, left_gun_x_pos, right_gun_x_pos);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform_Laser::Draw_Wing(HDC hdc, double x_pos, bool is_left)
@@ -745,10 +752,7 @@ void AsPlatform_Laser::Draw_Wing(HDC hdc, double x_pos, bool is_left)
 	{
 		ratio = (double)(Laser_Transformation_Step - half_max_step) / (double)half_max_step;
 
-		if (is_left)
-			x = x_pos + 3.0;
-		else
-			x = x_pos + (AsPlatform::Normal_Width - 4);
+		x = Get_Gun_Pos(x_pos, is_left);
 
 		height = 3.0 * (1.0 - ratio) * d_scale;
 
@@ -758,6 +762,18 @@ void AsPlatform_Laser::Draw_Wing(HDC hdc, double x_pos, bool is_left)
 		// 1.3. Хвост
 		Draw_Expanding_Figure(hdc, EFigure_type::Ellipse, x + 1, y + 5, 0, 0, ratio, x - 1, y + 5 + 1.0 / d_scale, 3, 6);
 	}
+}
+//------------------------------------------------------------------------------------------------------------
+double AsPlatform_Laser::Get_Gun_Pos(double platform_x_pos, bool is_left)
+{
+	double gun_x_pos;
+
+	if (is_left)
+		gun_x_pos = platform_x_pos + 3.0;
+	else
+		gun_x_pos = platform_x_pos + (AsPlatform::Normal_Width - 4);
+
+	return gun_x_pos;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform_Laser::Draw_Inner_part(HDC hdc, double x_pos)

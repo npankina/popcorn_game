@@ -173,7 +173,7 @@ public:
 	virtual void Clear(HDC hdc, RECT &paint_area);
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
-	void Fire(bool fire_on, double x_pos);
+	void Fire(bool fire_on, double left_x_pos, double right_x_pos);
 
 private:
 	static const int Max_Laser_Beams_Count = 10;
@@ -192,6 +192,7 @@ public:
 
 private:
 	void Draw_Wing(HDC hdc, double x_pos, bool is_left);
+	double Get_Gun_Pos(double platform_x_pos, bool is_left);
 	void Draw_Inner_part(HDC hdc, double x_pos);
 	void Draw_Leg(HDC hdc, double x_pos, bool is_left);
 	void Draw_Cabin(HDC hdc, double x_pos);
