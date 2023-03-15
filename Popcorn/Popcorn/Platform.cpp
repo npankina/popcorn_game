@@ -443,58 +443,92 @@ void AsPlatform_Expanding::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool 
 // ALaser_Beam
 //------------------------------------------------------------------------------------------------------------
 ALaser_Beam::ALaser_Beam()
-: Is_Active(false), X_Pos(0.0), Y_Pos(0.0), Beam_Rect{}
+: Is_Active(false), X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Beam_Rect{}, Prev_Beam_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Begin_Movement()
 {
-	// @@@ Надо сделать!
+	// Заглушка! Метод не используется
 }
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Finish_Movement()
 {
-	// @@@ Надо сделать!
+	if (Is_Active)
+		Redraw_Beam();
 }
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Advance(double max_speed)
 {
-	// @@@ Надо сделать!
+	double next_step;
+
+	if (!Is_Active)
+		return;
+
+	next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
+
+	Y_Pos -= next_step;
 }
 //------------------------------------------------------------------------------------------------------------
 double ALaser_Beam::Get_Speed()
 {
-	// @@@ Надо сделать!
-	return 0.0;
+	return Speed;
 }
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Act()
 {
-	// @@@ Надо сделать!
+	// Заглушка! Метод не используется - Лазерные лучи не имеют своей анимации
 }
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Clear(HDC hdc, RECT &paint_area)
 {
-	// @@@ Надо сделать!
+	RECT intersection_rect;
+
+	if ( !Is_Active)
+		return;
+
+	if ( !IntersectRect(&intersection_rect, &paint_area, &Prev_Beam_Rect) )
+		return;
+
+	AsConfig::BG_Color.Select(hdc);
+	Rectangle(hdc, Prev_Beam_Rect.left, Prev_Beam_Rect.top, Prev_Beam_Rect.right - 1, Prev_Beam_Rect.bottom);
 }
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
-	int x = Beam_Rect.left + (Beam_Rect.right - Beam_Rect.left) / 2;
-	int y = Beam_Rect.top;
+	int x, y;
 
+	if ( !Is_Active)
+		return;
+	
 	if ( !IntersectRect(&intersection_rect, &paint_area, &Beam_Rect) )
 		return;
 
 	AsConfig::Laser_Color.Select(hdc);
 
+	x = Beam_Rect.left + (Beam_Rect.right - Beam_Rect.left) / 2;
+	y = Beam_Rect.top;
+
 	MoveToEx(hdc, x, y + 1, 0);
-	LineTo(hdc, x, y + Height * AsConfig::Global_Scale - 1);
+	LineTo(hdc, x, y + Height * AsConfig::Global_Scale - AsConfig::Global_Scale / 2 - 1);
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALaser_Beam::Is_Finished()
 {
-	return false;// @@@ Надо сделать!
+	return false; // Заглушка! Метод не используется
+}
+//------------------------------------------------------------------------------------------------------------
+void ALaser_Beam::Redraw_Beam()
+{
+	Prev_Beam_Rect = Beam_Rect;
+
+	Beam_Rect.left = (int)((X_Pos - (double)Width / 2.0) * AsConfig::D_Global_Scale);
+	Beam_Rect.top = (int)(Y_Pos * AsConfig::D_Global_Scale);
+	Beam_Rect.right = Beam_Rect.left + Width * AsConfig::Global_Scale;
+	Beam_Rect.bottom = Beam_Rect.top + Height * AsConfig::Global_Scale;
+
+	AsConfig::Invalidate_Rect(Beam_Rect);
+	AsConfig::Invalidate_Rect(Prev_Beam_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Set_At(double x, double y)
@@ -503,13 +537,9 @@ void ALaser_Beam::Set_At(double x, double y)
 	Y_Pos = y;
 
 	Is_Active = true;
+	Speed = 10.0;
 
-	Beam_Rect.left = (int)((X_Pos - (double)Width / 2.0) * AsConfig::D_Global_Scale);
-	Beam_Rect.top = (int)(Y_Pos * AsConfig::D_Global_Scale);
-	Beam_Rect.right = Beam_Rect.left + Width * AsConfig::Global_Scale;
-	Beam_Rect.bottom = Beam_Rect.top + Height * AsConfig::Global_Scale;
-
-	AsConfig::Invalidate_Rect(Beam_Rect);
+	Redraw_Beam();
 }
 //------------------------------------------------------------------------------------------------------------
 
