@@ -443,7 +443,7 @@ void AsPlatform_Expanding::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool 
 // ALaser_Beam
 //------------------------------------------------------------------------------------------------------------
 ALaser_Beam::ALaser_Beam()
-: Is_Active(false), X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Beam_Rect{}, Prev_Beam_Rect{}
+: Laser_Beam_State(ELaser_Beam_State::Disabled), X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Beam_Rect{}, Prev_Beam_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Begin_Movement()
@@ -453,7 +453,7 @@ void ALaser_Beam::Begin_Movement()
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Finish_Movement()
 {
-	if (Is_Active)
+	if (Laser_Beam_State != ELaser_Beam_State::Disabled)
 		Redraw_Beam();
 }
 //------------------------------------------------------------------------------------------------------------
@@ -461,12 +461,18 @@ void ALaser_Beam::Advance(double max_speed)
 {
 	double next_step;
 
-	if (!Is_Active)
+	if (Laser_Beam_State != ELaser_Beam_State::Active)
 		return;
 
 	next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
 
 	Y_Pos -= next_step;
+
+	if (Y_Pos < AsConfig::Level_Y_Offset)
+	{
+		Laser_Beam_State = ELaser_Beam_State::Stopping;
+		Speed = 0.0;
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 double ALaser_Beam::Get_Speed()
@@ -483,8 +489,12 @@ void ALaser_Beam::Clear(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	if ( !Is_Active)
+	if (Laser_Beam_State == ELaser_Beam_State::Disabled)
 		return;
+
+	if (Laser_Beam_State == ELaser_Beam_State::Cleanup)
+		Laser_Beam_State = ELaser_Beam_State::Disabled;
+
 
 	if ( !IntersectRect(&intersection_rect, &paint_area, &Prev_Beam_Rect) )
 		return;
@@ -498,8 +508,11 @@ void ALaser_Beam::Draw(HDC hdc, RECT &paint_area)
 	RECT intersection_rect;
 	int x, y;
 
-	if ( !Is_Active)
+	if (Laser_Beam_State == ELaser_Beam_State::Disabled)
 		return;
+
+	if (Laser_Beam_State == ELaser_Beam_State::Stopping)
+		Laser_Beam_State = ELaser_Beam_State::Cleanup;
 	
 	if ( !IntersectRect(&intersection_rect, &paint_area, &Beam_Rect) )
 		return;
@@ -536,10 +549,17 @@ void ALaser_Beam::Set_At(double x, double y)
 	X_Pos = x;
 	Y_Pos = y;
 
-	Is_Active = true;
+	Laser_Beam_State = ELaser_Beam_State::Active;
 	Speed = 10.0;
 
 	Redraw_Beam();
+}
+//------------------------------------------------------------------------------------------------------------
+bool ALaser_Beam::Is_Active()
+{
+	if (Laser_Beam_State == ELaser_Beam_State::Active)
+		return true;
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -620,7 +640,7 @@ void AsLaser_Beam_Set::Fire(bool fire_on, double left_x_pos, double right_x_pos)
 
 	for (i = 0; i < Max_Laser_Beams_Count; i++)
 	{
-		if (Laser_Beams[i].Is_Active )
+		if (Laser_Beams[i].Is_Active() )
 			continue; // луч летит дальше
 
 		if (left == 0)

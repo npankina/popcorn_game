@@ -132,6 +132,14 @@ private:
 	static const double Max_Expanding_Platform_Width, Min_Expanding_Platform_Width, Expanding_Platform_Width_Step;
 };
 //------------------------------------------------------------------------------------------------------------
+enum class ELaser_Beam_State: unsigned char
+{
+	Disabled,
+	Active,
+	Stopping,
+	Cleanup
+};
+//------------------------------------------------------------------------------------------------------------
 class ALaser_Beam: public AMover, public AGraphics_Object
 {
 public:
@@ -149,11 +157,12 @@ public:
 	virtual bool Is_Finished();
 
 	void Set_At(double x, double y);
+	bool Is_Active();
 
-	bool Is_Active;
 private:
 	void Redraw_Beam();
 
+	ELaser_Beam_State Laser_Beam_State;
 	double X_Pos, Y_Pos;
 	double Speed;
 	RECT Beam_Rect, Prev_Beam_Rect;
