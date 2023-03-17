@@ -184,7 +184,7 @@ public:
 	virtual void Clear(HDC hdc, RECT &paint_area);
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
-	void Fire(bool fire_on, double left_x_pos, double right_x_pos);
+	void Fire(double left_x_pos, double right_x_pos);
 
 private:
 	static const int Max_Laser_Beams_Count = 10;
@@ -196,10 +196,10 @@ class AsPlatform_Laser
 public:
 	AsPlatform_Laser(AsPlatform_State &platform_state);
 	void Init(AsLaser_Beam_Set *laser_beam_set);
-	bool Act(EPlatform_State &next_state);
+	bool Act(EPlatform_State &next_state, double x_pos);
 	void Draw_State(HDC hdc, double x_pos, RECT &platform_rect);
 	void Reset();
-	void Fire(bool fire_on, double x_pos);
+	void Fire(bool fire_on);
 
 private:
 	void Draw_Wing(HDC hdc, double x_pos, bool is_left);
@@ -213,9 +213,12 @@ private:
 	AsPlatform_State *Platform_State;
 	AsLaser_Beam_Set *Laser_Beam_Set; // UNO
 
+	bool Enable_Laser_Firing;
 	int Laser_Transformation_Step;
+	int Last_Laser_Shot_Tick;
 
 	static const int Max_Laser_Transformation_Step = 20;
+	static const int Laser_Shot_Timeout = AsConfig::FPS / 2; // 2 раза в секунду будет стрелять лазер
 };
 //------------------------------------------------------------------------------------------------------------
 class AsPlatform: public AHit_Checker, public AMover, public AGraphics_Object

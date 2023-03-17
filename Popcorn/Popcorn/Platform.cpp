@@ -633,7 +633,7 @@ bool AsLaser_Beam_Set::Is_Finished()
 	return false;  // Заглушка, т.к. этот метод не используется
 }
 //------------------------------------------------------------------------------------------------------------
-void AsLaser_Beam_Set::Fire(bool fire_on, double left_x_pos, double right_x_pos)
+void AsLaser_Beam_Set::Fire(double left_x_pos, double right_x_pos)
 {
 	int i;
 	ALaser_Beam *left = 0, *right = 0;
@@ -667,7 +667,8 @@ void AsLaser_Beam_Set::Fire(bool fire_on, double left_x_pos, double right_x_pos)
 // AsPlatform_Laser
 //------------------------------------------------------------------------------------------------------------
 AsPlatform_Laser::AsPlatform_Laser(AsPlatform_State &platform_state)
-: Platform_State(&platform_state), Laser_Transformation_Step(0), Laser_Beam_Set(0)
+: Platform_State(&platform_state), Laser_Beam_Set(0), Enable_Laser_Firing(false), Laser_Transformation_Step(0),
+Last_Laser_Shot_Tick(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform_Laser::Init(AsLaser_Beam_Set *laser_beam_set)
@@ -675,9 +676,10 @@ void AsPlatform_Laser::Init(AsLaser_Beam_Set *laser_beam_set)
 	Laser_Beam_Set = laser_beam_set;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsPlatform_Laser::Act(EPlatform_State &next_state)
+bool AsPlatform_Laser::Act(EPlatform_State &next_state, double x_pos)
 {
 	next_state = EPlatform_State::Unknown;
+	double left_gun_x_pos, right_gun_x_pos;
 
 	switch (Platform_State->Laser)
 	{
@@ -691,6 +693,18 @@ bool AsPlatform_Laser::Act(EPlatform_State &next_state)
 
 
 	case EPlatform_Transformation::Active:
+		if (Enable_Laser_Firing)
+		{
+			if (Last_Laser_Shot_Tick + Laser_Shot_Timeout <= AsConfig::Current_Timer_Tick)
+			{
+				Last_Laser_Shot_Tick = AsConfig::Current_Timer_Tick + Laser_Shot_Timeout;
+
+				left_gun_x_pos = Get_Gun_Pos(x_pos, true) + 0.5;
+				right_gun_x_pos = Get_Gun_Pos(x_pos, false) + 0.5;
+
+				Laser_Beam_Set->Fire(left_gun_x_pos, right_gun_x_pos);
+			}
+		}
 		break;
 
 
@@ -747,20 +761,12 @@ void AsPlatform_Laser::Reset()
 	Laser_Transformation_Step = 0;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform_Laser::Fire(bool fire_on, double x_pos)
+void AsPlatform_Laser::Fire(bool fire_on)
 {
-	double left_gun_x_pos, right_gun_x_pos;
-
 	if (Platform_State->Laser != EPlatform_Transformation::Active)
 		return; // Игнорируем выстрел, пока платформа не сформируется
 
-	if (!fire_on)
-		return;
-
-	left_gun_x_pos = Get_Gun_Pos(x_pos, true) + 0.5;
-	right_gun_x_pos = Get_Gun_Pos(x_pos, false) + 0.5;
-
-	Laser_Beam_Set->Fire(fire_on, left_gun_x_pos, right_gun_x_pos);
+	Enable_Laser_Firing = fire_on;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform_Laser::Draw_Wing(HDC hdc, double x_pos, bool is_left)
@@ -1092,7 +1098,7 @@ void AsPlatform::Act()
 
 
 	case EPlatform_State::Laser:
-		if (Platform_Laser.Act(next_state) )
+		if (Platform_Laser.Act(next_state, X_Pos) )
 			Redraw_Platform();
 
 		if (next_state != EPlatform_State::Unknown)
@@ -1400,7 +1406,7 @@ void AsPlatform::On_Space_Key(bool key_down)
 			Ball_Set->Release_Next_Ball();
 
 		else if (Platform_State == EPlatform_State::Laser)
-			Platform_Laser.Fire(key_down, X_Pos);
+			Platform_Laser.Fire(key_down);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
