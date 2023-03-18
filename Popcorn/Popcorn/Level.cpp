@@ -146,6 +146,27 @@ bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
+bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos)
+{// Возврат true, если в позиции (х, у) луч коснется кирпича
+	int level_x_index, level_y_index;
+
+	level_x_index = (int)( (next_x_pos - AsConfig::Level_X_Offset) / (double)(AsConfig::Cell_Width) );
+	level_y_index = (int)( (next_y_pos - AsConfig::Level_Y_Offset) / (double)(AsConfig::Cell_Height) );
+
+	if (level_x_index < 0 || level_x_index >= AsConfig::Level_Width)
+		return false;
+
+	if (level_y_index < 0 || level_y_index >= AsConfig::Level_Height)
+		return false;
+
+	if (Current_Level[level_y_index][level_x_index] == 0)
+		return false;
+
+	On_Hit(level_x_index, level_y_index, 0, true);
+
+	return true;
+}
+//------------------------------------------------------------------------------------------------------------
 void AsLevel::Act()
 {
 	Act_Objects( (AGraphics_Object **)&Active_Bricks, Active_Bricks_Count, AsConfig::Max_Active_Bricks_Count);
@@ -302,9 +323,13 @@ bool AsLevel::On_Hit(int brick_x, int brick_y, ABall *ball, bool vertical_hit)
 	EBrick_Type brick_type;
 	bool can_reflect = true;
 
-
-
 	brick_type = (EBrick_Type)Current_Level[brick_y][brick_x];
+
+	if (ball == 0 && brick_type == EBT_Parachute)
+	{
+		brick_type = EBT_Red;
+		Current_Level[brick_y][brick_x] = EBT_Red;
+	}
 
 	if (brick_type == EBT_Parachute)
 	{
@@ -431,7 +456,8 @@ bool AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_ty
 		break;
 
 	case EBT_Teleport:
-		Add_Active_Brick_Teleport(brick_x, brick_y, ball, vertical_hit);
+		if (ball != 0)
+			Add_Active_Brick_Teleport(brick_x, brick_y, ball, vertical_hit);
 		return false;
 
 	case EBT_Ad:

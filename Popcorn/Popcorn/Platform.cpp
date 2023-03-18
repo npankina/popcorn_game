@@ -441,6 +441,8 @@ void AsPlatform_Expanding::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool 
 
 
 // ALaser_Beam
+int ALaser_Beam::Hit_Checkers_Count = 0;
+AHit_Checker *ALaser_Beam::Hit_Checkers[] = {};
 //------------------------------------------------------------------------------------------------------------
 ALaser_Beam::ALaser_Beam()
 : Laser_Beam_State(ELaser_Beam_State::Disabled), X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Beam_Rect{}, Prev_Beam_Rect{}
@@ -460,6 +462,7 @@ void ALaser_Beam::Finish_Movement()
 void ALaser_Beam::Advance(double max_speed)
 {
 	double next_step;
+	int i;
 
 	if (Laser_Beam_State != ELaser_Beam_State::Active)
 		return;
@@ -469,10 +472,28 @@ void ALaser_Beam::Advance(double max_speed)
 	Y_Pos -= next_step;
 
 	if (Y_Pos < AsConfig::Level_Y_Offset)
-	{
-		Laser_Beam_State = ELaser_Beam_State::Stopping;
-		Speed = 0.0;
-	}
+		Stop();
+
+	for (i = 0; i < Hit_Checkers_Count; i++)
+		if (Hit_Checkers[i]->Check_Hit(X_Pos, Y_Pos))
+		{
+			Stop();
+			break;
+		}
+}
+//------------------------------------------------------------------------------------------------------------
+void ALaser_Beam::Stop()
+{
+	Laser_Beam_State = ELaser_Beam_State::Stopping;
+	Speed = 0.0;
+}
+//------------------------------------------------------------------------------------------------------------
+void ALaser_Beam::Add_Hit_Checker(AHit_Checker *hit_checker)
+{
+	if (Hit_Checkers_Count >= sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]) )
+		return;
+
+	Hit_Checkers[Hit_Checkers_Count++] = hit_checker;
 }
 //------------------------------------------------------------------------------------------------------------
 double ALaser_Beam::Get_Speed()
@@ -715,6 +736,7 @@ bool AsPlatform_Laser::Act(EPlatform_State &next_state, double x_pos)
 		{
 			Platform_State->Laser = EPlatform_Transformation::Unknown;
 			next_state = Platform_State->Set_State(EPlatform_Substate_Regular::Normal);
+			Enable_Laser_Firing = false;
 		}
 
 		return true; // нужно перерисовать платформу
@@ -1392,18 +1414,21 @@ void AsPlatform::Move(bool to_left, bool key_down)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::On_Space_Key(bool key_down)
 {
-	if (! key_down)
-		return;
-
 	if (Has_State(EPlatform_Substate_Regular::Ready) )
 	{
-		Ball_Set->Release_From_Platform(Get_Middle_Pos() );
-		Set_State(EPlatform_Substate_Regular::Normal);
+		if (! key_down)
+		{
+			Ball_Set->Release_From_Platform(Get_Middle_Pos() );
+			Set_State(EPlatform_Substate_Regular::Normal);
+		}
 	}
 	else
 	{
 		if (Platform_State == EPlatform_State::Glue)
-			Ball_Set->Release_Next_Ball();
+		{
+			if (! key_down)
+				Ball_Set->Release_Next_Ball();
+		}
 
 		else if (Platform_State == EPlatform_State::Laser)
 			Platform_Laser.Fire(key_down);

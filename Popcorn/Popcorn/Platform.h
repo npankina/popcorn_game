@@ -159,8 +159,11 @@ public:
 	void Set_At(double x, double y);
 	bool Is_Active();
 
+	static void Add_Hit_Checker(AHit_Checker *hit_checker);
+
 private:
 	void Redraw_Beam();
+	void Stop();
 
 	ELaser_Beam_State Laser_Beam_State;
 	double X_Pos, Y_Pos;
@@ -169,6 +172,9 @@ private:
 
 	static const int Width = 1;
 	static const int Height = 3;
+
+	static int Hit_Checkers_Count;
+	static AHit_Checker *Hit_Checkers[3];
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLaser_Beam_Set: public AMover, public AGraphics_Object
@@ -200,7 +206,7 @@ public:
 	void Draw_State(HDC hdc, double x_pos, RECT &platform_rect);
 	void Reset();
 	void Fire(bool fire_on);
-
+	
 private:
 	void Draw_Wing(HDC hdc, double x_pos, bool is_left);
 	double Get_Gun_Pos(double platform_x_pos, bool is_left);

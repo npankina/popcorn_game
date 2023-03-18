@@ -2,6 +2,11 @@
 
 
 //------------------------------------------------------------------------------------------------------------
+bool AHit_Checker::Check_Hit(double next_x_pos, double next_y_pos)
+{
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
 bool AHit_Checker::Hit_Circle_On_Line(double y, double next_x_pos, double left_x, double right_x, double radius, double &x)
 {// Проверяет пересечение горизонтального отрезка (проходящего от left_x до right_x через y) с окружностью радиусом radius
 
@@ -50,7 +55,7 @@ AGraphics_Object::~AGraphics_Object()
 
 
 // ABall
-
+//------------------------------------------------------------------------------------------------------------
 const double ABall::Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
 int ABall::Hit_Checkers_Count = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};

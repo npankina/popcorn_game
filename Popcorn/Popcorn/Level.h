@@ -15,6 +15,7 @@ public:
 	AsLevel();
 
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos);
 
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT &paint_area);

@@ -21,6 +21,7 @@ class AHit_Checker
 {
 public:
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball) = 0;
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos);
 
 	bool Hit_Circle_On_Line(double y, double next_x_pos, double left_x, double right_x, double radius, double &x);
 };
@@ -83,8 +84,6 @@ public:
 	int Release_Timer_Tick;  // Значение счётчика времени, после которого надо отпустить прикленненый мячик
 
 	static void Add_Hit_Checker(AHit_Checker *hit_checker);
-
-
 
 	static const double Radius;
 
