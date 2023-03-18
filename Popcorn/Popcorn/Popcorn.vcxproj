@@ -131,19 +131,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Active_Brick.h" />
-    <ClInclude Include="Ball.h" />
-    <ClInclude Include="Ball_Set.h" />
-    <ClInclude Include="Border.h" />
-    <ClInclude Include="Config.h" />
-    <ClInclude Include="Engine.h" />
-    <ClInclude Include="Falling_Letter.h" />
+    <ClInclude Include="Active_Brick.hpp" />
+    <ClInclude Include="Ball.hpp" />
+    <ClInclude Include="Ball_Set.hpp" />
+    <ClInclude Include="Border.hpp" />
+    <ClInclude Include="Config.hpp" />
+    <ClInclude Include="Engine.hpp" />
+    <ClInclude Include="Falling_Letter.hpp" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="Level.h" />
-    <ClInclude Include="Main.h" />
-    <ClInclude Include="Platform.h" />
+    <ClInclude Include="Laser_Beam.hpp" />
+    <ClInclude Include="Laser_Beam_Set.hpp" />
+    <ClInclude Include="Level.hpp" />
+    <ClInclude Include="Main.hpp" />
+    <ClInclude Include="Platform.hpp" />
+    <ClInclude Include="Platform_Glue.hpp" />
+    <ClInclude Include="Platform_State.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Tools.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Active_Brick.cpp" />
@@ -153,9 +158,14 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Falling_Letter.cpp" />
+    <ClCompile Include="Laser_Beam.cpp" />
+    <ClCompile Include="Laser_Beam_Set.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Platform.cpp" />
+    <ClCompile Include="Platform_Glue.cpp" />
+    <ClCompile Include="Platform_State.cpp" />
+    <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Popcorn.rc" />

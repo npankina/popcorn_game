@@ -2,10 +2,10 @@
 
 #include <Windows.h>
 
-#include "Border.h"
-#include "Level.h"
-#include "Platform.h"
-#include "Ball_Set.h"
+#include "Border.hpp"
+#include "Level.hpp"
+#include "Platform.hpp"
+#include "Ball_Set.hpp"
 
 //------------------------------------------------------------------------------------------------------------
 enum EKey_Type

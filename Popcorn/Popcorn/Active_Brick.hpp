@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Ball.h"
+#include "Ball.hpp"
 
 
 //------------------------------------------------------------------------------------------------------------
@@ -198,6 +198,6 @@ public:
 
 private:
 	AAdvertisement *Advertisement;
-	static const int Circle_Size = 7;
+	static const int Platform_Circle_Size = 7;
 };
 //------------------------------------------------------------------------------------------------------------

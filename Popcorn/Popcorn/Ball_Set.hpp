@@ -1,8 +1,6 @@
 #pragma once
+#include "Ball.hpp"
 
-#include "Ball.h"
-
-//------------------------------------------------------------------------------------------------------------
 class AsBall_Set: public AMover, public AGraphics_Object
 {
 public:
@@ -32,4 +30,3 @@ public:
 private:
 	ABall Balls[AsConfig::Max_Balls_Count];
 };
-//------------------------------------------------------------------------------------------------------------

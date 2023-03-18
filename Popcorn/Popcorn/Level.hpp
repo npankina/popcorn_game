@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Falling_Letter.h"
+#include "Falling_Letter.hpp"
 
 //------------------------------------------------------------------------------------------------------------
 struct SPoint

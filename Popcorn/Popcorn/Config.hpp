@@ -1,32 +1,6 @@
 ﻿#pragma once
-#include <Windows.h> // имена переменных Windows
-#define _USE_MATH_DEFINES // объявляет имя как существующее
-#include <cmath>
+#include "Tools.hpp"
 
-//------------------------------------------------------------------------------------------------------------
-class AColor
-{
-public:
-	AColor();
-	AColor(unsigned char r, unsigned char g, unsigned char b);
-	AColor(const AColor &color, int pen_size);
-	AColor(unsigned char r, unsigned char g, unsigned char b, int pen_size);
-
-	AColor(const AColor &pen_color, const AColor &brush_color, int pen_size);
-
-
-	int Get_RGB() const;
-	void Select(HDC hdc) const;
-	void Select_Pen(HDC hdc) const;
-	HBRUSH Get_Brush() const;
-
-	unsigned char R, G, B;
-
-private:
-	HPEN Pen;
-	HBRUSH Brush;
-};
-//------------------------------------------------------------------------------------------------------------
 class AsConfig
 {
 public:
@@ -77,5 +51,10 @@ public:
 	static const int Initial_Life_Count = 5;
 	static const int Max_Life_Count = 12;
 	static const int Floor_Y_Pos = Max_Y_Pos - 1;
+
+	static const int Platform_Normal_Width = 28;
+	static const int Platform_Height = 7;
+	static const int Platform_Circle_Size = 7;
+	static const int Platform_Normal_Inner_Width = Platform_Normal_Width - Platform_Circle_Size;
 };
 //------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-#include "Active_Brick.h"
+#include "Active_Brick.hpp"
 
 // AActive_Brick
 //------------------------------------------------------------------------------------------------------------
@@ -792,7 +792,7 @@ void AActive_Brick_Ad::Draw_In_Level(HDC hdc, RECT &brick_rect)
 	int x = brick_rect.left;
 	int y = brick_rect.top;
 	const int scale = AsConfig::Global_Scale;
-	int size = (Circle_Size - 1) * scale - 1;
+	int size = (Platform_Circle_Size - 1) * scale - 1;
 
 	// 1. Стираем предыдущее изображение
 	AsConfig::BG_Color.Select(hdc);
