@@ -1,8 +1,7 @@
 ﻿#include "Laser_Beam.hpp"
 
-int ALaser_Beam::Hit_Checkers_Count = 0;
-AHit_Checker *ALaser_Beam::Hit_Checkers[] = {};
-//------------------------------------------------------------------------------------------------------------
+AHit_Checker_List ALaser_Beam::Hit_Checker_List;
+
 ALaser_Beam::ALaser_Beam()
 : Laser_Beam_State(ELaser_Beam_State::Disabled), X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Beam_Rect{}, Prev_Beam_Rect{}
 {}
@@ -21,7 +20,6 @@ void ALaser_Beam::Finish_Movement()
 void ALaser_Beam::Advance(double max_speed)
 {
 	double next_step;
-	int i;
 
 	if (Laser_Beam_State != ELaser_Beam_State::Active)
 		return;
@@ -33,26 +31,14 @@ void ALaser_Beam::Advance(double max_speed)
 	if (Y_Pos < AsConfig::Level_Y_Offset)
 		Stop();
 
-	for (i = 0; i < Hit_Checkers_Count; i++)
-		if (Hit_Checkers[i]->Check_Hit(X_Pos, Y_Pos))
-		{
-			Stop();
-			break;
-		}
+	if (Hit_Checker_List.Check_Hit(X_Pos, Y_Pos) )
+		Stop();
 }
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Stop()
 {
 	Laser_Beam_State = ELaser_Beam_State::Stopping;
 	Speed = 0.0;
-}
-//------------------------------------------------------------------------------------------------------------
-void ALaser_Beam::Add_Hit_Checker(AHit_Checker *hit_checker)
-{
-	if (Hit_Checkers_Count >= sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]) )
-		return;
-
-	Hit_Checkers[Hit_Checkers_Count++] = hit_checker;
 }
 //------------------------------------------------------------------------------------------------------------
 double ALaser_Beam::Get_Speed()

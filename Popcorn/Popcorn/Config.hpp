@@ -57,4 +57,3 @@ public:
 	static const int Platform_Circle_Size = 7;
 	static const int Platform_Normal_Inner_Width = Platform_Normal_Width - Platform_Circle_Size;
 };
-//------------------------------------------------------------------------------------------------------------

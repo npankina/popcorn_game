@@ -13,6 +13,19 @@ public:
 	bool Hit_Circle_On_Line(double y, double next_x_pos, double left_x, double right_x, double radius, double &x);
 };
 //------------------------------------------------------------------------------------------------------------
+class AHit_Checker_List
+{
+public:
+	AHit_Checker_List();
+	bool Add_Hit_Cheker(AHit_Checker *hit_checker);
+	bool Check_Hit(double x_pos, double y_pos, ABall *ball);
+	bool Check_Hit(double x_pos, double y_pos);
+
+private:
+	int Hit_Checkers_Count;
+	AHit_Checker *Hit_Checkers[3];
+};
+//------------------------------------------------------------------------------------------------------------
 class AMover
 {
 public:

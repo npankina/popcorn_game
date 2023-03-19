@@ -58,6 +58,12 @@
     <Filter Include="Platform_Glue">
       <UniqueIdentifier>{535c2e94-67b8-4ecf-8851-a98969f06518}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform_Expanding">
+      <UniqueIdentifier>{0986c536-2f00-41f8-909a-3699399c83f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform_Laser">
+      <UniqueIdentifier>{f14df67e-d749-471f-b541-beb2fd9b9b2c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -113,6 +119,12 @@
     </ClInclude>
     <ClInclude Include="Platform_Glue.hpp">
       <Filter>Platform_Glue</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform_Expanding.hpp">
+      <Filter>Platform_Expanding</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform_Laser.hpp">
+      <Filter>Platform_Laser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +185,12 @@
     </ClCompile>
     <ClCompile Include="Platform_Glue.cpp">
       <Filter>Platform_Glue</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform_Expanding.cpp">
+      <Filter>Platform_Expanding</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform_Laser.cpp">
+      <Filter>Platform_Laser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

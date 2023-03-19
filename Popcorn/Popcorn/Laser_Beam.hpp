@@ -28,7 +28,7 @@ public:
 	void Set_At(double x, double y);
 	bool Is_Active();
 
-	static void Add_Hit_Checker(AHit_Checker *hit_checker);
+	static AHit_Checker_List Hit_Checker_List;
 
 private:
 	void Redraw_Beam();
@@ -41,7 +41,4 @@ private:
 
 	static const int Width = 1;
 	static const int Height = 3;
-
-	static int Hit_Checkers_Count;
-	static AHit_Checker *Hit_Checkers[3];
 };

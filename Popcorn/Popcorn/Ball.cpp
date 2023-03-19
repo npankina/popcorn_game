@@ -1,17 +1,13 @@
 ﻿#include "Ball.hpp"
 
-// ABall
-//------------------------------------------------------------------------------------------------------------
+AHit_Checker_List ABall::Hit_Checker_List;
 const double ABall::Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
-int ABall::Hit_Checkers_Count = 0;
-AHit_Checker *ABall::Hit_Checkers[] = {};
 //------------------------------------------------------------------------------------------------------------
 ABall::ABall()
 : Ball_State(EBS_Disabled), Prev_Ball_State(EBS_Disabled), Release_Timer_Tick(0), Center_X_Pos(0.0), Center_Y_Pos(0.0),
   Ball_Speed(0.0), Prev_Ball_Speed(0.0), Ball_Direction(0.0), Prev_Ball_Direction(0.0), Testing_Is_Active(false),
   Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 void ABall::Begin_Movement()
 {
@@ -38,7 +34,6 @@ void ABall::Finish_Movement()
 //------------------------------------------------------------------------------------------------------------
 void ABall::Advance(double max_speed)
 {
-	int i;
 	bool got_hit = true;
 	int prev_hits_count = 0;
 	const int max_hits_count = 8;
@@ -59,8 +54,7 @@ void ABall::Advance(double max_speed)
 		next_y_pos = Center_Y_Pos - next_step * sin(Ball_Direction);
 
 		// Корректируем позицию при отражении:
-		for (i = 0; i < Hit_Checkers_Count; i++)
-			got_hit |= Hit_Checkers[i]->Check_Hit(next_x_pos, next_y_pos, this);
+		got_hit = Hit_Checker_List.Check_Hit(next_x_pos, next_y_pos, this);
 
 		if (got_hit)
 		{
@@ -409,14 +403,6 @@ void ABall::Release()
 
 	Ball_Direction = Prev_Ball_Direction;
 	Release_Timer_Tick = 0;
-}
-//------------------------------------------------------------------------------------------------------------
-void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)
-{
-	if (Hit_Checkers_Count >= sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]) )
-		return;
-
-	Hit_Checkers[Hit_Checkers_Count++] = hit_checker;
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Redraw_Ball()
