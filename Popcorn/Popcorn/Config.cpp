@@ -47,6 +47,25 @@ void AsConfig::Invalidate_Rect(RECT &rect)
 	InvalidateRect(Hwnd, &rect, FALSE);
 }
 //------------------------------------------------------------------------------------------------------------
+void AsConfig::Rect(HDC hdc, RECT &rect, const AColor color)
+{
+	color.Select(hdc);
+	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsConfig::Rect(HDC hdc, int x, int y, int width, int height, const AColor color)
+{
+	RECT rect{};
+
+	rect.left = x * Global_Scale;
+	rect.top = y * Global_Scale;
+	rect.right = rect.left + width * Global_Scale;
+	rect.bottom = rect.top + height * Global_Scale;
+
+	color.Select(hdc);
+	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
+}
+//------------------------------------------------------------------------------------------------------------
 void AsConfig::Throw()
 {
 	throw 22;

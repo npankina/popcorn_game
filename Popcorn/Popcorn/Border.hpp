@@ -1,7 +1,21 @@
 ﻿#pragma once
 #include "Ball.hpp"
 
+class AGate : public AGraphics_Object
+{
+public:
+	AGate(int x, int y);
 
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+private:
+	void Draw_Cup(HDC hdc, bool is_up_cup);
+
+	int X_Pos, Y_Pos;
+};
 //------------------------------------------------------------------------------------------------------------
 class AsBorder: public AHit_Checker, public AGraphics_Object
 {
@@ -22,5 +36,5 @@ private:
 	void Draw_Floor(HDC hdc, RECT &paint_area);
 
 	RECT Floor_Rect;
+	AGate Gate;
 };
-//------------------------------------------------------------------------------------------------------------

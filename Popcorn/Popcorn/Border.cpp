@@ -1,9 +1,99 @@
 ﻿#include "Border.hpp"
 
+// AGate
+AGate::AGate(int x, int y)
+: X_Pos(x), Y_Pos(y)
+{}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Act()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Clear(HDC hdc, RECT &paint_area)
+{}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw(HDC hdc, RECT &paint_area)
+{
+	Draw_Cup(hdc, true);
+	Draw_Cup(hdc, false);
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw_Cup(HDC hdc, bool is_up_cup)
+{
+	RECT rect{}, gate_rect{};
+	HRGN region;
+	const int scale = AsConfig::Global_Scale;
+	const int half_size = scale / 2;
+	int x = 0, y = 0;
+	XFORM xform{}, old_xform{};
+
+	xform.eM11 = 1.0f;
+	xform.eM12 = 0.0f;
+	xform.eM21 = 0.0f;
+	xform.eM22 = 1.0f;
+	xform.eDx = (float)X_Pos * scale;
+	xform.eDy = (float)Y_Pos * scale;
+	GetWorldTransform(hdc, &old_xform);
+	SetWorldTransform(hdc, &xform);
+
+	// 1. Полукруглая часть чаши
+	rect.left = x * scale;
+	rect.top = (y + 1) * scale;
+	rect.right = rect.left + 6 * scale;
+	rect.bottom = rect.top + 4 * scale;
+
+	// 1.1. Основа
+	AsConfig::Blue_Color.Select(hdc);
+	AsConfig::Round_Rect(hdc, rect, 3);
+
+	// 1.2. Блик слева (область обрезки)
+	rect.left = X_Pos * scale;
+	rect.top = (Y_Pos + 1) * scale;
+	rect.right = rect.left + 3 * scale;
+	rect.bottom = rect.top + 4 * scale;
+
+	region = CreateRectRgnIndirect(&rect);
+	SelectClipRgn(hdc, region);
+
+	AsConfig::Letter_Color.Select_Pen(hdc);
+
+	rect.left = x * scale + half_size;
+	rect.top = (y + 1) * scale + half_size;
+	rect.right = rect.left + 5 * scale + half_size;
+	rect.bottom = rect.top + 5 * scale + half_size;
+
+	AsConfig::Round_Rect(hdc, rect, 3);
+
+	SelectClipRgn(hdc, 0);
+	DeleteObject(region);
+
+	// 1.3. Блик снизу
+	AsConfig::Rect(hdc, x, y + 4, 4, 1, AsConfig::White_Color);
+
+	// 1.4 "Заплатка" в правом нижнем углу
+	AsConfig::Rect(hdc, x + 4, y + 3, 2, 2, AsConfig::Blue_Color);
+
+	// 1.5 Перфорация
+	AsConfig::Rect(hdc, x + 4, y + 3, 1, 1, AsConfig::BG_Color);
+
+	// 1.6 Перемычка перед чашей
+	AsConfig::Rect(hdc, x + 2, y, 2, 1, AsConfig::Blue_Color);
+
+	SetWorldTransform(hdc, &old_xform);
+}
+//------------------------------------------------------------------------------------------------------------
+bool AGate::Is_Finished()
+{
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
 // AsBorder
 //------------------------------------------------------------------------------------------------------------
 AsBorder::AsBorder()
-
+: Gate(AsConfig::Max_X_Pos, 178)
 {
 	Floor_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
 	Floor_Rect.top = AsConfig::Floor_Y_Pos * AsConfig::Global_Scale;
@@ -89,8 +179,8 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 		Draw_Element(hdc, paint_area, 2, 1 + i * 4, false);
 
 	// 2. Линия справа
-	for (i = 0; i < 50; i++)
-		Draw_Element(hdc, paint_area, AsConfig::Max_X_Pos + 1, 1 + i * 4, false);
+	//for (i = 0; i < 50; i++)
+		//Draw_Element(hdc, paint_area, AsConfig::Max_X_Pos + 1, 1 + i * 4, false);
 
 	// 3. Линия сверху
 	for (i = 0; i < 50; i++)
@@ -99,6 +189,9 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 	// 4. Пол (если есть)
 	if (AsConfig::Level_Has_Floor)
 		Draw_Floor(hdc, paint_area);
+
+	// 5. Gates
+	Gate.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsBorder::Is_Finished()
@@ -109,7 +202,7 @@ bool AsBorder::Is_Finished()
 void AsBorder::Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_border)
 {// Рисует элемент рамки уровня
 
-	RECT intersection_rect, rect;
+	RECT intersection_rect{}, rect{};
 
 	rect.left = x * AsConfig::Global_Scale;
 	rect.top = y * AsConfig::Global_Scale;

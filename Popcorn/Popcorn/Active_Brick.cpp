@@ -541,7 +541,6 @@ AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
   Ball_Width(Ball_Size * AsConfig::Global_Scale), Ball_Height(Ball_Size * AsConfig::Global_Scale), Ball_Y_Offset(0),
   Falling_Speed(0.0), Acceleration_Step(0.2), Brick_Regions(0)
 {
-	//int i, j;
 	const int scale = AsConfig::Global_Scale;
 
 	Empty_Region = CreateRectRgn(0, 0, 0, 0);
@@ -556,10 +555,6 @@ AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
 
 	Ball_X = Ad_Rect.left + 9 * scale + Ball_Width / 2 + 1;
 	Ball_Y = Ad_Rect.top + 2 * scale + Ball_Height / 2;
-
-	//for (i = 0; i < Height; i++)
-	//	for (j = 0; j < Width; j++)
-	//		Show_Under_Brick(Level_X + j, Level_Y + i);
 }
 //------------------------------------------------------------------------------------------------------------
 void AAdvertisement::Act()

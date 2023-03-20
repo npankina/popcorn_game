@@ -1,10 +1,8 @@
 ﻿#include "Falling_Letter.hpp"
 
-// AFalling_Letter
 int AFalling_Letter::All_Letters_Popularity;
 int AFalling_Letter::Letters_Popularity[ELT_Max] = { 7, 7, 7, 7, 7, 7, 7,  3, 3, 3,  1 };
 //------------------------------------------------------------------------------------------------------------
-
 AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y)
 : Brick_Type(brick_type), Letter_Type(letter_type), Falling_Letter_State(EFLS_Normal), X(x), Y(y), Rotation_Step(2),
   Next_Rotation_Tick(AsConfig::Current_Timer_Tick + Ticks_Per_Step)
@@ -158,7 +156,7 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	double y_ratio;
 	int back_part_offset;
 	const AColor *front_color, *back_color;
-	XFORM xform, old_xform;
+	XFORM xform{}, old_xform{};
 
 	if (! (Brick_Type == EBT_Blue || Brick_Type == EBT_Red))
 		return;  // Падающие буквы могут быть только от кирпичей такого типа
