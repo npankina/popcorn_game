@@ -2,17 +2,38 @@
 
 // AGate
 AGate::AGate(int x, int y)
-: X_Pos(x), Y_Pos(y), Edge_Count(5)
-{}
+: X_Pos(x), Y_Pos(y), Edge_Count(5), Gate_Rect{}
+{
+	const int scale = AsConfig::Global_Scale;
+
+	Gate_Rect.left = X_Pos * scale;
+	Gate_Rect.top = Y_Pos * scale;
+	Gate_Rect.right = Gate_Rect.left + Width * scale;
+	Gate_Rect.bottom = Gate_Rect.top + Height * scale;
+}
 //------------------------------------------------------------------------------------------------------------
 void AGate::Act()
 {}
 //------------------------------------------------------------------------------------------------------------
 void AGate::Clear(HDC hdc, RECT &paint_area)
-{}
+{
+	RECT intersection_rect;
+
+	if (! IntersectRect(&intersection_rect, &paint_area, &Gate_Rect) )
+		return;
+
+	AsConfig::Rect(hdc, Gate_Rect, AsConfig::BG_Color);
+}
 //------------------------------------------------------------------------------------------------------------
 void AGate::Draw(HDC hdc, RECT &paint_area)
 {
+	RECT intersection_rect;
+
+	if (! IntersectRect(&intersection_rect, &paint_area, &Gate_Rect) )
+		return;
+
+	Clear(hdc, paint_area);
+
 	Draw_Cup(hdc, true);
 	Draw_Cup(hdc, false);
 }
@@ -76,7 +97,7 @@ void AGate::Draw_Cup(HDC hdc, bool is_top)
 	region = CreateRectRgnIndirect(&rect);
 	SelectClipRgn(hdc, region);
 
-	AsConfig::Letter_Color.Select_Pen(hdc);
+	AsConfig::Gate_Color.Select_Pen(hdc);
 
 	rect.left = x * scale + half_size;
 	rect.top = (y + 1) * scale + half_size;
@@ -141,12 +162,30 @@ bool AGate::Is_Finished()
 // AsBorder
 //------------------------------------------------------------------------------------------------------------
 AsBorder::AsBorder()
-: Gate(AsConfig::Max_X_Pos, 178)
+: Floor_Rect{}, Gates{} 
 {
 	Floor_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
 	Floor_Rect.top = AsConfig::Floor_Y_Pos * AsConfig::Global_Scale;
 	Floor_Rect.right = (AsConfig::Max_X_Pos - 1) * AsConfig::Global_Scale;
 	Floor_Rect.bottom = AsConfig::Max_Y_Pos * AsConfig::Global_Scale;
+
+	Gates[0] = new AGate(1, 29);
+	Gates[1] = new AGate(AsConfig::Max_X_Pos, 29);
+
+	Gates[2] = new AGate(1, 77);
+	Gates[3] = new AGate(AsConfig::Max_X_Pos, 77);
+
+	Gates[4] = new AGate(1, 129);
+	Gates[5] = new AGate(AsConfig::Max_X_Pos, 129);
+
+	Gates[6] = new AGate(1, 178);
+	Gates[7] = new AGate(AsConfig::Max_X_Pos, 178);
+}
+//------------------------------------------------------------------------------------------------------------
+AsBorder::~AsBorder()
+{
+	for(int i = 0; i < AsConfig::Gates_Number; i++)
+		delete Gates[i];
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Redraw_Floor()
@@ -227,8 +266,8 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 		Draw_Element(hdc, paint_area, 2, 1 + i * 4, false);
 
 	// 2. Линия справа
-	//for (i = 0; i < 50; i++)
-		//Draw_Element(hdc, paint_area, AsConfig::Max_X_Pos + 1, 1 + i * 4, false);
+	for (i = 0; i < 50; i++)
+		Draw_Element(hdc, paint_area, AsConfig::Max_X_Pos + 1, 1 + i * 4, false);
 
 	// 3. Линия сверху
 	for (i = 0; i < 50; i++)
@@ -239,7 +278,8 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 		Draw_Floor(hdc, paint_area);
 
 	// 5. Gates
-	Gate.Draw(hdc, paint_area);
+	for(int i = 0; i < AsConfig::Gates_Number; i++)
+		Gates[i]->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsBorder::Is_Finished()

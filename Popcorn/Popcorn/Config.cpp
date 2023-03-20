@@ -8,6 +8,7 @@ const AColor AsConfig::Red_Color(230, 25, 229);
 const AColor AsConfig::Blue_Color(0, 255, 255);
 const AColor AsConfig::White_Color(255, 255, 255);
 const AColor AsConfig::Letter_Color(AsConfig::White_Color, AsConfig::Global_Scale);
+const AColor AsConfig::Gate_Color(AsConfig::White_Color, AsConfig::Global_Scale);
 const AColor AsConfig::Laser_Color(AsConfig::White_Color, AsConfig::Global_Scale);
 const AColor AsConfig::Unbreakable_Blue_Highlight(AsConfig::Blue_Color, AsConfig::Global_Scale);
 const AColor AsConfig::Unbreakable_Red_Highlight(AsConfig::Red_Color, 3 * AsConfig::Global_Scale);

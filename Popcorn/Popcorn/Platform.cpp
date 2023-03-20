@@ -816,12 +816,13 @@ double AsPlatform::Get_Current_Platform_Width()
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Correct_Platform_Pos()
 { //--- проверка что край платформы не залез за край рамки слева и справа
-	double 	max_platform_x = AsConfig::Max_X_Pos - Get_Current_Platform_Width() + 1;
+	double 	max_platform_x = AsConfig::Max_X_Pos - Get_Current_Platform_Width();
+	double 	min_platform_x = AsConfig::Border_X_Offset + 1;
 	bool got_correction = false;
 
-	if (X_Pos <= AsConfig::Border_X_Offset)
+	if (X_Pos <= min_platform_x)
 	{
-		X_Pos = AsConfig::Border_X_Offset;
+		X_Pos = min_platform_x;
 		got_correction = true;
 	}
 

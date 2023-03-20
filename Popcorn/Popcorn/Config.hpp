@@ -15,7 +15,7 @@ public:
 	static bool Level_Has_Floor;
 	static int Current_Timer_Tick;
 
-	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color, Laser_Color;
+	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color, Laser_Color, Gate_Color;
 	static const AColor Unbreakable_Blue_Highlight, Unbreakable_Red_Highlight, Teleport_Portal_Color;
 	static const AColor Advertisement_Blue_Table, Advertisement_Red_Table;
 	static const AColor Platform_Inner_Color, Platform_Circle_Color, Highlight_Color, Truss_Color, Gun_Color;
@@ -58,4 +58,6 @@ public:
 	static const int Platform_Height = 7;
 	static const int Platform_Circle_Size = 7;
 	static const int Platform_Normal_Inner_Width = Platform_Normal_Width - Platform_Circle_Size;
+
+	static const int Gates_Number = 8;
 };
