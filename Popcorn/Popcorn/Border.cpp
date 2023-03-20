@@ -2,7 +2,7 @@
 
 // AGate
 AGate::AGate(int x, int y)
-: X_Pos(x), Y_Pos(y)
+: X_Pos(x), Y_Pos(y), Edge_Count(5)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AGate::Act()
@@ -17,21 +17,34 @@ void AGate::Draw(HDC hdc, RECT &paint_area)
 	Draw_Cup(hdc, false);
 }
 //------------------------------------------------------------------------------------------------------------
-void AGate::Draw_Cup(HDC hdc, bool is_up_cup)
+void AGate::Draw_Cup(HDC hdc, bool is_top)
 {
 	RECT rect{}, gate_rect{};
 	HRGN region;
 	const int scale = AsConfig::Global_Scale;
 	const int half_size = scale / 2;
 	int x = 0, y = 0;
+	int cup_y_offset;
 	XFORM xform{}, old_xform{};
 
 	xform.eM11 = 1.0f;
 	xform.eM12 = 0.0f;
 	xform.eM21 = 0.0f;
-	xform.eM22 = 1.0f;
-	xform.eDx = (float)X_Pos * scale;
-	xform.eDy = (float)Y_Pos * scale;
+
+	if (is_top)
+	{
+		xform.eM22 = 1.0f;
+		cup_y_offset = 0;
+	}
+	else
+	{
+		xform.eM22 = -1.0f;
+		cup_y_offset = 19 * scale - 1;
+	}
+
+	xform.eDx = (float)(X_Pos * scale);
+	xform.eDy = (float)(Y_Pos * scale + cup_y_offset);
+
 	GetWorldTransform(hdc, &old_xform);
 	SetWorldTransform(hdc, &xform);
 
@@ -47,9 +60,18 @@ void AGate::Draw_Cup(HDC hdc, bool is_up_cup)
 
 	// 1.2. Блик слева (область обрезки)
 	rect.left = X_Pos * scale;
-	rect.top = (Y_Pos + 1) * scale;
 	rect.right = rect.left + 3 * scale;
-	rect.bottom = rect.top + 4 * scale;
+
+	if (is_top)
+	{
+		rect.top = (Y_Pos + 1) * scale;
+		rect.bottom = rect.top + 4 * scale;
+	}
+	else
+	{
+		rect.top = (Y_Pos - 1) * scale + cup_y_offset + 1;
+		rect.bottom = rect.top - 4 * scale;
+	}
 
 	region = CreateRectRgnIndirect(&rect);
 	SelectClipRgn(hdc, region);
@@ -78,7 +100,33 @@ void AGate::Draw_Cup(HDC hdc, bool is_up_cup)
 	// 1.6 Перемычка перед чашей
 	AsConfig::Rect(hdc, x + 2, y, 2, 1, AsConfig::Blue_Color);
 
+	Draw_Edges(hdc); // Рисуем перемычки
+
 	SetWorldTransform(hdc, &old_xform);
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw_Edges(HDC hdc)
+{
+	bool is_long_edge = false;
+	for (int i = 0; i < Edge_Count; i++)
+	{
+		Draw_One_Edge(hdc, 5 + i, is_long_edge);
+		is_long_edge = !is_long_edge;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw_One_Edge(HDC hdc, int edge_y_offset, bool is_long)
+{
+	if (is_long)
+	{// Длинное ребро
+		AsConfig::Rect(hdc, 0, edge_y_offset, 4, 1, AsConfig::White_Color);
+		AsConfig::Rect(hdc, 4, edge_y_offset, 2, 1, AsConfig::Blue_Color);
+	}
+	else
+	{// Короткое ребро
+		AsConfig::Rect(hdc, 1, edge_y_offset, 2, 1, AsConfig::Blue_Color);
+		AsConfig::Rect(hdc, 4, edge_y_offset, 1, 1, AsConfig::Blue_Color);
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 bool AGate::Is_Finished()
