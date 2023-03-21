@@ -1,13 +1,10 @@
 ﻿#pragma once
-
 #include <Windows.h>
-
 #include "Border.hpp"
 #include "Level.hpp"
 #include "Platform.hpp"
 #include "Ball_Set.hpp"
 
-//------------------------------------------------------------------------------------------------------------
 enum EKey_Type
 {
 	EKT_Left,
@@ -44,6 +41,7 @@ private:
 	void Advance_Movers();
 	void Act();
 	void On_Falling_Letter(AFalling_Letter *falling_letter);
+	void Restart_Level();
 
 	EGame_State Game_State;
 	double Rest_Distance;
@@ -58,4 +56,3 @@ private:
 	AMover *Movers[AsConfig::Max_Movers_Count];  // UNO; Движущиеся в данный момент объекты
 	AGraphics_Object *Modules[AsConfig::Max_Modules_Count];  // UNO; Главные графические объекты (модули) игры
 };
-//------------------------------------------------------------------------------------------------------------
