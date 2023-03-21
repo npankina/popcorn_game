@@ -1,8 +1,13 @@
 ﻿#include "Border.hpp"
 
 // AGate
+const double AGate::Max_Gap_Short_Height = 9.0;
+const double AGate::Gap_Height_Short_Step = Max_Gap_Short_Height / (double)AsConfig::FPS; // Для анимации за 1 сек.
+const double AGate::Gap_Height_Long_Step = 0.0;
+
 AGate::AGate(int x, int y)
-: X_Pos(x), Y_Pos(y), Edge_Count(5), Gate_Rect{}
+: Gate_State(EGate_State::Closed), Gate_Transformation(EGate_Transformation::Unknown), 
+  X_Pos(x), Y_Pos(y), Edge_Count(5), Gate_Close_Tick(0), Gap_Height(0.0), Gate_Rect{}
 {
 	const int scale = AsConfig::Global_Scale;
 
@@ -13,7 +18,25 @@ AGate::AGate(int x, int y)
 }
 //------------------------------------------------------------------------------------------------------------
 void AGate::Act()
-{}
+{
+	switch (Gate_State)
+	{
+	case EGate_State::Closed:
+		break;
+
+	case EGate_State::Short_Open:
+		if (Act_For_Short_Open() )
+			Redraw_Gate();
+		break;
+
+	/*case EGate_State::Long_Open:
+		Act_For_Long_Open();
+		break;*/
+
+	default:
+		AsConfig::Throw();
+	}
+}
 //------------------------------------------------------------------------------------------------------------
 void AGate::Clear(HDC hdc, RECT &paint_area)
 {
@@ -129,7 +152,10 @@ void AGate::Draw_Cup(HDC hdc, bool is_top)
 void AGate::Draw_Edges(HDC hdc)
 {
 	bool is_long_edge = false;
-	for (int i = 0; i < Edge_Count; i++)
+	double ratio = 1.0 - Gap_Height / Max_Gap_Short_Height; // коэфф-т от 0..1
+	int count = Edge_Count * ratio;
+
+	for (int i = 0; i < count; i++)
 	{
 		Draw_One_Edge(hdc, 5 + i, is_long_edge);
 		is_long_edge = !is_long_edge;
@@ -153,6 +179,68 @@ void AGate::Draw_One_Edge(HDC hdc, int edge_y_offset, bool is_long)
 bool AGate::Is_Finished()
 {
 	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Open_Gate(bool short_open)
+{
+	if (Gate_State != EGate_State::Closed)
+		return;
+
+	if (short_open)
+		Gate_State = EGate_State::Short_Open;
+	else
+		Gate_State = EGate_State::Long_Open;
+
+	Gate_Transformation = EGate_Transformation::Init;
+}
+//------------------------------------------------------------------------------------------------------------
+bool AGate::Act_For_Short_Open()
+{
+	switch (Gate_Transformation)
+	{
+	case EGate_Transformation::Unknown:
+		break;
+
+	case EGate_Transformation::Init:
+		if (Gap_Height < Max_Gap_Short_Height)
+		{
+			Gap_Height += Gap_Height_Short_Step;
+		}
+		else
+		{
+			Gate_Close_Tick = AsConfig::Current_Timer_Tick + Short_Opening_Timeout;
+			Gate_Transformation = EGate_Transformation::Active;
+		}
+		break;
+
+	case EGate_Transformation::Active:
+		if (AsConfig::Current_Timer_Tick >= Gate_Close_Tick)
+			Gate_Transformation = EGate_Transformation::Finalize;
+		break;
+
+	case EGate_Transformation::Finalize:
+		if (Gap_Height > 0.0)
+		{
+			Gap_Height -= Gap_Height_Short_Step;
+		}
+		else
+		{
+			Gate_Transformation = EGate_Transformation::Unknown;
+			Gate_State = EGate_State::Closed;
+		}
+		break;
+
+	default:
+		AsConfig::Throw();
+	}
+
+	return true;
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Redraw_Gate()
+{
+	AsConfig::Invalidate_Rect(Gate_Rect);
+
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -191,6 +279,17 @@ AsBorder::~AsBorder()
 void AsBorder::Redraw_Floor()
 {
 	AsConfig::Invalidate_Rect(Floor_Rect);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBorder::Open_Gate(int gate_index, bool short_open)
+{
+	if (gate_index < 0 || gate_index >= AsConfig::Gates_Number)
+		AsConfig::Throw();
+
+	if (gate_index != AsConfig::Gates_Number - 1 && short_open)
+		AsConfig::Throw(); // самый последний гейт может открываться только short_open
+
+	Gates[gate_index]->Open_Gate(short_open);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -238,12 +337,16 @@ bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Act()
 {
-	// Заглушка, т.к. этот метод не используется
+	for(int i = 0; i < AsConfig::Gates_Number; i++)
+		Gates[i]->Act();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Clear(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
+
+	for (int i = 0; i < AsConfig::Gates_Number; i++)
+		Gates[i]->Clear(hdc, paint_area);
 
 	if (! AsConfig::Level_Has_Floor)
 		return;

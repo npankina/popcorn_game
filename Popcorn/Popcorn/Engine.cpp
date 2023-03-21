@@ -61,6 +61,8 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Modules[2] = &Platform;
 	Modules[3] = &Ball_Set;
 	Modules[4] = &Laser_Beam_Set;
+
+	Border.Open_Gate(7, true);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
@@ -219,13 +221,17 @@ void AsEngine::Act()
 	int index = 0;
 	AFalling_Letter *falling_letter;
 
-	Platform.Act();
+	/*Platform.Act();
 	Level.Act();
+	Border.Act();*/
+	for (int i = 0; i < AsConfig::Max_Modules_Count; i++)
+		if (Modules[i] != 0)
+			Modules[i]->Act();
 
-	if (! Platform.Has_State(EPlatform_Substate_Regular::Ready) )
-		Ball_Set.Act();
+	/*if (! Platform.Has_State(EPlatform_Substate_Regular::Ready) )
+		Ball_Set.Act();*/
 
-	while (Level.Get_Next_Falling_Letter(index, &falling_letter) )
+	while (Level.Get_Next_Falling_Letter(index, &falling_letter) ) // обрабатывает перехват падающих букв
 	{
 		if (Platform.Hit_By(falling_letter) )
 			On_Falling_Letter(falling_letter);
