@@ -27,6 +27,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	Level.Init();
 	Platform.Init(&Ball_Set, &Laser_Beam_Set);
+	Monster_Set.Init(&Border);
 
 	AFalling_Letter::Init();
 
@@ -48,13 +49,6 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 
-	// Movers
-	/*memset(Movers, 0, sizeof(Movers) );
-	Movers[0] = &Platform;
-	Movers[1] = &Ball_Set;
-	Movers[2] = &Laser_Beam_Set;*/
-
-
 	// Modules
 	memset(Modules, 0, sizeof(Modules) );
 	index = 0;
@@ -64,7 +58,9 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Add_Next_Module(index, &Platform);
 	Add_Next_Module(index, &Ball_Set);
 	Add_Next_Module(index, &Laser_Beam_Set);
+	Add_Next_Module(index, &Monster_Set);
 
+	Monster_Set.Emit_At_Gate(4);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
@@ -108,7 +104,7 @@ int AsEngine::On_Key(EKey_Type key_type, bool key_down)
 void AsEngine::Restart_Level()
 {
 	Border.Open_Gate(7, true);
-	Border.Open_Gate(5, false);
+	//Border.Open_Gate(5, false);
 	Game_State = EGame_State::Restart_Level;
 }
 //------------------------------------------------------------------------------------------------------------

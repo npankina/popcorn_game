@@ -144,6 +144,8 @@
     <ClInclude Include="Laser_Beam_Set.hpp" />
     <ClInclude Include="Level.hpp" />
     <ClInclude Include="Main.hpp" />
+    <ClInclude Include="Monster.hpp" />
+    <ClInclude Include="Monster_Set.hpp" />
     <ClInclude Include="Platform.hpp" />
     <ClInclude Include="Platform_Expanding.hpp" />
     <ClInclude Include="Platform_Glue.hpp" />
@@ -166,6 +168,8 @@
     <ClCompile Include="Laser_Beam_Set.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Monster.cpp" />
+    <ClCompile Include="Monster_Set.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="Platform_Expanding.cpp" />
     <ClCompile Include="Platform_Glue.cpp" />
@@ -179,10 +183,6 @@
   <ItemGroup>
     <Image Include="Popcorn.ico" />
     <Image Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="game_development_plan.txt" />
-    <Text Include="To-do_List.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

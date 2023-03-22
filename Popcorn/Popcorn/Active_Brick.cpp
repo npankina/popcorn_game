@@ -9,8 +9,7 @@ void AActive_Brick::Get_Level_Pos(int &dest_brick_x, int &dest_brick_y)
 }
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick::~AActive_Brick()
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick::AActive_Brick(EBrick_Type brick_type, int level_x, int level_y)
 : Brick_Type(brick_type), Level_X(level_x), Level_Y(level_y), Brick_Rect{}
@@ -22,8 +21,7 @@ AActive_Brick::AActive_Brick(EBrick_Type brick_type, int level_x, int level_y)
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick::Clear(HDC hdc, RECT &paint_area)
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 double AActive_Brick::Get_Brick_X_Pos(bool of_center)
 {
@@ -55,8 +53,7 @@ AColor AActive_Brick_Red_Blue::Fading_Red_Brick_Colors[Max_Fade_Step];
 AColor AActive_Brick_Red_Blue::Fading_Blue_Brick_Colors[Max_Fade_Step];
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Red_Blue::~AActive_Brick_Red_Blue()
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Red_Blue::AActive_Brick_Red_Blue(EBrick_Type brick_type, int level_x, int level_y)
 : AActive_Brick(brick_type, level_x, level_y), Fade_Step(0)
@@ -230,13 +227,11 @@ void AActive_Brick_Unbreakable::Draw_In_Level(HDC hdc, RECT &brick_rect)
 // AActive_Brick_Multihit
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Multihit::~AActive_Brick_Multihit()
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Multihit::AActive_Brick_Multihit(int level_x, int level_y)
 : AActive_Brick(EBrick_Type::Multihit_1, level_x, level_y), Rotation_Step(0)
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Multihit::Act()
 {
@@ -683,8 +678,6 @@ void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 21 * scale);
 	LineTo(hdc, Ad_Rect.left + 30 * scale - 1, Ad_Rect.top + 16 * scale);
 
-
-
 	// 5. Шарик
 	// 5.1. Красный эллипс 12х12
 	ball_width = Ball_Width + deformation;
@@ -752,8 +745,7 @@ bool AAdvertisement::Has_Brick_At(int level_x, int level_y)
 // AActive_Brick_Ad
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Ad::~AActive_Brick_Ad()
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Ad::AActive_Brick_Ad(int level_x, int level_y, AAdvertisement *advertisement)
 : AActive_Brick(EBrick_Type::Unbreakable, level_x, level_y), Advertisement(advertisement)
@@ -808,4 +800,3 @@ void AActive_Brick_Ad::Draw_In_Level(HDC hdc, RECT &brick_rect)
 		x += 8 * scale;
 	}
 }
-//------------------------------------------------------------------------------------------------------------

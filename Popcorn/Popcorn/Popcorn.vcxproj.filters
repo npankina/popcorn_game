@@ -82,6 +82,15 @@
     <Filter Include="#Tools\Common">
       <UniqueIdentifier>{f1762cc2-9005-4d46-98cf-88374e44b5b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="#Monster">
+      <UniqueIdentifier>{9576ee43-4f30-4cf8-a883-e7d715d182a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Monster\Monsters_Set">
+      <UniqueIdentifier>{b62dd060-68d8-4899-800e-376e760539e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Monster\Monster">
+      <UniqueIdentifier>{53ae7e0f-438b-4632-a2e0-1e0ac67eb279}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -146,6 +155,12 @@
     </ClInclude>
     <ClInclude Include="Gate.hpp">
       <Filter>#Border\Gate</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster_Set.hpp">
+      <Filter>#Monster\Monsters_Set</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.hpp">
+      <Filter>#Monster\Monster</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -216,9 +231,11 @@
     <ClCompile Include="Gate.cpp">
       <Filter>#Border\Gate</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="game_development_plan.txt" />
-    <Text Include="To-do_List.txt" />
+    <ClCompile Include="Monster_Set.cpp">
+      <Filter>#Monster\Monsters_Set</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>#Monster\Monster</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

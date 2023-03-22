@@ -321,9 +321,7 @@ bool AGate::Act_For_Short_Open()
 
 	case EGate_Transformation::Init:
 		if (Gap_Height < Max_Gap_Short_Height)
-		{
 			Gap_Height += Gap_Height_Short_Step;
-		}
 		else
 		{
 			Gate_Close_Tick = AsConfig::Current_Timer_Tick + Short_Opening_Timeout;
@@ -415,4 +413,10 @@ void AGate::Redraw_Gate()
 
 	++Gate_Rect.top;
 	--Gate_Rect.bottom;
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Get_Pos(int &gate_x_pos, int &gate_y_pos)
+{
+	gate_x_pos = X_Pos;
+	gate_y_pos = (int)Origin_Y_Pos;
 }
