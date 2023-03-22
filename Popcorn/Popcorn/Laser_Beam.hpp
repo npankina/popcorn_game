@@ -9,7 +9,7 @@ enum class ELaser_Beam_State: unsigned char
 	Cleanup
 };
 //------------------------------------------------------------------------------------------------------------
-class ALaser_Beam: public AMover, public AGraphics_Object
+class ALaser_Beam: public AGame_Object
 {
 public:
 	ALaser_Beam();

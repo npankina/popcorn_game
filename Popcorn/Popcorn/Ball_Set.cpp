@@ -1,47 +1,5 @@
 #include "Ball_Set.hpp"
 
-// AsBall_Set
-//------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Begin_Movement()
-{
-	int i;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-		Balls[i].Begin_Movement();
-}
-//------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Finish_Movement()
-{
-	int i;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-		Balls[i].Finish_Movement();
-}
-//------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Advance(double max_speed)
-{
-	int i;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-		Balls[i].Advance(max_speed);
-}
-//------------------------------------------------------------------------------------------------------------
-double AsBall_Set::Get_Speed()
-{
-	int i;
-	double curr_speed, max_speed = 0.0;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-	{
-		curr_speed = Balls[i].Get_Speed();
-
-		if (curr_speed > max_speed)
-			max_speed = curr_speed;
-	}
-
-	return max_speed;
-}
-//------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Act()
 {
 	int i;
@@ -55,27 +13,6 @@ void AsBall_Set::Act()
 			if (curr_ball->Release_Timer_Tick != 0 && AsConfig::Current_Timer_Tick >= curr_ball->Release_Timer_Tick)
 				curr_ball->Release();
 	}
-}
-//------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Clear(HDC hdc, RECT &paint_area)
-{
-	int i;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-		Balls[i].Clear(hdc, paint_area);
-}
-//------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Draw(HDC hdc, RECT &paint_area)
-{
-	int i;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-		Balls[i].Draw(hdc, paint_area);
-}
-//------------------------------------------------------------------------------------------------------------
-bool AsBall_Set::Is_Finished()
-{
-	return false;  // Заглушка, т.к. этот метод не используется
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Release_From_Platform(double platform_x_pos)
@@ -285,3 +222,11 @@ void AsBall_Set::On_Platform_Advance(double direction, double platform_speed, do
 	}
 }
 //------------------------------------------------------------------------------------------------------------
+bool AsBall_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
+{
+	if (index < 0 || index >= AsConfig::Max_Balls_Count)
+		return false;
+
+	*game_obj = &Balls[index++]; //  в указатель помещается адрес объекта, index по ссылке инкрементируется
+	return true;
+}

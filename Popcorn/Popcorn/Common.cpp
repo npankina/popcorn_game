@@ -145,3 +145,84 @@ HBRUSH AColor::Get_Brush() const
 {
 	return Brush;
 }
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
+// AsGame_Objects_Set
+void AsGame_Objects_Set::Begin_Movement()
+{
+	int index = 0;
+	AGame_Object *object;
+
+	while (Get_Next_Game_Object(index, &object) )
+		object->Begin_Movement();
+}
+//------------------------------------------------------------------------------------------------------------
+void AsGame_Objects_Set::Finish_Movement()
+{
+	int index = 0;
+	AGame_Object *object;
+
+	while (Get_Next_Game_Object(index, &object) )
+		object->Finish_Movement();
+}
+//------------------------------------------------------------------------------------------------------------
+void AsGame_Objects_Set::Advance(double max_speed)
+{
+	int index = 0;
+	AGame_Object *object;
+
+	while (Get_Next_Game_Object(index, &object) )
+		object->Advance(max_speed);
+}
+//------------------------------------------------------------------------------------------------------------
+double AsGame_Objects_Set::Get_Speed()
+{
+	int index = 0;
+	AGame_Object *object;
+	double curr_speed, max_speed = 0.0;
+
+	while (Get_Next_Game_Object(index, &object) )
+	{
+		curr_speed = object->Get_Speed();
+
+		if (curr_speed > max_speed)
+			max_speed = curr_speed;
+	}
+
+	return max_speed;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsGame_Objects_Set::Act()
+{
+	int index = 0;
+	AGame_Object *object;
+
+	while (Get_Next_Game_Object(index, &object) )
+		object->Act();
+}
+//------------------------------------------------------------------------------------------------------------
+void AsGame_Objects_Set::Clear(HDC hdc, RECT &paint_area)
+{
+	int index = 0;
+	AGame_Object *object;
+
+	while (Get_Next_Game_Object(index, &object) )
+		object->Clear(hdc, paint_area);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsGame_Objects_Set::Draw(HDC hdc, RECT &paint_area)
+{
+	int index = 0;
+	AGame_Object *object;
+
+	while (Get_Next_Game_Object(index, &object) )
+		object->Draw(hdc, paint_area);
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsGame_Objects_Set::Is_Finished()
+{
+	return false;  // Заглушка, т.к. этот метод не используется (мы можем проверить это состояние разве что у элементарного объекта, но не у всей коллекции)
+}

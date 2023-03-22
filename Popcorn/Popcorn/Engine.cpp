@@ -3,7 +3,7 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(AsConfig::Initial_Life_Count), Movers{}, Modules{}
+: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(AsConfig::Initial_Life_Count), Modules{}
 {
 	//memset(Movers, 0, sizeof(Movers) );
 	//memset(Modules, 0, sizeof(Modules) );
@@ -12,6 +12,7 @@ AsEngine::AsEngine()
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Init_Engine(HWND hwnd)
 {// Настройка игры при старте
+	int index;
 
 	SYSTEMTIME sys_time;
 	FILETIME file_time;
@@ -48,19 +49,22 @@ void AsEngine::Init_Engine(HWND hwnd)
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 
 	// Movers
-	memset(Movers, 0, sizeof(Movers) );
+	/*memset(Movers, 0, sizeof(Movers) );
 	Movers[0] = &Platform;
 	Movers[1] = &Ball_Set;
-	Movers[2] = &Laser_Beam_Set;
+	Movers[2] = &Laser_Beam_Set;*/
 
 
 	// Modules
 	memset(Modules, 0, sizeof(Modules) );
-	Modules[0] = &Level;
-	Modules[1] = &Border;
-	Modules[2] = &Platform;
-	Modules[3] = &Ball_Set;
-	Modules[4] = &Laser_Beam_Set;
+	index = 0;
+
+	Add_Next_Module(index, &Level);
+	Add_Next_Module(index, &Border);
+	Add_Next_Module(index, &Platform);
+	Add_Next_Module(index, &Ball_Set);
+	Add_Next_Module(index, &Laser_Beam_Set);
+
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
@@ -172,11 +176,11 @@ void AsEngine::Advance_Movers()
 	// 1. Получаем максимальную скорость движущихся объектов
 	for (i = 0; i < AsConfig::Max_Movers_Count; i++)
 	{
-		if (Movers[i] != 0)
+		if (Modules[i] != 0)
 		{
-			Movers[i]->Begin_Movement();
+			Modules[i]->Begin_Movement();
 
-			curr_speed = fabs(Movers[i]->Get_Speed() );
+			curr_speed = fabs(Modules[i]->Get_Speed() );
 
 			if (curr_speed > max_speed)
 				max_speed = curr_speed;
@@ -189,8 +193,8 @@ void AsEngine::Advance_Movers()
 	while (Rest_Distance > 0.0)
 	{
 		for (i = 0; i < AsConfig::Max_Movers_Count; i++)
-			if (Movers[i] != 0)
-				Movers[i]->Advance(max_speed);
+			if (Modules[i] != 0)
+				Modules[i]->Advance(max_speed);
 
 		//Platform.Advance(max_speed);
 		Rest_Distance -= AsConfig::Moving_Step_Size;
@@ -198,8 +202,8 @@ void AsEngine::Advance_Movers()
 
 	// 3. Заканчиваем все движения на этом кадре
 	for (i = 0; i < AsConfig::Max_Movers_Count; i++)
-		if (Movers[i] != 0)
-			Movers[i]->Finish_Movement();
+		if (Modules[i] != 0)
+			Modules[i]->Finish_Movement();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Act()
@@ -285,3 +289,10 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 
 }
 //------------------------------------------------------------------------------------------------------------
+void AsEngine::Add_Next_Module(int &index, AGame_Object *game_obj)
+{
+	if (index >= 0 && index < AsConfig::Max_Modules_Count)
+		Modules[index++] = game_obj;
+	else 
+		AsConfig::Throw();
+}

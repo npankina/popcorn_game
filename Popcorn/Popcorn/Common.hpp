@@ -71,3 +71,25 @@ private:
 	HPEN Pen;
 	HBRUSH Brush;
 };
+//------------------------------------------------------------------------------------------------------------
+class AGame_Object : public AMover, public AGraphics_Object
+{
+};
+//------------------------------------------------------------------------------------------------------------
+class AsGame_Objects_Set: public AGame_Object
+{
+public:
+	virtual void Begin_Movement();
+	virtual void Finish_Movement();
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+protected:
+	virtual bool Get_Next_Game_Object(int &index, AGame_Object **game_obj) = 0; // iterator
+};

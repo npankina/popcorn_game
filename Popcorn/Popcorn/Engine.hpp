@@ -33,15 +33,13 @@ public:
 	int On_Key(EKey_Type key_type, bool key_down);
 	int On_Timer();
 
-
-
 private:
-
 	void Play_Level();
 	void Advance_Movers();
 	void Act();
 	void On_Falling_Letter(AFalling_Letter *falling_letter);
 	void Restart_Level();
+	void Add_Next_Module(int &index, AGame_Object *game_obj);
 
 	EGame_State Game_State;
 	double Rest_Distance;
@@ -53,6 +51,8 @@ private:
 	AsBall_Set Ball_Set;
 	AsLaser_Beam_Set Laser_Beam_Set;
 
-	AMover *Movers[AsConfig::Max_Movers_Count];  // UNO; Движущиеся в данный момент объекты
-	AGraphics_Object *Modules[AsConfig::Max_Modules_Count];  // UNO; Главные графические объекты (модули) игры
+	//AMover *Movers[AsConfig::Max_Movers_Count];  // UNO; Движущиеся в данный момент объекты
+	//AGraphics_Object *Modules[AsConfig::Max_Modules_Count];  // UNO; Главные графические объекты (модули) игры
+	
+	AGame_Object *Modules[AsConfig::Max_Modules_Count]; // UNO Главные графические объекты игры
 };
