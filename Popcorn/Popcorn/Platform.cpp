@@ -54,13 +54,13 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	return false;
 
 _on_hit:
-	if (ball->Get_State() == EBS_On_Parachute)
-		ball->Set_State(EBS_Off_Parachute);
+	if (ball->Get_State() == EBall_State::On_Parachute)
+		ball->Set_State(EBall_State::Off_Parachute);
 
 	if (Platform_State == EPlatform_State::Glue && Platform_State.Glue == EPlatform_Transformation::Active)
 	{
 		ball->Get_Center(ball_x, ball_y);
-		ball->Set_State(EBS_On_Platform, ball_x, ball_y);
+		ball->Set_State(EBall_State::On_Platform, ball_x, ball_y);
 	}
 
 	return true;
@@ -397,8 +397,8 @@ void AsPlatform::Redraw_Platform()
 	if (Platform_State == EPlatform_State::Meltdown)
 		Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1) * AsConfig::Global_Scale;
 
-	AsConfig::Invalidate_Rect(Prev_Platform_Rect);
-	AsConfig::Invalidate_Rect(Platform_Rect);
+	AsTools::Invalidate_Rect(Prev_Platform_Rect);
+	AsTools::Invalidate_Rect(Platform_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Move(bool to_left, bool key_down)
@@ -581,7 +581,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	inner_rect.right = (int)( (x + 4 + Inner_Width - 1) * d_scale);
 	inner_rect.bottom = (y + 1 + 5) * scale;
 
-	AsConfig::Round_Rect(hdc, inner_rect, 3);
+	AsTools::Round_Rect(hdc, inner_rect, 3);
 
 	if (Normal_Platform_Image == 0 && Has_State(EPlatform_Substate_Regular::Ready) )
 		Get_Normal_Platform_Image(hdc);
@@ -626,7 +626,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 
 		++moved_columns_count;
 
-		y_offset = AsConfig::Rand(Meltdown_Speed) + 1;
+		y_offset = AsTools::Rand(Meltdown_Speed) + 1;
 		x = Platform_Rect.left + i;
 
 		j = 0;

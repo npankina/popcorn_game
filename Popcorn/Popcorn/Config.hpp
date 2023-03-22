@@ -1,16 +1,10 @@
 ﻿#pragma once
-#include "Tools.hpp"
+#include "Common.hpp"
 
 class AsConfig
 {
 public:
-	static int Rand(int range);
-	static void Round_Rect(HDC hdc, RECT &rect, int corner_radius = 2);
-	static void Invalidate_Rect(RECT &rect);
-	static void Rect(HDC hdc, RECT &rect, const AColor color);
-	static void Rect(HDC hdc, int x, int y, int width, int height, const AColor color);
 	static void Throw();
-
 
 	static bool Level_Has_Floor;
 	static int Current_Timer_Tick;
@@ -60,4 +54,14 @@ public:
 	static const int Platform_Normal_Inner_Width = Platform_Normal_Width - Platform_Circle_Size;
 
 	static const int Gates_Number = 8;
+};
+//------------------------------------------------------------------------------------------------------------
+class AsTools
+{
+public:
+	static int Rand(int range);
+	static void Round_Rect(HDC hdc, RECT &rect, int corner_radius = 2);
+	static void Invalidate_Rect(RECT &rect);
+	static void Rect(HDC hdc, RECT &rect, const AColor color);
+	static void Rect(HDC hdc, int x, int y, int width, int height, const AColor color);
 };

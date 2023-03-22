@@ -139,6 +139,7 @@
     <ClInclude Include="Engine.hpp" />
     <ClInclude Include="Falling_Letter.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Gate.hpp" />
     <ClInclude Include="Laser_Beam.hpp" />
     <ClInclude Include="Laser_Beam_Set.hpp" />
     <ClInclude Include="Level.hpp" />
@@ -150,7 +151,7 @@
     <ClInclude Include="Platform_State.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Tools.hpp" />
+    <ClInclude Include="Common.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Active_Brick.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Falling_Letter.cpp" />
+    <ClCompile Include="Gate.cpp" />
     <ClCompile Include="Laser_Beam.cpp" />
     <ClCompile Include="Laser_Beam_Set.cpp" />
     <ClCompile Include="Level.cpp" />
@@ -169,7 +171,7 @@
     <ClCompile Include="Platform_Glue.cpp" />
     <ClCompile Include="Platform_Laser.cpp" />
     <ClCompile Include="Platform_State.cpp" />
-    <ClCompile Include="Tools.cpp" />
+    <ClCompile Include="Common.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Popcorn.rc" />

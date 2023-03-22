@@ -1,16 +1,16 @@
 ﻿#pragma once
 #include "Config.hpp"
 
-enum EBall_State
+enum class EBall_State : unsigned char
 {
-	EBS_Disabled,  // Отключён (не рисуется, не перемещается и не взаимодействует)
+	Disabled,  // Отключён (не рисуется, не перемещается и не взаимодействует)
 
-	EBS_Normal,
-	EBS_Lost,
-	EBS_On_Platform,
-	EBS_On_Parachute,
-	EBS_Off_Parachute,
-	EBS_Teleporting
+	Normal,
+	Lost,
+	On_Platform,
+	On_Parachute,
+	Off_Parachute,
+	Teleporting
 
 };
 //------------------------------------------------------------------------------------------------------------

@@ -265,7 +265,7 @@ void AsPlatform_Laser::Draw_Expanding_Figure(HDC hdc, EFigure_type figure_type, 
 		rect.right = rect.left + width;
 		rect.bottom = rect.top + height + 1;
 
-		AsConfig::Round_Rect(hdc, rect, 3);
+		AsTools::Round_Rect(hdc, rect, 3);
 		break;
 
 	default:

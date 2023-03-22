@@ -106,8 +106,8 @@ void ALaser_Beam::Redraw_Beam()
 	Beam_Rect.right = Beam_Rect.left + Width * AsConfig::Global_Scale;
 	Beam_Rect.bottom = Beam_Rect.top + Height * AsConfig::Global_Scale;
 
-	AsConfig::Invalidate_Rect(Beam_Rect);
-	AsConfig::Invalidate_Rect(Prev_Beam_Rect);
+	AsTools::Invalidate_Rect(Beam_Rect);
+	AsTools::Invalidate_Rect(Prev_Beam_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void ALaser_Beam::Set_At(double x, double y)

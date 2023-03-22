@@ -31,44 +31,46 @@ const double AsConfig::Normal_Ball_Speed = 3.0;
 const double AsConfig::Min_Ball_Angle = M_PI / 8.0;
 
 //------------------------------------------------------------------------------------------------------------
-int AsConfig::Rand(int range)
+void AsConfig::Throw()
+{
+	throw 22;
+}
+//------------------------------------------------------------------------------------------------------------
+int AsTools::Rand(int range)
 {// Вычисляет псевдослучайное число в диапазоне [0, .. range - 1]
 
 	return rand() * range / RAND_MAX;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsConfig::Round_Rect(HDC hdc, RECT &rect, int corner_radius)
+void AsTools::Round_Rect(HDC hdc, RECT &rect, int corner_radius)
 {
 	int radius = corner_radius * AsConfig::Global_Scale;
 	RoundRect(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1, radius, radius);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsConfig::Invalidate_Rect(RECT &rect)
+void AsTools::Invalidate_Rect(RECT &rect)
 {
-	InvalidateRect(Hwnd, &rect, FALSE);
+	InvalidateRect(AsConfig::Hwnd, &rect, FALSE);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsConfig::Rect(HDC hdc, RECT &rect, const AColor color)
+void AsTools::Rect(HDC hdc, RECT &rect, const AColor color)
 {
 	color.Select(hdc);
 	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsConfig::Rect(HDC hdc, int x, int y, int width, int height, const AColor color)
+void AsTools::Rect(HDC hdc, int x, int y, int width, int height, const AColor color)
 {
 	RECT rect{};
 
-	rect.left = x * Global_Scale;
-	rect.top = y * Global_Scale;
-	rect.right = rect.left + width * Global_Scale;
-	rect.bottom = rect.top + height * Global_Scale;
+	const int scale = AsConfig::Global_Scale;
+
+	rect.left = x * scale;
+	rect.top = y * scale;
+	rect.right = rect.left + width * scale;
+	rect.bottom = rect.top + height * scale;
 
 	color.Select(hdc);
 	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
-}
-//------------------------------------------------------------------------------------------------------------
-void AsConfig::Throw()
-{
-	throw 22;
 }
 //------------------------------------------------------------------------------------------------------------

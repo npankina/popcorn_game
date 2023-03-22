@@ -3,7 +3,7 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-: Game_State(EGS_Lost_Ball), Rest_Distance(0.0), Life_Count(AsConfig::Initial_Life_Count), Movers{}, Modules{}
+: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(AsConfig::Initial_Life_Count), Movers{}, Modules{}
 {
 	//memset(Movers, 0, sizeof(Movers) );
 	//memset(Modules, 0, sizeof(Modules) );
@@ -37,7 +37,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	Level.Set_Current_Level(AsLevel::Level_01);
 
-	//Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
+	//Ball.Set_State(EBall_State::Normal, Platform.X_Pos + Platform.Width / 2);
 	//Platform.Set_State(EPS_Normal);
 	//Platform.Set_State(EPlatform_State::Expanding);
 	//Platform.Set_State(EPlatform_State::Laser);
@@ -83,17 +83,17 @@ int AsEngine::On_Key(EKey_Type key_type, bool key_down)
 
 	switch (key_type)
 	{
-	case EKT_Left:
+	case EKey_Type::Left:
 		Platform.Move(true, key_down);
 		break;
 
 
-	case EKT_Right:
+	case EKey_Type::Right:
 		Platform.Move(false, key_down);
 		break;
 
 
-	case EKT_Space:
+	case EKey_Type::Space:
 		Platform.On_Space_Key(key_down);
 		break;
 	}
@@ -105,7 +105,7 @@ void AsEngine::Restart_Level()
 {
 	Border.Open_Gate(7, true);
 	Border.Open_Gate(5, false);
-	Game_State = EGS_Restart_Level;
+	Game_State = EGame_State::Restart_Level;
 }
 //------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Timer()
@@ -114,28 +114,28 @@ int AsEngine::On_Timer()
 
 	switch (Game_State)
 	{
-	case EGS_Test_Ball:
+	case EGame_State::Test_Ball:
 
 		Ball_Set.Set_For_Test();
-		Game_State = EGS_Play_Level;
+		Game_State = EGame_State::Play_Level;
 		break;
 
 
-	case EGS_Play_Level:
+	case EGame_State::Play_Level:
 		Play_Level();
 		break;
 
 
-	case EGS_Lost_Ball:
+	case EGame_State::Lost_Ball:
 		if (Platform.Has_State(EPlatform_Substate_Regular::Missing) )
 			Restart_Level();
 		break;
 
 
-	case EGS_Restart_Level:
+	case EGame_State::Restart_Level:
 		if (Platform.Has_State(EPlatform_Substate_Regular::Ready) )
 		{
-			Game_State = EGS_Play_Level;
+			Game_State = EGame_State::Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos() );
 		}
 		break;
@@ -153,7 +153,7 @@ void AsEngine::Play_Level()
 	if (Ball_Set.All_Balls_Are_Lost() )
 	{// Потеряли все мячики
 
-		Game_State = EGS_Lost_Ball;
+		Game_State = EGame_State::Lost_Ball;
 		Level.Stop();
 		Platform.Set_State(EPlatform_State::Meltdown);
 	}
@@ -161,7 +161,7 @@ void AsEngine::Play_Level()
 		Ball_Set.Accelerate();
 
 	if (Ball_Set.Is_Test_Finished() )
-		Game_State = EGS_Test_Ball;
+		Game_State = EGame_State::Test_Ball;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Advance_Movers()
@@ -220,7 +220,7 @@ void AsEngine::Act()
 	}
 
 	// 3. Перезапуск уровня если надо
-	if (Game_State == EGS_Restart_Level)
+	if (Game_State == EGame_State::Restart_Level)
 		if (Border.Is_Gate_Open(AsConfig::Gates_Number - 1) ) // 
 			Platform.Set_State(EPlatform_State::Rolling);
 }
@@ -229,46 +229,46 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 {
 	switch (falling_letter->Letter_Type)
 	{
-	case ELT_O:  // "Отмена"
+	case ELetter_Type::O:  // "Отмена"
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;  //!!! Пока отменяется только клей!
 
-	case ELT_I:  // "Инверсия"
+	case ELetter_Type::I:  // "Инверсия"
 		Ball_Set.Inverse_Balls();
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
-	case ELT_C:  // "Скорость"
+	case ELetter_Type::C:  // "Скорость"
 		Ball_Set.Reset_Speed();
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
-	//case ELT_M:  // "Монстры"
+	//case ELetter_Type::M:  // "Монстры"
 
-	case ELT_G:  // "Жизнь"
+	case ELetter_Type::G:  // "Жизнь"
 		if (Life_Count < AsConfig::Max_Life_Count)
 			++Life_Count;  //!!! Отобразить на индикаторе!
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
-	case ELT_K:  // "Клей"
+	case ELetter_Type::K:  // "Клей"
 		Platform.Set_State(EPlatform_State::Glue);
 		break;
 
-	case ELT_W:  // "Шире"
+	case ELetter_Type::W:  // "Шире"
 		Platform.Set_State(EPlatform_State::Expanding);
 		break;
 
-	case ELT_T:  // "Три"
+	case ELetter_Type::T:  // "Три"
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		Ball_Set.Triple_Balls();
 		break;
 
-	case ELT_L:  // "Лазер"
+	case ELetter_Type::L:  // "Лазер"
 		Platform.Set_State(EPlatform_State::Laser);
 		break;
 
-	case ELT_P:  // "Пол"
+	case ELetter_Type::P:  // "Пол"
 		AsConfig::Level_Has_Floor = true;
 		Border.Redraw_Floor();
 		//!!! Отобразить на индикаторе!
@@ -276,7 +276,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 
 		break;
 
-	//case ELT_Plus:  // Переход на следующий уровень
+	//case ELetter_Type::Plus:  // Переход на следующий уровень
 	default:
 		AsConfig::Throw();
 	}
