@@ -21,10 +21,10 @@ public:
 
 private:
 	int X_Pos, Y_Pos;
-	int Cornea_Height;
+	double Cornea_Height;
 	RECT Monster_Rect;
 
 	static const int Width = 16;
 	static const int Height = 16;
-	static const int Max_Cornea_Height = 11;
+	static const double Max_Cornea_Height;
 };

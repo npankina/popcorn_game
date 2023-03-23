@@ -23,6 +23,7 @@ const AColor AsConfig::Gun_Color(Highlight_Color, Global_Scale);
 const AColor AsConfig::Monster_Dark_Red_Color(153, 17, 153);
 const AColor AsConfig::Monster_Cornea_Color(BG_Color, White_Color, 2);
 const AColor AsConfig::Monster_Iris_Color(BG_Color, Blue_Color, 2);
+const AColor AsConfig::BG_Outcome_Color(BG_Color, 2);
 
 
 HWND AsConfig::Hwnd;

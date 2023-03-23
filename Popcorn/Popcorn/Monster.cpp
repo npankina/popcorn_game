@@ -1,5 +1,6 @@
 #include "Monster.hpp"
 
+const double AMonster::Max_Cornea_Height = 11.0;
 
 AMonster::AMonster()
 : X_Pos(0), Y_Pos(0), Cornea_Height(Max_Cornea_Height), Is_Active(false), Monster_Rect{}
@@ -33,7 +34,7 @@ void AMonster::Clear(HDC hdc, RECT &paint_area)
 void AMonster::Draw(HDC hdc, RECT &paint_area)
 {
 	const int scale = AsConfig::Global_Scale;
-	RECT intersection_rect{}, rect{};
+	RECT intersection_rect{}, rect{}, cornea_rect{};
 	HRGN region{};
 
 	if (!Is_Active)
@@ -62,18 +63,25 @@ void AMonster::Draw(HDC hdc, RECT &paint_area)
 
 	AsTools::Ellipse(hdc, rect, AsConfig::Red_Color);
 
+	SelectClipRgn(hdc, 0);
+	DeleteObject(region);
+
 	// Рисуем глаз
 	// 2.1. Роговица
-	rect = Monster_Rect;
+	cornea_rect = Monster_Rect;
 
-	rect.left += scale;
-	rect.top += 2 * scale;
-	rect.right -= scale;
-	rect.bottom = rect.top + Cornea_Height * scale;
+	cornea_rect.left += scale;
+	cornea_rect.top += 2 * scale + (int)( (Max_Cornea_Height / 2.0 - Cornea_Height / 2.0) * AsConfig::D_Global_Scale);
+	cornea_rect.right -= scale;
+	cornea_rect.bottom = cornea_rect.top + Cornea_Height * scale;
 
-	AsTools::Ellipse(hdc, rect, AsConfig::Monster_Cornea_Color);
+	// 2.3. Ограничиваем вывод внутренней части
+	region = CreateEllipticRgnIndirect(&cornea_rect);
+	SelectClipRgn(hdc, region);
+
+	AsTools::Ellipse(hdc, cornea_rect, AsConfig::Monster_Cornea_Color);
 	
-	// 2.2. Радужка
+	// 2.3. Радужка
 	rect = Monster_Rect;
 
 	rect.left += 4 * scale;
@@ -83,7 +91,7 @@ void AMonster::Draw(HDC hdc, RECT &paint_area)
 
 	AsTools::Ellipse(hdc, rect, AsConfig::Monster_Iris_Color);
 
-	// 2.3. Зрачок
+	// 2.4. Зрачок
 	rect = Monster_Rect;
 
 	rect.left += 7 * scale;
@@ -95,6 +103,11 @@ void AMonster::Draw(HDC hdc, RECT &paint_area)
 
 	SelectClipRgn(hdc, 0); // снятие региона обрезки
 	DeleteObject(region); // удаление региона обрезки
+
+	// 2.5. Обводим роговицу
+	AsConfig::BG_Outcome_Color.Select(hdc);
+
+	Arc(hdc, cornea_rect.left, cornea_rect.top, cornea_rect.right - 1, cornea_rect.bottom - 1, 0, 0, 0, 0);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AMonster::Is_Finished()
