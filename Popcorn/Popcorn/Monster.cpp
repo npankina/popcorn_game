@@ -1,9 +1,20 @@
 #include "Monster.hpp"
 
 const double AMonster::Max_Cornea_Height = 11.0;
-
+const double AMonster::Blink_Timeouts[Blink_Stages_Count] = {0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5};
+const EEye_State AMonster::Blinks_States[Blink_Stages_Count] = 
+{
+	EEye_State::Closed, 
+	EEye_State::Opening, 
+	EEye_State::Staring, 
+	EEye_State::Closing,
+	EEye_State::Opening, 
+	EEye_State::Staring, 
+	EEye_State::Closing
+};
+//------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-: X_Pos(0), Y_Pos(0), Cornea_Height(Max_Cornea_Height), Is_Active(false), Monster_Rect{}
+: X_Pos(0), Y_Pos(0), Cornea_Height(Max_Cornea_Height), Is_Active(false), Monster_Rect{}, Eye_State(EEye_State::Closed)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement()

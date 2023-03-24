@@ -1,6 +1,14 @@
 #pragma once
 #include "Config.hpp"
 
+enum class EEye_State : unsigned char
+{
+	Closed,
+	Opening,
+	Staring,
+	Closing
+};
+
 class AMonster: public AGame_Object
 {
 public:
@@ -23,8 +31,12 @@ private:
 	int X_Pos, Y_Pos;
 	double Cornea_Height;
 	RECT Monster_Rect;
+	EEye_State Eye_State;
 
 	static const int Width = 16;
 	static const int Height = 16;
+	static const int Blink_Stages_Count = 7;
 	static const double Max_Cornea_Height;
+	static const double Blink_Timeouts[Blink_Stages_Count];
+	static const EEye_State Blinks_States[Blink_Stages_Count];
 };
