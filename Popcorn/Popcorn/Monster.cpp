@@ -2,19 +2,13 @@
 
 const double AMonster::Max_Cornea_Height = 11.0;
 const double AMonster::Blink_Timeouts[Blink_Stages_Count] = {0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5};
-const EEye_State AMonster::Blinks_States[Blink_Stages_Count] = 
-{
-	EEye_State::Closed, 
-	EEye_State::Opening, 
-	EEye_State::Staring, 
-	EEye_State::Closing,
-	EEye_State::Opening, 
-	EEye_State::Staring, 
-	EEye_State::Closing
-};
+const EEye_State AMonster::Blinks_States[Blink_Stages_Count] = {
+	EEye_State::Closed, EEye_State::Opening, EEye_State::Staring, EEye_State::Closing,
+						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing};
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-: X_Pos(0), Y_Pos(0), Cornea_Height(Max_Cornea_Height), Is_Active(false), Monster_Rect{}, Eye_State(EEye_State::Closed)
+: X_Pos(0), Y_Pos(0), Start_Blink_Timeout(0), Cornea_Height(Max_Cornea_Height), Is_Active(false), Monster_Rect{}, 
+  Eye_State(EEye_State::Closed), Blink_Ticks{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement()
@@ -35,12 +29,10 @@ double AMonster::Get_Speed()
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Act()
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Clear(HDC hdc, RECT &paint_area)
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Draw(HDC hdc, RECT &paint_area)
 {
@@ -129,6 +121,8 @@ bool AMonster::Is_Finished()
 void AMonster::Activate(int x_pos, int y_pos)
 {
 	const int scale = AsConfig::Global_Scale;
+	double current_timeout = 0.0;
+	int tick_offset;
 	Is_Active = true;
 
 	X_Pos = x_pos;
@@ -138,4 +132,14 @@ void AMonster::Activate(int x_pos, int y_pos)
 	Monster_Rect.top = Y_Pos * scale;
 	Monster_Rect.right = Monster_Rect.left + Width * scale;
 	Monster_Rect.bottom = Monster_Rect.top + Height * scale;
+
+	// Рассчитываем тики таймера для анимации монстров
+
+	Start_Blink_Timeout;
+	for (int i = 0; i < Blink_Stages_Count; i++)
+	{
+		current_timeout += Blink_Timeouts[i];
+		tick_offset = (int)((double)AsConfig::FPS * current_timeout);
+		Blink_Ticks[i] = tick_offset;
+	}
 }

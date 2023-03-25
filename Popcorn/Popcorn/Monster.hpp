@@ -29,6 +29,7 @@ public:
 
 private:
 	int X_Pos, Y_Pos;
+	int Start_Blink_Timeout;
 	double Cornea_Height;
 	RECT Monster_Rect;
 	EEye_State Eye_State;
@@ -39,4 +40,6 @@ private:
 	static const double Max_Cornea_Height;
 	static const double Blink_Timeouts[Blink_Stages_Count];
 	static const EEye_State Blinks_States[Blink_Stages_Count];
+	
+	int Blink_Ticks[Blink_Stages_Count];
 };
