@@ -7,8 +7,8 @@ const EEye_State AMonster::Blinks_States[Blink_Stages_Count] = {
 						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing};
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-: X_Pos(0), Y_Pos(0), Start_Blink_Timeout(0), Cornea_Height(Max_Cornea_Height), Is_Active(false), Monster_Rect{}, 
-  Eye_State(EEye_State::Closed), Blink_Ticks{}
+: X_Pos(0), Y_Pos(0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height), Is_Active(false),
+  Eye_State(EEye_State::Closed), Monster_Rect{}, Blink_Ticks{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement()
@@ -29,7 +29,46 @@ double AMonster::Get_Speed()
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Act()
-{}
+{
+	int current_tick_offset, prev_tick;
+
+	double ratio;
+
+	if (!Is_Active)
+		return;
+
+	current_tick_offset = (AsConfig::Current_Timer_Tick - Start_Blink_Timeout) % Total_Animation_Timeout;
+
+	for (i = 0; i < Blink_Stages_Count; i++)
+		if (current_tick_offset < Blink_Ticks[i])
+		{
+			Eye_State = Blinks_States[i];
+			break;
+		}
+
+	if (i == 0)
+		prev_tick = 0;
+	else:
+		prev_tick = Blink_Ticks[i-1];
+	ratio = current_tick_offset - prev_tick;
+
+	switch(Eye_State)
+	{
+	case EEye_State::Closed:
+		Cornea_Height = 0.0;
+		break;
+
+	case EEye_State::Opening:
+		Cornea_Height = Max_Cornea_Height * ratio;
+		break;
+
+	case EEye_State::Staring:
+		break;
+
+	case EEye_State::Closing:
+		break;
+	}
+}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Clear(HDC hdc, RECT &paint_area)
 {}
@@ -135,11 +174,14 @@ void AMonster::Activate(int x_pos, int y_pos)
 
 	// Рассчитываем тики таймера для анимации монстров
 
-	Start_Blink_Timeout;
+	Start_Blink_Timeout = AsConfig::Current_Timer_Tick;
+
 	for (int i = 0; i < Blink_Stages_Count; i++)
 	{
 		current_timeout += Blink_Timeouts[i];
 		tick_offset = (int)((double)AsConfig::FPS * current_timeout);
 		Blink_Ticks[i] = tick_offset;
 	}
+
+	Total_Animation_Timeout = tick_offset;
 }

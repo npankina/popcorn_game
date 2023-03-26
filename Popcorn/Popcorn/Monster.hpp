@@ -30,9 +30,11 @@ public:
 private:
 	int X_Pos, Y_Pos;
 	int Start_Blink_Timeout;
+	int Total_Animation_Timeout;
 	double Cornea_Height;
-	RECT Monster_Rect;
 	EEye_State Eye_State;
+	RECT Monster_Rect;
+
 
 	static const int Width = 16;
 	static const int Height = 16;
