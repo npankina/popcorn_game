@@ -1,7 +1,7 @@
 #include "Monster.hpp"
 
 const double AMonster::Max_Cornea_Height = 11.0;
-const double AMonster::Blink_Timeouts[Blink_Stages_Count] = {0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5};
+const double AMonster::Blink_Timeouts[Blink_Stages_Count] = {0.4, 0.3, 0.8, 0.4, 0.4, 0.4, 0.8};
 const EEye_State AMonster::Blinks_States[Blink_Stages_Count] = {
 	EEye_State::Closed, EEye_State::Opening, EEye_State::Staring, EEye_State::Closing,
 						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing};
@@ -31,7 +31,7 @@ double AMonster::Get_Speed()
 void AMonster::Act()
 {
 	int current_tick_offset, prev_tick;
-
+	int i;
 	double ratio;
 
 	if (!Is_Active)
@@ -48,9 +48,10 @@ void AMonster::Act()
 
 	if (i == 0)
 		prev_tick = 0;
-	else:
+	else
 		prev_tick = Blink_Ticks[i-1];
-	ratio = current_tick_offset - prev_tick;
+
+	ratio = (double)( (current_tick_offset - prev_tick) / (Blink_Ticks[i] - prev_tick) ); // смещение между текущим и предыдущим значение таймера от 0 до 1
 
 	switch(Eye_State)
 	{
@@ -63,11 +64,18 @@ void AMonster::Act()
 		break;
 
 	case EEye_State::Staring:
+		Cornea_Height = Max_Cornea_Height;
 		break;
 
 	case EEye_State::Closing:
+		Cornea_Height = Max_Cornea_Height * (1.0 - ratio);
 		break;
+
+	default:
+		AsConfig::Throw();
 	}
+
+	AsTools::Invalidate_Rect(Monster_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Clear(HDC hdc, RECT &paint_area)
@@ -109,6 +117,10 @@ void AMonster::Draw(HDC hdc, RECT &paint_area)
 	DeleteObject(region);
 
 	// Рисуем глаз
+	
+	if (Eye_State == EEye_State::Closed)
+		return;
+
 	// 2.1. Роговица
 	cornea_rect = Monster_Rect;
 
@@ -164,7 +176,7 @@ void AMonster::Activate(int x_pos, int y_pos)
 	int tick_offset;
 	Is_Active = true;
 
-	X_Pos = x_pos;
+	X_Pos = x_pos + 10;
 	Y_Pos = y_pos;
 
 	Monster_Rect.left = X_Pos * scale;
