@@ -9,6 +9,24 @@ enum class EEye_State : unsigned char
 	Closing
 };
 
+enum class EMonster_State : unsigned char
+{
+	Missing,
+	Alive,
+	Destroing
+};
+
+class AExplosive_Ball : public AGraphics_Object
+{
+public:
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+	void Explode(int x_pos, int y_pos, int size, int step_count);
+};
+
 class AMonster: public AGame_Object
 {
 public:
@@ -24,8 +42,9 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
-	bool Is_Active;
+	bool Is_Active();
 	void Activate(int x_pos, int y_pos);
+	void Destroy();
 
 private:
 	int X_Pos, Y_Pos;
@@ -33,15 +52,18 @@ private:
 	int Total_Animation_Timeout;
 	double Cornea_Height;
 	EEye_State Eye_State;
+	EMonster_State Monster_State;
 	RECT Monster_Rect;
 
 
 	static const int Width = 16;
 	static const int Height = 16;
 	static const int Blink_Stages_Count = 7;
+	static const int Explosive_Balls_Ñount = 10;
 	static const double Max_Cornea_Height;
 	static const double Blink_Timeouts[Blink_Stages_Count];
 	static const EEye_State Blinks_States[Blink_Stages_Count];
 	
 	int Blink_Ticks[Blink_Stages_Count];
+	AExplosive_Ball Explosive_Balls[Explosive_Balls_Ñount];
 };

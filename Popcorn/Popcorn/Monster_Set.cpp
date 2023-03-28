@@ -19,7 +19,7 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 
 	for (int i = 0; i < Max_Monsters_Count; i++)
 	{
-		if (! Monsters[i].Is_Active )
+		if (! Monsters[i].Is_Active() )
 		{
 			monster = &Monsters[i];
 			break;
@@ -32,6 +32,8 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 	Border->Get_Gate_Pos(gate_index, gate_x_pos, gate_y_pos);
 
 	monster->Activate(gate_x_pos, gate_y_pos);
+
+	monster->Destroy();
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель

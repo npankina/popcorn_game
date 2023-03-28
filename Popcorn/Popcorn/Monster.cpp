@@ -1,5 +1,25 @@
 #include "Monster.hpp"
 
+// AExplosive_Ball
+void AExplosive_Ball::Act()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AExplosive_Ball::Clear(HDC hdc, RECT &paint_area)
+{}
+//------------------------------------------------------------------------------------------------------------
+void AExplosive_Ball::Draw(HDC hdc, RECT &paint_area)
+{}
+//------------------------------------------------------------------------------------------------------------
+bool AExplosive_Ball::Is_Finished()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AExplosive_Ball::Explode(int x_pos, int y_pos, int size, int step_count)
+{}
+
+
+
+
+// AMonster
 const double AMonster::Max_Cornea_Height = 11.0;
 const double AMonster::Blink_Timeouts[Blink_Stages_Count] = {0.4, 0.3, 0.8, 0.4, 0.4, 0.4, 0.8};
 const EEye_State AMonster::Blinks_States[Blink_Stages_Count] = {
@@ -7,8 +27,8 @@ const EEye_State AMonster::Blinks_States[Blink_Stages_Count] = {
 						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing};
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-: X_Pos(0), Y_Pos(0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height), Is_Active(false),
-  Eye_State(EEye_State::Closed), Monster_Rect{}, Blink_Ticks{}
+: X_Pos(0), Y_Pos(0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
+  Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Monster_Rect{}, Blink_Ticks{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement()
@@ -34,7 +54,7 @@ void AMonster::Act()
 	int i;
 	double ratio;
 
-	if (!Is_Active)
+	if (Monster_State == EMonster_State::Missing)
 		return;
 
 	current_tick_offset = (AsConfig::Current_Timer_Tick - Start_Blink_Timeout) % Total_Animation_Timeout;
@@ -87,7 +107,7 @@ void AMonster::Draw(HDC hdc, RECT &paint_area)
 	RECT intersection_rect{}, rect{}, cornea_rect{};
 	HRGN region{};
 
-	if (!Is_Active)
+	if (Monster_State == EMonster_State::Missing)
 		return;
 
 	if (! IntersectRect(&intersection_rect, &paint_area, &Monster_Rect) )
@@ -169,12 +189,19 @@ bool AMonster::Is_Finished()
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
+bool AMonster::Is_Active()
+{
+	if (Monster_State == EMonster_State::Missing)
+		return false;
+	return true;
+}
+//------------------------------------------------------------------------------------------------------------
 void AMonster::Activate(int x_pos, int y_pos)
 {
 	const int scale = AsConfig::Global_Scale;
 	double current_timeout = 0.0;
 	int tick_offset;
-	Is_Active = true;
+	Monster_State = EMonster_State::Alive;
 
 	X_Pos = x_pos + 10;
 	Y_Pos = y_pos;
@@ -196,4 +223,12 @@ void AMonster::Activate(int x_pos, int y_pos)
 	}
 
 	Total_Animation_Timeout = tick_offset;
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Destroy()
+{
+	Monster_State == EMonster_State::Destroing;
+
+	Explosive_Balls[0].Explode(Monster_Rect.left + 20, Monster_Rect.right + 20);
+
 }
