@@ -19,12 +19,19 @@ enum class EMonster_State : unsigned char
 class AExplosive_Ball : public AGraphics_Object
 {
 public:
+	AExplosive_Ball();
+
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT &paint_area);
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
 	void Explode(int x_pos, int y_pos, int size, int step_count);
+
+private:
+	int X_Pos, Y_Pos;
+	int Size;
+	int Step_Count;
 };
 
 class AMonster: public AGame_Object
@@ -47,6 +54,9 @@ public:
 	void Destroy();
 
 private:
+	void Draw_Alive(HDC hdc);
+	void Draw_Destroing(HDC hdc);
+
 	int X_Pos, Y_Pos;
 	int Start_Blink_Timeout;
 	int Total_Animation_Timeout;

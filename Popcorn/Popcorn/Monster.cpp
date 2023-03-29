@@ -1,6 +1,10 @@
 #include "Monster.hpp"
 
 // AExplosive_Ball
+AExplosive_Ball::AExplosive_Ball()
+: X_Pos(0), Y_Pos(0),Size(0), Step_Count(0)
+{}
+//------------------------------------------------------------------------------------------------------------
 void AExplosive_Ball::Act()
 {}
 //------------------------------------------------------------------------------------------------------------
@@ -14,7 +18,12 @@ bool AExplosive_Ball::Is_Finished()
 {}
 //------------------------------------------------------------------------------------------------------------
 void AExplosive_Ball::Explode(int x_pos, int y_pos, int size, int step_count)
-{}
+{
+	X_Pos = x_pos;
+	Y_Pos = y_pos;
+	Size = size; 
+	Step_Count = step_count;
+}
 
 
 
@@ -103,15 +112,32 @@ void AMonster::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Draw(HDC hdc, RECT &paint_area)
 {
-	const int scale = AsConfig::Global_Scale;
-	RECT intersection_rect{}, rect{}, cornea_rect{};
-	HRGN region{};
-
-	if (Monster_State == EMonster_State::Missing)
-		return;
+	RECT intersection_rect{};
 
 	if (! IntersectRect(&intersection_rect, &paint_area, &Monster_Rect) )
 		return;
+
+	switch(Monster_State)
+	{
+	case EMonster_State::Missing:
+		break;
+		
+	case EMonster_State::Alive:
+		Draw_Alive(hdc);
+		break;
+
+	case EMonster_State::Destroing:
+		Draw_Destroing(hdc);
+		break;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Draw_Alive(HDC hdc)
+{
+	const int scale = AsConfig::Global_Scale;
+	RECT rect{}, cornea_rect{};
+	HRGN region{};
+
 
 	// 1. Рисуем фон
 	// 1.1. Огриничение вывода фона
@@ -229,6 +255,12 @@ void AMonster::Destroy()
 {
 	Monster_State == EMonster_State::Destroing;
 
-	Explosive_Balls[0].Explode(Monster_Rect.left + 20, Monster_Rect.right + 20);
+	Explosive_Balls[0].Explode(Monster_Rect.left + 20, Monster_Rect.right + 20, 30, 10);
 
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Draw_Destroing(HDC hdc)
+{
+	for (int i = 0; i < Explosive_Balls_Сount; i++)
+		Explosive_Balls[i].Draw();
 }
