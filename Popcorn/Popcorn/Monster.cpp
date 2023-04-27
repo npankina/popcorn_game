@@ -80,7 +80,7 @@ void AMonster::Act()
 	else
 		prev_tick = Blink_Ticks[i-1];
 
-	ratio = (double)( (current_tick_offset - prev_tick) / (Blink_Ticks[i] - prev_tick) ); // смещение между текущим и предыдущим значение таймера от 0 до 1
+	ratio = (double)( (current_tick_offset - prev_tick) / (Blink_Ticks[i] - prev_tick) ); 
 
 	switch(Eye_State)
 	{
@@ -139,19 +139,19 @@ void AMonster::Draw_Alive(HDC hdc)
 	HRGN region{};
 
 
-	// 1. Рисуем фон
-	// 1.1. Огриничение вывода фона
+	// 1. 
+	// 1.1. 
 	rect = Monster_Rect;
 	++rect.right;
 	++rect.bottom;
 
-	// 1.2. Темный фон
+	// 1.2. 
 	AsTools::Ellipse(hdc, Monster_Rect, AsConfig::Monster_Dark_Red_Color);
 
  	region = CreateEllipticRgnIndirect(&rect);
-	SelectClipRgn(hdc, region); // назначение региона обрезки
+	SelectClipRgn(hdc, region); 
 
-	// 1.3. Посветлее
+	// 1.3. 
 	rect.left -= 2 * scale;
 	rect.top -= 3 * scale;
 	rect.right -= 2 * scale;
@@ -162,12 +162,11 @@ void AMonster::Draw_Alive(HDC hdc)
 	SelectClipRgn(hdc, 0);
 	DeleteObject(region);
 
-	// Рисуем глаз
-	
+		
 	if (Eye_State == EEye_State::Closed)
 		return;
 
-	// 2.1. Роговица
+	// 2.1. 
 	cornea_rect = Monster_Rect;
 
 	cornea_rect.left += scale;
@@ -175,13 +174,13 @@ void AMonster::Draw_Alive(HDC hdc)
 	cornea_rect.right -= scale;
 	cornea_rect.bottom = cornea_rect.top + Cornea_Height * scale;
 
-	// 2.3. Ограничиваем вывод внутренней части
+	// 2.3. 
 	region = CreateEllipticRgnIndirect(&cornea_rect);
 	SelectClipRgn(hdc, region);
 
 	AsTools::Ellipse(hdc, cornea_rect, AsConfig::Monster_Cornea_Color);
 	
-	// 2.3. Радужка
+	// 2.3. 
 	rect = Monster_Rect;
 
 	rect.left += 4 * scale;
@@ -191,7 +190,7 @@ void AMonster::Draw_Alive(HDC hdc)
 
 	AsTools::Ellipse(hdc, rect, AsConfig::Monster_Iris_Color);
 
-	// 2.4. Зрачок
+	// 2.4. 
 	rect = Monster_Rect;
 
 	rect.left += 7 * scale;
@@ -201,10 +200,10 @@ void AMonster::Draw_Alive(HDC hdc)
 
 	AsTools::Rect(hdc, rect, AsConfig::BG_Color);
 
-	SelectClipRgn(hdc, 0); // снятие региона обрезки
-	DeleteObject(region); // удаление региона обрезки
+	SelectClipRgn(hdc, 0); 
+	DeleteObject(region);
 
-	// 2.5. Обводим роговицу
+	// 2.5. 
 	AsConfig::BG_Outcome_Color.Select(hdc);
 
 	Arc(hdc, cornea_rect.left, cornea_rect.top, cornea_rect.right - 1, cornea_rect.bottom - 1, 0, 0, 0, 0);
@@ -237,8 +236,6 @@ void AMonster::Activate(int x_pos, int y_pos)
 	Monster_Rect.right = Monster_Rect.left + Width * scale;
 	Monster_Rect.bottom = Monster_Rect.top + Height * scale;
 
-	// Рассчитываем тики таймера для анимации монстров
-
 	Start_Blink_Timeout = AsConfig::Current_Timer_Tick;
 
 	for (int i = 0; i < Blink_Stages_Count; i++)
@@ -261,6 +258,6 @@ void AMonster::Destroy()
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Draw_Destroing(HDC hdc)
 {
-	for (int i = 0; i < Explosive_Balls_Сount; i++)
+	for (int i = 0; i < Explosive_Balls_Count; i++)
 		Explosive_Balls[i].Draw();
 }

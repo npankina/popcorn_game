@@ -69,11 +69,11 @@ private:
 	static const int Width = 16;
 	static const int Height = 16;
 	static const int Blink_Stages_Count = 7;
-	static const int Explosive_Balls_Ñount = 10;
+	static const int Explosive_Balls_Count = 10;
 	static const double Max_Cornea_Height;
 	static const double Blink_Timeouts[Blink_Stages_Count];
 	static const EEye_State Blinks_States[Blink_Stages_Count];
 	
 	int Blink_Ticks[Blink_Stages_Count];
-	AExplosive_Ball Explosive_Balls[Explosive_Balls_Ñount];
+	AExplosive_Ball Explosive_Balls[Explosive_Balls_Count];
 };
