@@ -1,4 +1,4 @@
-﻿#include "Platform_Expanding.hpp"
+﻿#include "Platform_Expanding.h"
 
 const double AsPlatform_Expanding::Max_Expanding_Platform_Width = 40.0;
 const double AsPlatform_Expanding::Min_Expanding_Platform_Width = (double)AsConfig::Platform_Normal_Width;

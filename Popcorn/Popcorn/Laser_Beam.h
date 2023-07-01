@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Config.hpp"
+#include "Config.h"
 
 enum class ELaser_Beam_State: unsigned char
 {

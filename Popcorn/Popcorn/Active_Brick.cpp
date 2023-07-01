@@ -1,4 +1,4 @@
-#include "Active_Brick.hpp"
+#include "Active_Brick.h"
 
 // AActive_Brick
 //------------------------------------------------------------------------------------------------------------
@@ -106,8 +106,8 @@ void AActive_Brick_Red_Blue::Setup_Colors()
 
 	for (i = 0; i < Max_Fade_Step; i++)
 	{
-		Get_Fading_Color(AsConfig::Red_Color, i, Fading_Red_Brick_Colors[i]);
-		Get_Fading_Color(AsConfig::Blue_Color, i, Fading_Blue_Brick_Colors[i]);
+		AsTools::Get_Fading_Color(AsConfig::Red_Color, i, Fading_Red_Brick_Colors[i], Max_Fade_Step);
+		AsTools::Get_Fading_Color(AsConfig::Blue_Color, i, Fading_Blue_Brick_Colors[i], Max_Fade_Step);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -137,22 +137,6 @@ void AActive_Brick_Red_Blue::Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Typ
 		color->Select(hdc);
 
 	AsTools::Round_Rect(hdc, brick_rect);
-}
-//------------------------------------------------------------------------------------------------------------
-unsigned char AActive_Brick_Red_Blue::Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step)
-{
-	return color - step * (color - bg_color) / (Max_Fade_Step - 1);
-}
-//------------------------------------------------------------------------------------------------------------
-void AActive_Brick_Red_Blue::Get_Fading_Color(const AColor &origin_color, int step, AColor &result_color)
-{
-	unsigned char r, g, b;
-
-	r = Get_Fading_Channel(origin_color.R, AsConfig::BG_Color.R, step);
-	g = Get_Fading_Channel(origin_color.G, AsConfig::BG_Color.G, step);
-	b = Get_Fading_Channel(origin_color.B, AsConfig::BG_Color.B, step);
-
-	result_color = AColor(r, g, b);
 }
 //------------------------------------------------------------------------------------------------------------
 

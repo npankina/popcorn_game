@@ -1,4 +1,4 @@
-﻿#include "Gate.hpp"
+﻿#include "Gate.h"
 
 const double AGate::Max_Gap_Short_Height = 9.0;
 const double AGate::Max_Gap_Long_Height = 18.0;

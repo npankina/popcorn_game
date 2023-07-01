@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Config.hpp"
-#include "Laser_Beam.hpp"
+#include "Config.h"
+#include "Laser_Beam.h"
 
 class AsLaser_Beam_Set: public AsGame_Objects_Set
 {

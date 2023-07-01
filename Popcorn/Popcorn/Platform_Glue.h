@@ -1,6 +1,6 @@
 #pragma once
-#include "Platform_State.hpp"
-#include "Ball_Set.hpp"
+#include "Platform_State.h"
+#include "Ball_Set.h"
 
 class AsPlatform_Glue
 {

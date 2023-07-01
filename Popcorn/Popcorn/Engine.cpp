@@ -1,4 +1,4 @@
-﻿#include "Engine.hpp"
+﻿#include "Engine.h"
 
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
@@ -31,11 +31,11 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	AFalling_Letter::Init();
 
-	ABall::Hit_Checker_List.Add_Hit_Cheker(&Border);
-	ABall::Hit_Checker_List.Add_Hit_Cheker(&Level);
-	ABall::Hit_Checker_List.Add_Hit_Cheker(&Platform);
+	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
+	ABall::Hit_Checker_List.Add_Hit_Checker(&Level);
+	ABall::Hit_Checker_List.Add_Hit_Checker(&Platform);
 
-	ALaser_Beam::Hit_Checker_List.Add_Hit_Cheker(&Level);
+	ALaser_Beam::Hit_Checker_List.Add_Hit_Checker(&Level);
 
 	Level.Set_Current_Level(AsLevel::Level_01);
 
@@ -183,6 +183,7 @@ void AsEngine::Advance_Movers()
 		}
 	}
 
+
 	// 2. Смещаем все движущиеся объекты
 	Rest_Distance += max_speed;
 
@@ -195,6 +196,7 @@ void AsEngine::Advance_Movers()
 		//Platform.Advance(max_speed);
 		Rest_Distance -= AsConfig::Moving_Step_Size;
 	}
+
 
 	// 3. Заканчиваем все движения на этом кадре
 	for (i = 0; i < AsConfig::Max_Movers_Count; i++)
@@ -289,6 +291,6 @@ void AsEngine::Add_Next_Module(int &index, AGame_Object *game_obj)
 {
 	if (index >= 0 && index < AsConfig::Max_Modules_Count)
 		Modules[index++] = game_obj;
-	else 
+	else
 		AsConfig::Throw();
 }

@@ -1,4 +1,4 @@
-﻿#include "Ball.hpp"
+﻿#include "Ball.h"
 
 AHit_Checker_List ABall::Hit_Checker_List;
 const double ABall::Radius = 2.0 - 0.5 / AsConfig::Global_Scale;

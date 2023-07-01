@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Config.hpp"
+#include "Config.h"
 
 enum class EGate_State : unsigned char
 {

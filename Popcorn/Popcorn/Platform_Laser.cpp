@@ -1,4 +1,4 @@
-﻿#include "Platform_Laser.hpp"
+﻿#include "Platform_Laser.h"
 
 AsPlatform_Laser::AsPlatform_Laser(AsPlatform_State &platform_state)
 	: Platform_State(&platform_state), Laser_Beam_Set(0), Enable_Laser_Firing(false), Laser_Transformation_Step(0),

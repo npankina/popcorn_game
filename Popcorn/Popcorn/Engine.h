@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include <Windows.h>
-#include "Border.hpp"
-#include "Level.hpp"
-#include "Platform.hpp"
-#include "Ball_Set.hpp"
-#include "Monster_Set.hpp"
+#include "Border.h"
+#include "Level.h"
+#include "Platform.h"
+#include "Ball_Set.h"
+#include "Monster_Set.h"
 
 enum class EKey_Type : unsigned char
 {

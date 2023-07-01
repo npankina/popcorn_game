@@ -1,5 +1,7 @@
 ﻿#pragma once
+
 #include <Windows.h>
+
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -17,7 +19,7 @@ class AHit_Checker_List
 {
 public:
 	AHit_Checker_List();
-	bool Add_Hit_Cheker(AHit_Checker *hit_checker);
+	bool Add_Hit_Checker(AHit_Checker *hit_checker);
 	bool Check_Hit(double x_pos, double y_pos, ABall *ball);
 	bool Check_Hit(double x_pos, double y_pos);
 

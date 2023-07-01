@@ -1,6 +1,7 @@
 ﻿#pragma once
-#include "Common.hpp"
+#include "Common.h"
 
+//------------------------------------------------------------------------------------------------------------
 class AsConfig
 {
 public:
@@ -13,7 +14,7 @@ public:
 	static const AColor Unbreakable_Blue_Highlight, Unbreakable_Red_Highlight, Teleport_Portal_Color;
 	static const AColor Advertisement_Blue_Table, Advertisement_Red_Table;
 	static const AColor Platform_Inner_Color, Platform_Circle_Color, Highlight_Color, Truss_Color, Gun_Color;
-	static const AColor Monster_Dark_Red_Color, Monster_Cornea_Color, Monster_Iris_Color, BG_Outcome_Color;
+	static const AColor Monster_Dark_Red_Color, Monster_Cornea_Color, Monster_Iris_Color, BG_Outcome_Color, Explosion_Red_Color, Explosion_Blue_Color;
 	static HWND Hwnd;
 
 	static const double D_Global_Scale;
@@ -63,7 +64,9 @@ public:
 	static int Rand(int range);
 	static void Round_Rect(HDC hdc, RECT &rect, int corner_radius = 2);
 	static void Invalidate_Rect(RECT &rect);
-	static void Rect(HDC hdc, RECT &rect, const AColor color);
-	static void Rect(HDC hdc, int x, int y, int width, int height, const AColor color);
+	static void Rect(HDC hdc, RECT &rect, const AColor &color);
+	static void Rect(HDC hdc, int x, int y, int width, int height, const AColor &color);
 	static void Ellipse(HDC hdc, RECT &rect, const AColor &color);
+	static unsigned char Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step, int max_step);
+	static void Get_Fading_Color(const AColor& origin_color, int step, AColor& result_color, int max_step);
 };

@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Platform_State.hpp"
-#include "Laser_Beam_Set.hpp"
+#include "Platform_State.h"
+#include "Laser_Beam_Set.h"
 
 enum class EFigure_type: unsigned char
 {

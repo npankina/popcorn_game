@@ -1,4 +1,4 @@
-﻿#include "Config.hpp"
+﻿#include "Config.h"
 
 bool AsConfig::Level_Has_Floor = true;
 int AsConfig::Current_Timer_Tick = 0;
@@ -24,6 +24,8 @@ const AColor AsConfig::Monster_Dark_Red_Color(153, 17, 153);
 const AColor AsConfig::Monster_Cornea_Color(BG_Color, White_Color, 2);
 const AColor AsConfig::Monster_Iris_Color(BG_Color, Blue_Color, 2);
 const AColor AsConfig::BG_Outcome_Color(BG_Color, 2);
+const AColor AsConfig::Explosion_Red_Color(AsConfig::White_Color, AsConfig::Red_Color, 0);
+const AColor AsConfig::Explosion_Blue_Color(AsConfig::White_Color, AsConfig::Blue_Color, 0);
 
 
 HWND AsConfig::Hwnd;
@@ -41,6 +43,12 @@ void AsConfig::Throw()
 	throw 22;
 }
 //------------------------------------------------------------------------------------------------------------
+
+
+
+
+// AsTools
+//------------------------------------------------------------------------------------------------------------
 int AsTools::Rand(int range)
 {// Вычисляет псевдослучайное число в диапазоне [0, .. range - 1]
 
@@ -50,6 +58,7 @@ int AsTools::Rand(int range)
 void AsTools::Round_Rect(HDC hdc, RECT &rect, int corner_radius)
 {
 	int radius = corner_radius * AsConfig::Global_Scale;
+
 	RoundRect(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1, radius, radius);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -58,13 +67,13 @@ void AsTools::Invalidate_Rect(RECT &rect)
 	InvalidateRect(AsConfig::Hwnd, &rect, FALSE);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsTools::Rect(HDC hdc, RECT &rect, const AColor color)
+void AsTools::Rect(HDC hdc, RECT &rect, const AColor &color)
 {
 	color.Select(hdc);
 	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsTools::Rect(HDC hdc, int x, int y, int width, int height, const AColor color)
+void AsTools::Rect(HDC hdc, int x, int y, int width, int height, const AColor &color)
 {
 	RECT rect{};
 
@@ -84,3 +93,20 @@ void AsTools::Ellipse(HDC hdc, RECT &rect, const AColor &color)
 	color.Select(hdc);
 	::Ellipse(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
+//------------------------------------------------------------------------------------------------------------
+unsigned char AsTools::Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step, int max_step)
+{
+	return color - step * (color - bg_color) / (max_step - 1);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsTools::Get_Fading_Color(const AColor &origin_color, int step, AColor &result_color, int max_step)
+{
+	unsigned char r, g, b;
+
+	r = Get_Fading_Channel(origin_color.R, AsConfig::BG_Color.R, step, max_step);
+	g = Get_Fading_Channel(origin_color.G, AsConfig::BG_Color.G, step, max_step);
+	b = Get_Fading_Channel(origin_color.B, AsConfig::BG_Color.B, step, max_step);
+
+	result_color = AColor(r, g, b);
+}
+//------------------------------------------------------------------------------------------------------------

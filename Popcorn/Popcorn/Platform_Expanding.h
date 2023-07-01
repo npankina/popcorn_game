@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Platform_State.hpp"
+#include "Platform_State.h"
 
 class AsPlatform_Expanding
 {

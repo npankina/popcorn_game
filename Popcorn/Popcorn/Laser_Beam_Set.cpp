@@ -1,4 +1,4 @@
-﻿#include "Laser_Beam_Set.hpp"
+﻿#include "Laser_Beam_Set.h"
 
 void AsLaser_Beam_Set::Fire(double left_x_pos, double right_x_pos)
 {

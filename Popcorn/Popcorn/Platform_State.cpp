@@ -1,4 +1,4 @@
-#include "Platform_State.hpp"
+#include "Platform_State.h"
 
 AsPlatform_State::AsPlatform_State()
 : Current_State(EPlatform_State::Regular), Next_State(EPlatform_State::Unknown), Regular(EPlatform_Substate_Regular::Missing),

@@ -105,61 +105,61 @@
     <ClInclude Include="Main.hpp">
       <Filter>Main</Filter>
     </ClInclude>
-    <ClInclude Include="Engine.hpp">
+    <ClInclude Include="Engine.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Border.hpp">
+    <ClInclude Include="Border.h">
       <Filter>#Border\Border</Filter>
     </ClInclude>
-    <ClInclude Include="Level.hpp">
+    <ClInclude Include="Level.h">
       <Filter>Level</Filter>
     </ClInclude>
-    <ClInclude Include="Config.hpp">
+    <ClInclude Include="Config.h">
       <Filter>#Tools\Config</Filter>
     </ClInclude>
-    <ClInclude Include="Ball.hpp">
+    <ClInclude Include="Ball.h">
       <Filter>#Ball\Ball</Filter>
     </ClInclude>
-    <ClInclude Include="Platform.hpp">
+    <ClInclude Include="Platform.h">
       <Filter>#Platform\Platform</Filter>
     </ClInclude>
-    <ClInclude Include="Active_Brick.hpp">
+    <ClInclude Include="Active_Brick.h">
       <Filter>Active_Brick</Filter>
     </ClInclude>
-    <ClInclude Include="Falling_Letter.hpp">
+    <ClInclude Include="Falling_Letter.h">
       <Filter>Falling_Letter</Filter>
     </ClInclude>
-    <ClInclude Include="Ball_Set.hpp">
+    <ClInclude Include="Ball_Set.h">
       <Filter>#Ball\Ball_Set</Filter>
     </ClInclude>
-    <ClInclude Include="Laser_Beam.hpp">
+    <ClInclude Include="Laser_Beam.h">
       <Filter>#Laser_Beam\Laser_Beam</Filter>
     </ClInclude>
-    <ClInclude Include="Common.hpp">
+    <ClInclude Include="Common.h">
       <Filter>#Tools\Common</Filter>
     </ClInclude>
-    <ClInclude Include="Laser_Beam_Set.hpp">
+    <ClInclude Include="Laser_Beam_Set.h">
       <Filter>#Laser_Beam\Laser_Beam_Set</Filter>
     </ClInclude>
-    <ClInclude Include="Platform_State.hpp">
+    <ClInclude Include="Platform_State.h">
       <Filter>#Platform\Platform_State</Filter>
     </ClInclude>
-    <ClInclude Include="Platform_Glue.hpp">
+    <ClInclude Include="Platform_Glue.h">
       <Filter>#Platform\Platform_Glue</Filter>
     </ClInclude>
-    <ClInclude Include="Platform_Expanding.hpp">
+    <ClInclude Include="Platform_Expanding.h">
       <Filter>#Platform\Platform_Expanding</Filter>
     </ClInclude>
-    <ClInclude Include="Platform_Laser.hpp">
+    <ClInclude Include="Platform_Laser.h">
       <Filter>#Platform\Platform_Laser</Filter>
     </ClInclude>
-    <ClInclude Include="Gate.hpp">
+    <ClInclude Include="Gate.h">
       <Filter>#Border\Gate</Filter>
     </ClInclude>
-    <ClInclude Include="Monster_Set.hpp">
+    <ClInclude Include="Monster_Set.h">
       <Filter>#Monster\Monsters_Set</Filter>
     </ClInclude>
-    <ClInclude Include="Monster.hpp">
+    <ClInclude Include="Monster.h">
       <Filter>#Monster\Monster</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Ball.hpp"
-#include "Gate.hpp"
+#include "Ball.h"
+#include "Gate.h"
 
 class AsBorder: public AHit_Checker, public AGame_Object
 {

@@ -131,29 +131,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Active_Brick.hpp" />
-    <ClInclude Include="Ball.hpp" />
-    <ClInclude Include="Ball_Set.hpp" />
-    <ClInclude Include="Border.hpp" />
-    <ClInclude Include="Config.hpp" />
-    <ClInclude Include="Engine.hpp" />
-    <ClInclude Include="Falling_Letter.hpp" />
+    <ClInclude Include="Active_Brick.h" />
+    <ClInclude Include="Ball.h" />
+    <ClInclude Include="Ball_Set.h" />
+    <ClInclude Include="Border.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="Falling_Letter.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="Gate.hpp" />
-    <ClInclude Include="Laser_Beam.hpp" />
-    <ClInclude Include="Laser_Beam_Set.hpp" />
-    <ClInclude Include="Level.hpp" />
+    <ClInclude Include="Gate.h" />
+    <ClInclude Include="Laser_Beam.h" />
+    <ClInclude Include="Laser_Beam_Set.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="Main.hpp" />
-    <ClInclude Include="Monster.hpp" />
-    <ClInclude Include="Monster_Set.hpp" />
-    <ClInclude Include="Platform.hpp" />
-    <ClInclude Include="Platform_Expanding.hpp" />
-    <ClInclude Include="Platform_Glue.hpp" />
-    <ClInclude Include="Platform_Laser.hpp" />
-    <ClInclude Include="Platform_State.hpp" />
+    <ClInclude Include="Monster.h" />
+    <ClInclude Include="Monster_Set.h" />
+    <ClInclude Include="Platform.h" />
+    <ClInclude Include="Platform_Expanding.h" />
+    <ClInclude Include="Platform_Glue.h" />
+    <ClInclude Include="Platform_Laser.h" />
+    <ClInclude Include="Platform_State.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Common.hpp" />
+    <ClInclude Include="Common.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Active_Brick.cpp" />

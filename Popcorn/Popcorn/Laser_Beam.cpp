@@ -1,4 +1,4 @@
-﻿#include "Laser_Beam.hpp"
+﻿#include "Laser_Beam.h"
 
 AHit_Checker_List ALaser_Beam::Hit_Checker_List;
 

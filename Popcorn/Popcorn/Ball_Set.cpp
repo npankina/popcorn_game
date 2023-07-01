@@ -1,4 +1,4 @@
-#include "Ball_Set.hpp"
+#include "Ball_Set.h"
 
 void AsBall_Set::Act()
 {
