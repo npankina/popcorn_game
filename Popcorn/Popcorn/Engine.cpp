@@ -165,16 +165,16 @@ void AsEngine::Play_Level()
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Advance_Movers()
-{
+{// смещает в течение текущего кадра все двигающиеся объекты на несколько элементарных шагов
 	int i;
 	double curr_speed, max_speed = 0.0;
 
 	// 1. Получаем максимальную скорость движущихся объектов
 	for (i = 0; i < AsConfig::Max_Movers_Count; i++)
 	{
-		if (Modules[i] != 0)
+		if (Modules[i] != 0)  
 		{
-			Modules[i]->Begin_Movement();
+			Modules[i]->Begin_Movement(); // для всех объектов сначала вызываем начало движения
 
 			curr_speed = fabs(Modules[i]->Get_Speed() );
 
@@ -191,7 +191,7 @@ void AsEngine::Advance_Movers()
 	{
 		for (i = 0; i < AsConfig::Max_Movers_Count; i++)
 			if (Modules[i] != 0)
-				Modules[i]->Advance(max_speed);
+				Modules[i]->Advance(max_speed); // смещаем все объекты
 
 		//Platform.Advance(max_speed);
 		Rest_Distance -= AsConfig::Moving_Step_Size;
@@ -201,7 +201,7 @@ void AsEngine::Advance_Movers()
 	// 3. Заканчиваем все движения на этом кадре
 	for (i = 0; i < AsConfig::Max_Movers_Count; i++)
 		if (Modules[i] != 0)
-			Modules[i]->Finish_Movement();
+			Modules[i]->Finish_Movement(); // завершаем все движения
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Act()

@@ -81,10 +81,12 @@ private:
 	void Draw_Destroing(HDC hdc, RECT& paint_area);
 	void Act_Alive();
 	void Act_Destroing();
+	void Redraw_Monster();
 
 	EEye_State Eye_State;
 	EMonster_State Monster_State;
-	int X_Pos, Y_Pos;
+	double X_Pos, Y_Pos;
+	double Speed, Direction;
 	double Cornea_Height;
 	int Start_Blink_Timeout, Total_Animation_Timeout;
 	RECT Monster_Rect;

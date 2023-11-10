@@ -146,22 +146,33 @@ const EEye_State AMonster::Blink_States[Blink_Stages_Count] = {
 						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing};
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-: X_Pos(0), Y_Pos(0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
+: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
   Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Monster_Rect{}, Blink_Ticks{}
 {}
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Begin_Movement()
-{}
+void AMonster::Begin_Movement() { /* заглушка, не используется */ }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Finish_Movement()
-{}
+{
+	if (!Is_Active()) // только у активных монстров заказывать перерисовку
+		return;
+
+	Redraw_Monster();
+}
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Advance(double max_speed)
-{}
+void AMonster::Advance(double max_speed) // смещает монстра на 1 кадр
+{
+	double next_step;
+
+	next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
+	X_Pos += next_step;
+	Y_Pos += next_step;
+
+}
 //------------------------------------------------------------------------------------------------------------
 double AMonster::Get_Speed()
 {
-	return 0.0;
+	return Speed;
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Act()
@@ -231,21 +242,26 @@ bool AMonster::Is_Active()
 		return true;
 }
 //------------------------------------------------------------------------------------------------------------
+void AMonster::Redraw_Monster()
+{
+	Monster_Rect.left = (int)(X_Pos * AsConfig::D_Global_Scale);
+	Monster_Rect.top = (int)(Y_Pos * AsConfig::D_Global_Scale);
+	Monster_Rect.right = Monster_Rect.left + Width * AsConfig::Global_Scale;
+	Monster_Rect.bottom = Monster_Rect.top + Height * AsConfig::Global_Scale;
+
+	AsTools::Invalidate_Rect(Monster_Rect); // закажет перерисовку прямоугольника
+}
+//------------------------------------------------------------------------------------------------------------
 void AMonster::Activate(int x_pos, int y_pos)
 {
-	const int scale = AsConfig::Global_Scale;
 	double current_timeout = 0.0;
 	int tick_offset;
 
 	Monster_State = EMonster_State::Alive;
 
-	X_Pos = x_pos + 10;
+	X_Pos = x_pos;
 	Y_Pos = y_pos;
-
-	Monster_Rect.left = X_Pos * scale;
-	Monster_Rect.top = Y_Pos * scale;
-	Monster_Rect.right = Monster_Rect.left + Width * scale;
-	Monster_Rect.bottom = Monster_Rect.top + Height * scale;
+	Speed = 0.3;
 
 	Start_Blink_Timeout = AsConfig::Current_Timer_Tick;
 
@@ -257,6 +273,8 @@ void AMonster::Activate(int x_pos, int y_pos)
 	}
 
 	Total_Animation_Timeout = tick_offset;
+
+	Redraw_Monster();
 }
 
 void AMonster::Destroy()
@@ -264,8 +282,8 @@ void AMonster::Destroy()
 	int i;
 	int half_width = Width * AsConfig::Global_Scale / 2;
 	int half_height = Height * AsConfig::Global_Scale / 2;
-	int x_pos = X_Pos * AsConfig::Global_Scale + half_width;
-	int y_pos = Y_Pos * AsConfig::Global_Scale + half_height;
+	int x_pos = (int)(X_Pos * AsConfig::D_Global_Scale) + half_width;
+	int y_pos = (int)(Y_Pos * AsConfig::D_Global_Scale) + half_height;
 	int x_offset, y_offset;
 	int size, half_size, rest_size;
 	int time_offset;
@@ -495,7 +513,7 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 
 	monster->Activate(gate_x_pos, gate_y_pos);
 
-	monster->Destroy();
+	//monster->Destroy();
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
