@@ -252,7 +252,7 @@ void AMonster::Redraw_Monster()
 	AsTools::Invalidate_Rect(Monster_Rect); // закажет перерисовку прямоугольника
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Activate(int x_pos, int y_pos)
+void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 {
 	double current_timeout = 0.0;
 	int tick_offset;
@@ -262,6 +262,11 @@ void AMonster::Activate(int x_pos, int y_pos)
 	X_Pos = x_pos;
 	Y_Pos = y_pos;
 	Speed = 0.3;
+
+	if (moving_right)
+		Direction = M_PI; // 180 градусов
+	else
+		Direction = 0.0;
 
 	Start_Blink_Timeout = AsConfig::Current_Timer_Tick;
 
@@ -492,6 +497,7 @@ void AsMonster_Set::Init(AsBorder *border)
 void AsMonster_Set::Emit_At_Gate(int gate_index)
 {
 	AMonster *monster = 0;
+	bool gate_is_left = false; // задаем движение монстра (все четные гейты находятся справа, а нечетные слева)
 	int gate_x_pos, gate_y_pos;
 
 	if (gate_index < 0 || gate_index > AsConfig::Gates_Number)
@@ -511,7 +517,10 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 
 	Border->Get_Gate_Pos(gate_index, gate_x_pos, gate_y_pos);
 
-	monster->Activate(gate_x_pos, gate_y_pos);
+	if (gate_index % 2 == 0)
+		gate_is_left = true; // гейт левый, иначе правый
+
+	monster->Activate(gate_x_pos, gate_y_pos, gate_is_left);
 
 	//monster->Destroy();
 }

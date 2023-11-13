@@ -73,7 +73,7 @@ public:
 	virtual bool Is_Finished();
 
 	bool Is_Active();
-	void Activate(int x_pos, int y_pos);
+	void Activate(int x_pos, int y_pos, bool moving_right);
 	void Destroy();
 
 private:
