@@ -32,6 +32,9 @@ public:
 	void Get_Y_Size(int &gate_top_y, int &gate_low_y);
 	void Get_Pos(int &gate_x_pos, int &gate_y_pos);
 
+	static const int Width = 6;
+	static const int Height = 19;
+
 private:
 	void Draw_Cup(HDC hdc, bool is_top);
 	void Draw_Discharge(HDC hdc);
@@ -53,8 +56,6 @@ private:
 	double Gap_Height;
 	RECT Gate_Rect;
 
-	static const int Width = 6;
-	static const int Height = 19;
 	static const int Short_Opening_Timeout = AsConfig::FPS / 2; // 1 сек.
 	static const int Long_Opening_Timeout = AsConfig::FPS / 2;
 	static const double Max_Gap_Short_Height, Max_Gap_Long_Height;
