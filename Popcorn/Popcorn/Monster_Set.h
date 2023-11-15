@@ -92,6 +92,7 @@ private:
 	double Speed, Direction;
 	double Cornea_Height;
 	int Start_Blink_Timeout, Total_Animation_Timeout;
+	int Next_Direction_Switch_Tick;
 	RECT Monster_Rect;
 
 	static const int Blink_Stages_Count = 7;

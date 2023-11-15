@@ -147,7 +147,7 @@ const EEye_State AMonster::Blink_States[Blink_Stages_Count] = {
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
 : X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
-  Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Monster_Rect{}, Blink_Ticks{}
+  Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Next_Direction_Switch_Tick(0), Monster_Rect{}, Blink_Ticks{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement() { /* заглушка, не используется */ }
@@ -165,8 +165,8 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 	double next_step;
 
 	next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
-	X_Pos += next_step;
-	Y_Pos += next_step;
+	X_Pos += next_step * cos(Direction); // приращение х
+	Y_Pos -= next_step * sin(Direction); // приращение у
 
 }
 //------------------------------------------------------------------------------------------------------------
@@ -253,7 +253,7 @@ void AMonster::Redraw_Monster()
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
-{
+{ // активация монстров
 	double current_timeout = 0.0;
 	int tick_offset;
 
@@ -264,9 +264,9 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 	Speed = 0.3;
 
 	if (moving_right)
-		Direction = M_PI; // 180 градусов
+		Direction = M_PI / 6.0; // 30 градусов
 	else
-		Direction = 0.0;
+		Direction = M_PI; // 180 градусов
 
 	Start_Blink_Timeout = AsConfig::Current_Timer_Tick;
 
@@ -421,14 +421,16 @@ void AMonster::Draw_Destroing(HDC hdc, RECT &paint_area)
 	for (i = 0; i < Explosive_Balls_Count; i++)
 		Explosive_Balls[i].Draw(hdc, paint_area);
 }
-
+//------------------------------------------------------------------------------------------------------------
 void AMonster::Act_Alive()
-{
+{ // занимается состояниями монстров
 	int i;
 	int curr_tick_offset;
 	int prev_tick;
 	double ratio;
+	double direction_delta;
 
+	// рассчеты для анимации
 	if (Monster_State == EMonster_State::Missing)
 		return;
 
@@ -471,6 +473,17 @@ void AMonster::Act_Alive()
 	default:
 		AsConfig::Throw();
 	}
+
+	// рассчет смены направления движени
+	if (AsConfig::Current_Timer_Tick > Next_Direction_Switch_Tick)
+	{
+		Next_Direction_Switch_Tick = AsTools::Rand(AsConfig::FPS); // увеличить счетчик на случайное число [0, 1]
+
+		// выбираем случайное направление монстру -45 / 45 градусов
+		direction_delta = (double)(AsTools::Rand(90) - 45) * M_PI / 180.0; // выбранное случайным образом направление приводим к значиению в радианах
+		Direction += direction_delta;
+	}
+
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Act_Destroing()
