@@ -147,7 +147,8 @@ const EEye_State AMonster::Blink_States[Blink_Stages_Count] = {
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
 : X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
-  Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Next_Direction_Switch_Tick(0), Monster_Rect{}, Blink_Ticks{}
+  Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Next_Direction_Switch_Tick(0), Monster_Rect{}, Blink_Ticks{},
+  Prev_Monster_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement() { /* заглушка, не используется */ }
@@ -198,10 +199,10 @@ void AMonster::Clear(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	if (! IntersectRect(&intersection_rect, &paint_area, &Monster_Rect) )
+	if (! IntersectRect(&intersection_rect, &paint_area, &Prev_Monster_Rect) )
 		return;
 
-	AsTools::Ellipse(hdc, Monster_Rect, AsConfig::BG_Color);
+	AsTools::Ellipse(hdc, Prev_Monster_Rect, AsConfig::BG_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Draw(HDC hdc, RECT &paint_area)
@@ -244,12 +245,15 @@ bool AMonster::Is_Active()
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Redraw_Monster()
 {
+	Prev_Monster_Rect = Monster_Rect;
+
 	Monster_Rect.left = (int)(X_Pos * AsConfig::D_Global_Scale);
 	Monster_Rect.top = (int)(Y_Pos * AsConfig::D_Global_Scale);
 	Monster_Rect.right = Monster_Rect.left + Width * AsConfig::Global_Scale;
 	Monster_Rect.bottom = Monster_Rect.top + Height * AsConfig::Global_Scale;
 
 	AsTools::Invalidate_Rect(Monster_Rect); // закажет перерисовку прямоугольника
+	AsTools::Invalidate_Rect(Prev_Monster_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Activate(int x_pos, int y_pos, bool moving_right)

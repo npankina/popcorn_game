@@ -93,7 +93,7 @@ private:
 	double Cornea_Height;
 	int Start_Blink_Timeout, Total_Animation_Timeout;
 	int Next_Direction_Switch_Tick;
-	RECT Monster_Rect;
+	RECT Monster_Rect, Prev_Monster_Rect;
 
 	static const int Blink_Stages_Count = 7;
 	static const int Explosive_Balls_Count = 20;
