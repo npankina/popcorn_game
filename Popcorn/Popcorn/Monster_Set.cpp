@@ -260,15 +260,17 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 { // активация монстров
 	double current_timeout = 0.0;
 	int tick_offset;
+	int rand_speed;
 
 	Monster_State = EMonster_State::Alive;
 
 	X_Pos = x_pos;
 	Y_Pos = y_pos;
-	Speed = 0.3;
+	rand_speed = AsTools::Rand(5) + 1;
+	Speed = (double)rand_speed / 10.0;
 
 	if (moving_right)
-		Direction = M_PI / 6.0; // 30 градусов
+		Direction = 0.0; // M_PI / 6.0 - 30 градусов
 	else
 		Direction = M_PI; // 180 градусов
 
