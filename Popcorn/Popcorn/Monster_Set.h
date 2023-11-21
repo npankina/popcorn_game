@@ -106,10 +106,11 @@ private:
 	static const EEye_State Blink_States[Blink_Stages_Count];	
 };
 
-class AsMonster_Set: public AsGame_Objects_Set
+class AsMonster_Set: public AGame_Objects_Set
 {
 public:
 	AsMonster_Set();
+	virtual void Act();
 	void Init(AsBorder *border);
 	void Emit_At_Gate(int gate_index);
 

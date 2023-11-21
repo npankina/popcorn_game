@@ -513,6 +513,14 @@ void AsMonster_Set::Init(AsBorder *border)
 	Border = border;
 }
 //------------------------------------------------------------------------------------------------------------
+void AsMonster_Set::Act()
+{
+	Emit_At_Gate(4);
+
+
+	AGame_Objects_Set::Act(); // выполняется вызов метода базового класса
+}
+//------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Emit_At_Gate(int gate_index)
 {
 	AMonster *monster = 0;
