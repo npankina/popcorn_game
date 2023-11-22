@@ -106,6 +106,14 @@ private:
 	static const EEye_State Blink_States[Blink_Stages_Count];	
 };
 
+enum class EMonster_Set_State : unsigned char
+{
+	Idle, // ничего не делаем
+	Selecting_Next_Gate,
+	Waiting_Gate_Openening,
+	Waiting_Gate_Closing
+};
+
 class AsMonster_Set: public AGame_Objects_Set
 {
 public:
@@ -120,4 +128,5 @@ private:
 	AsBorder *Border; // UNO
 	static const int Max_Monsters_Count = 10;
 	AMonster Monsters[Max_Monsters_Count];
+	EMonster_Set_State Monster_Set_State;
 };

@@ -505,7 +505,7 @@ void AMonster::Act_Destroing()
 
 
 AsMonster_Set::AsMonster_Set()
-: Border(0)
+: Border(0), Monster_Set_State(EMonster_Set_State::Idle)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Init(AsBorder *border)
@@ -515,8 +515,22 @@ void AsMonster_Set::Init(AsBorder *border)
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Act()
 {
-	Emit_At_Gate(4);
+	switch (Monster_Set_State)
+	{
+	case EMonster_Set_State::Idle:
+		break;
 
+	case EMonster_Set_State::Selecting_Next_Gate:
+		break;
+
+	case EMonster_Set_State::Waiting_Gate_Openening:
+		break;
+
+	case EMonster_Set_State::Waiting_Gate_Closing:
+		break;
+	}
+
+	Emit_At_Gate(4);
 
 	AGame_Objects_Set::Act(); // выполняется вызов метода базового класса
 }
