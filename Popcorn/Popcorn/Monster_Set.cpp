@@ -505,7 +505,7 @@ void AMonster::Act_Destroing()
 
 
 AsMonster_Set::AsMonster_Set()
-: Border(0)
+: Border(0), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Init(AsBorder *border)
@@ -515,8 +515,38 @@ void AsMonster_Set::Init(AsBorder *border)
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Act()
 {
-	Emit_At_Gate(4);
+	switch (Monster_Set_State)
+	{
+	case EMonster_Set_State::Idle:
+		break;
 
+
+	case EMonster_Set_State::Selecting_Next_Gate:
+		Current_Gate_Index = AsTools::Rand(AsConfig::Gates_Number);
+		Border->Open_Gate(Current_Gate_Index, false);
+		Monster_Set_State = EMonster_Set_State::Waiting_Gate_Openening; // ждем открытия гейта
+		break;
+
+
+	case EMonster_Set_State::Waiting_Gate_Openening:
+		if (Border->Is_Gate_Open(Current_Gate_Index)) // открылся ли нужный нам гейт
+		{
+			Emit_At_Gate(Current_Gate_Index); // выпускаем монстра из гейта
+			Monster_Set_State = EMonster_Set_State::Waiting_Gate_Closing; // перевод состояния в ожидание закрытия гейта
+		}
+		break;
+
+
+	case EMonster_Set_State::Waiting_Gate_Closing:
+		if (!Border->Is_Gate_Open(Current_Gate_Index)) // только если гейт закрыт
+			Monster_Set_State = EMonster_Set_State::Selecting_Next_Gate;
+
+		break;
+
+
+	default: // если добавятся новые состояния - ловим ошибку из-за отсутствия реализованной логики
+		AsConfig::Throw();
+	}
 
 	AGame_Objects_Set::Act(); // выполняется вызов метода базового класса
 }
