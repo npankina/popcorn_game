@@ -505,7 +505,11 @@ void AMonster::Act_Destroing()
 
 
 AsMonster_Set::AsMonster_Set()
+<<<<<<< HEAD
 : Border(0), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0)
+=======
+: Border(0), Monster_Set_State(EMonster_Set_State::Idle)
+>>>>>>> 4ec4014bf1227ae181be748e8cabab442610b5db
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Init(AsBorder *border)
@@ -517,9 +521,6 @@ void AsMonster_Set::Act()
 {
 	switch (Monster_Set_State)
 	{
-	case EMonster_Set_State::Idle:
-		break;
-
 
 	case EMonster_Set_State::Selecting_Next_Gate:
 		Current_Gate_Index = AsTools::Rand(AsConfig::Gates_Number);
