@@ -120,6 +120,7 @@ public:
 	AsMonster_Set();
 	virtual void Act();
 	void Init(AsBorder *border);
+	void Activate();
 	void Emit_At_Gate(int gate_index);
 
 private:
