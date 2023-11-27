@@ -251,6 +251,17 @@ bool AsBorder::Is_Gate_Open(int gates_index)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
+bool AsBorder::Is_Gate_Closed(int gates_index)
+{
+	if (gates_index >= 0 && gates_index < AsConfig::Gates_Number)
+		return Gates[gates_index]->Is_Closed();
+	else
+	{
+		AsConfig::Throw();
+		return false;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
 void AsBorder::Get_Gate_Pos(int gate_index, int &gate_x_pos, int &gate_y_pos)
 {
 	if (gate_index >= 0 && gate_index < AsConfig::Gates_Number)

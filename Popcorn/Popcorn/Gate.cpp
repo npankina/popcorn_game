@@ -306,6 +306,13 @@ bool AGate::Is_Opened()
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
+bool AGate::Is_Closed()
+{
+	if (Gate_State == EGate_State::Closed)
+		return true;
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
 void AGate::Get_Y_Size(int &gate_top_y, int &gate_low_y)
 {
 	gate_top_y = Gate_Rect.top;
