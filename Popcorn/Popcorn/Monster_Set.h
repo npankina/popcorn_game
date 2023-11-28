@@ -120,7 +120,7 @@ public:
 	AsMonster_Set();
 	virtual void Act();
 	void Init(AsBorder *border);
-	void Activate();
+	void Activate(int max_alive_monsters_count);
 	void Emit_At_Gate(int gate_index);
 
 private:
@@ -129,6 +129,7 @@ private:
 	AsBorder *Border; // UNO
 	static const int Max_Monsters_Count = 10;
 	int Current_Gate_Index;
+	int Max_Alive_Monsters_Count;
 	AMonster Monsters[Max_Monsters_Count];
 	EMonster_Set_State Monster_Set_State;
 };

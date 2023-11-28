@@ -505,7 +505,7 @@ void AMonster::Act_Destroing()
 
 
 AsMonster_Set::AsMonster_Set()
-: Border(0), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0)
+: Border(0), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0), Max_Alive_Monsters_Count(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Init(AsBorder *border)
@@ -515,15 +515,26 @@ void AsMonster_Set::Init(AsBorder *border)
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Act()
 {
+	int current_alive_count = 0; // для подсчета живых монстров
+
 	switch (Monster_Set_State)
 	{
 	case EMonster_Set_State::Idle:
 		break;
 
 	case EMonster_Set_State::Selecting_Next_Gate:
-		Current_Gate_Index = AsTools::Rand(AsConfig::Gates_Number);
-		Border->Open_Gate(Current_Gate_Index, false);
-		Monster_Set_State = EMonster_Set_State::Waiting_Gate_Openening; // ждем открытия гейта
+
+		for (int i = 0; i < Max_Monsters_Count; i++)
+			if (Monsters[i].Is_Active())
+				++current_alive_count;
+
+		// добавляем нового монстра, если можно
+		if (current_alive_count < Max_Alive_Monsters_Count)
+		{
+			Current_Gate_Index = AsTools::Rand(AsConfig::Gates_Number);
+			Border->Open_Gate(Current_Gate_Index, false);
+			Monster_Set_State = EMonster_Set_State::Waiting_Gate_Openening; // ждем открытия гейта
+		}
 		break;
 
 
@@ -583,9 +594,10 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 	//monster->Destroy();
 }
 //------------------------------------------------------------------------------------------------------------
-void AsMonster_Set::Activate() 
+void AsMonster_Set::Activate(int max_alive_monsters_count)
 {
 	Monster_Set_State = EMonster_Set_State::Selecting_Next_Gate;
+	Max_Alive_Monsters_Count = max_alive_monsters_count;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
