@@ -3,7 +3,7 @@
 const double AGate::Max_Gap_Short_Height = 9.0;
 const double AGate::Max_Gap_Long_Height = 18.0;
 const double AGate::Gap_Height_Short_Step = Max_Gap_Short_Height / ( (double)AsConfig::FPS / 2.0); // Для анимации за 1/2 сек.
-const double AGate::Gap_Height_Long_Step = Max_Gap_Long_Height / ((double)AsConfig::FPS * 3.0); // За 3 сек.
+const double AGate::Gap_Height_Long_Step = Max_Gap_Long_Height / ((double)AsConfig::FPS * 1.5); // За 1.5 сек.
 
 AGate::AGate(int x, int y)
 	: Gate_State(EGate_State::Closed), Gate_Transformation(EGate_Transformation::Unknown), 
@@ -373,6 +373,9 @@ bool AGate::Act_For_Long_Open(bool &correct_pos)
 		if (Gap_Height < Max_Gap_Long_Height)
 		{
 			Gap_Height += Gap_Height_Long_Step;
+
+			if (Gap_Height > Max_Gap_Long_Height)
+				Gap_Height  = Max_Gap_Long_Height;
 			//Gate_Rect.top = (int)((Y_Pos - (Gap_Height / 2.0) ) * AsConfig::D_Global_Scale);
 			//Gate_Rect.bottom = (int)((Y_Pos + (double)Height + (Gap_Height / 2.0) ) * AsConfig::D_Global_Scale);
 			correct_pos = true;
@@ -393,6 +396,8 @@ bool AGate::Act_For_Long_Open(bool &correct_pos)
 		if (Gap_Height > 0.0)
 		{
 			Gap_Height -= Gap_Height_Long_Step;
+			if (Gap_Height < 0.0)
+				Gap_Height = 0.0;
 			//Gate_Rect.top = (int)((Y_Pos - (Gap_Height / 2.0) ) * AsConfig::D_Global_Scale);
 			//Gate_Rect.bottom = (int)((Y_Pos + (double)Height + (Gap_Height / 2.0) ) * AsConfig::D_Global_Scale);
 			correct_pos = true;

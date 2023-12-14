@@ -589,7 +589,7 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 	if (!gate_is_left)
 		gate_x_pos -= monster->Width - AGate::Width; // вычисление положения монстра справа
 
-	monster->Activate(gate_x_pos, gate_y_pos, gate_is_left);
+	monster->Activate(gate_x_pos, gate_y_pos + 1, gate_is_left);
 
 	//monster->Destroy();
 }
