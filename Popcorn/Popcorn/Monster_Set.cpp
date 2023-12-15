@@ -147,8 +147,8 @@ const EEye_State AMonster::Blink_States[Blink_Stages_Count] = {
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
 : X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
-  Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Next_Direction_Switch_Tick(0), Monster_Rect{}, Blink_Ticks{},
-  Prev_Monster_Rect{}
+  Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0), 
+  Monster_Rect{}, Blink_Ticks{}, Prev_Monster_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement() { /* заглушка, не используется */ }
@@ -159,7 +159,7 @@ void AMonster::Finish_Movement()
 		return;
 
 	Redraw_Monster();
-}
+}	
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Advance(double max_speed) // смещает монстра на 1 кадр
 {
@@ -169,6 +169,21 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 	X_Pos += next_step * cos(Direction); // приращение х
 	Y_Pos -= next_step * sin(Direction); // приращение у
 
+	// ограничиваем монстра движением в рамках class Border игры
+	if (Monster_State == EMonster_State::Alive)
+	{
+		if (X_Pos < (double)AsConfig::Level_X_Offset)
+			X_Pos = (double)AsConfig::Level_X_Offset;
+
+		if (Y_Pos < (double)AsConfig::Level_Y_Offset) 
+			Y_Pos = (double)AsConfig::Level_Y_Offset;
+
+		if (X_Pos + (double)Width > (double)AsConfig::Max_X_Pos)
+			X_Pos = (double)(AsConfig::Max_X_Pos - Width);
+
+		if (Y_Pos + (double)Width > (double)AsConfig::Max_Y_Pos)
+			Y_Pos = (double)(AsConfig::Max_Y_Pos - Width);
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 double AMonster::Get_Speed()
@@ -182,6 +197,11 @@ void AMonster::Act()
 	{
 	case EMonster_State::Missing:
 		return;
+
+	case EMonster_State::Emitting:
+		if (AsConfig::Current_Timer_Tick >= Alive_Timer_Tick)
+			Monster_State = EMonster_State::Alive;
+		break;
 
 	case EMonster_State::Alive:
 		Act_Alive();
@@ -218,6 +238,7 @@ void AMonster::Draw(HDC hdc, RECT &paint_area)
 		break;
 
 	case EMonster_State::Alive:
+	case EMonster_State::Emitting:
 		Draw_Alive(hdc);
 		break;
 
@@ -260,14 +281,17 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 { // активация монстров
 	double current_timeout = 0.0;
 	int tick_offset;
+	int emitting_time_offset;
 	int rand_speed;
 
-	Monster_State = EMonster_State::Alive;
+	Monster_State = EMonster_State::Emitting;
 
 	X_Pos = x_pos;
 	Y_Pos = y_pos;
 	rand_speed = AsTools::Rand(5) + 1;
 	Speed = (double)rand_speed / 10.0;
+
+	emitting_time_offset = (int)((double)AGate::Width / Speed);
 
 	if (moving_right)
 		Direction = 0.0; // M_PI / 6.0 - 30 градусов
@@ -275,6 +299,7 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 		Direction = M_PI; // 180 градусов
 
 	Start_Blink_Timeout = AsConfig::Current_Timer_Tick;
+	Alive_Timer_Tick = AsConfig::Current_Timer_Tick + emitting_time_offset;
 
 	for (int i = 0; i < Blink_Stages_Count; i++)
 	{

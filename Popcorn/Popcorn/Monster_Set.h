@@ -13,6 +13,7 @@ enum class EEye_State : unsigned char
 enum class EMonster_State : unsigned char
 {
 	Missing,
+	Emitting,
 	Alive,
 	Destroing
 };
@@ -92,7 +93,7 @@ private:
 	double Speed, Direction;
 	double Cornea_Height;
 	int Start_Blink_Timeout, Total_Animation_Timeout;
-	int Next_Direction_Switch_Tick;
+	int Next_Direction_Switch_Tick, Alive_Timer_Tick;
 	RECT Monster_Rect, Prev_Monster_Rect;
 
 	static const int Blink_Stages_Count = 7;
