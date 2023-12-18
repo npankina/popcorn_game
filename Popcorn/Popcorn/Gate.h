@@ -20,7 +20,7 @@ enum class EGate_Transformation : unsigned char
 class AGate : public AGraphics_Object
 {
 public:
-	AGate(int x, int y);
+	AGate(int x, int y, int level_x_pos = -1, int level_y_pos = -1);
 
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT &paint_area);
@@ -54,6 +54,7 @@ private:
 	double Y_Pos, Origin_Y_Pos;
 	int Edge_Count;
 	int Gate_Close_Tick;
+	int Level_X_Pos, Level_Y_Pos;
 	double Gap_Height;
 	RECT Gate_Rect;
 

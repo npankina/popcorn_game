@@ -5,9 +5,10 @@ const double AGate::Max_Gap_Long_Height = 18.0;
 const double AGate::Gap_Height_Short_Step = Max_Gap_Short_Height / ( (double)AsConfig::FPS / 2.0); // Для анимации за 1/2 сек.
 const double AGate::Gap_Height_Long_Step = Max_Gap_Long_Height / ((double)AsConfig::FPS * 1.5); // За 1.5 сек.
 
-AGate::AGate(int x, int y)
-	: Gate_State(EGate_State::Closed), Gate_Transformation(EGate_Transformation::Unknown), 
-	X_Pos(x), Y_Pos(y), Origin_Y_Pos(y), Edge_Count(5), Gate_Close_Tick(0), Gap_Height(0.0), Gate_Rect{}
+AGate::AGate(int x, int y, int level_x_pos, int level_y_pos)
+: Gate_State(EGate_State::Closed), Gate_Transformation(EGate_Transformation::Unknown), 
+  X_Pos(x), Y_Pos(y), Origin_Y_Pos(y), Edge_Count(5), Gate_Close_Tick(0), Level_X_Pos(level_x_pos), Level_Y_Pos(level_y_pos), Gap_Height(0.0), 
+  Gate_Rect{}
 {
 	const int scale = AsConfig::Global_Scale;
 
