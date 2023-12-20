@@ -33,6 +33,8 @@ public:
 	void Get_Y_Size(int &gate_top_y, int &gate_low_y);
 	void Get_Pos(int &gate_x_pos, int &gate_y_pos);
 
+	int Level_X_Pos, Level_Y_Pos;
+
 	static const int Width = 6;
 	static const int Height = 19;
 
@@ -54,7 +56,6 @@ private:
 	double Y_Pos, Origin_Y_Pos;
 	int Edge_Count;
 	int Gate_Close_Tick;
-	int Level_X_Pos, Level_Y_Pos;
 	double Gap_Height;
 	RECT Gate_Rect;
 

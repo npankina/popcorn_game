@@ -43,6 +43,44 @@ void AsBorder::Open_Gate(int gate_index, bool short_open)
 		AsConfig::Throw();
 }
 //------------------------------------------------------------------------------------------------------------
+int AsBorder::Long_Open_Gate()
+{
+	int gate_index;
+	AGate* ptr_gate;
+	bool got_gate = false;
+
+	gate_index = AsTools::Rand(AsConfig::Gates_Number);
+
+	for (int i = 0; i < AsConfig::Gates_Number; i++)
+	{
+		ptr_gate = Gates[gate_index];
+		if (ptr_gate->Is_Closed()) // проверяем доступность гейта для выхода монстра
+		{
+			if (ptr_gate->Level_X_Pos == -1)
+			{
+				got_gate = true; // нашли свободный гейт
+				break;
+			}
+
+			if ( ! AsLevel::Has_Brick_At(ptr_gate->Level_X_Pos, ptr_gate->Level_Y_Pos) // если кирпича у гейта нет 
+				and ! AsLevel::Has_Brick_At(ptr_gate->Level_X_Pos, ptr_gate->Level_Y_Pos + 1) ) // и по той же позиции по х кирпича нет = такой гейт нам подходит
+			{
+				got_gate = true; // нашли свободный гейт
+				break;
+			}
+		}
+		++gate_index;
+		if (gate_index >= AsConfig::Gates_Number)
+			gate_index = 0;
+	}
+
+	if (!got_gate)
+		AsConfig::Throw(); // гейт не был найден
+
+	Open_Gate(gate_index, false);
+	return gate_index;
+}
+//------------------------------------------------------------------------------------------------------------
 bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {// Корректируем позицию при отражении от рамки
 

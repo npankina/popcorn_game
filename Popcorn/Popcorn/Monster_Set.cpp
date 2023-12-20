@@ -556,8 +556,7 @@ void AsMonster_Set::Act()
 		// добавляем нового монстра, если можно
 		if (current_alive_count < Max_Alive_Monsters_Count)
 		{
-			Current_Gate_Index = AsTools::Rand(AsConfig::Gates_Number);
-			Border->Open_Gate(Current_Gate_Index, false);
+			Current_Gate_Index = Border->Long_Open_Gate();
 			Monster_Set_State = EMonster_Set_State::Waiting_Gate_Openening; // ждем открытия гейта
 		}
 		break;
