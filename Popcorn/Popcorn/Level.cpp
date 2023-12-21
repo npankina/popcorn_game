@@ -41,6 +41,7 @@ char AsLevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 
 
 // AsLevel
+AsLevel *AsLevel::Level = nullptr;
 //------------------------------------------------------------------------------------------------------------
 AsLevel::~AsLevel()
 {
@@ -53,6 +54,7 @@ AsLevel::AsLevel()
 : Level_Rect{}, Need_To_Cancel_All(false), Active_Bricks_Count(0), Falling_Letters_Count(0), Teleport_Bricks_Count(0), Teleport_Bricks_Pos(0),
   Parachute_Color(AsConfig::Red_Color, AsConfig::Blue_Color, AsConfig::Global_Scale), Advertisement(0)
 {
+	Level = this;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -244,11 +246,6 @@ bool AsLevel::Is_Finished()
 	return false;  // Заглушка, т.к. этот метод не используется
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsLevel::Has_Brick_At(int x_pos, int y_pos)
-{
-
-}
-//------------------------------------------------------------------------------------------------------------
 void AsLevel::Init()
 {
 	Level_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
@@ -340,6 +337,24 @@ bool AsLevel::Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_lett
 void AsLevel::Stop()
 {
 	Need_To_Cancel_All = true;
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsLevel::Has_Brick_At(int level_x_pos, int level_y_pos)
+{
+	EBrick_Type brick_type;
+
+	if (level_x_pos < 0 or level_x_pos >= AsConfig::Level_Width)
+		return false;
+
+	if (level_y_pos < 0 or level_y_pos >= AsConfig::Level_Height) 
+		return false;
+
+	brick_type = (EBrick_Type)Level->Current_Level[level_y_pos][level_x_pos];
+
+	if (brick_type == EBrick_Type::None)
+		return false; // кирпич отсутствует
+	else
+		return true;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::On_Hit(int brick_x, int brick_y, ABall *ball, bool vertical_hit)

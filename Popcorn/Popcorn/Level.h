@@ -26,13 +26,12 @@ public:
 	virtual void Clear(HDC hdc, RECT &paint_area);
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
-	virtual bool Has_Brick_At(int x_pos, int y_pos);
 
 	void Init();
 	void Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width]);
 	bool Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_letter);
 	void Stop();
-
+	static bool Has_Brick_At(int x_pos, int y_pos);
 
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
 
@@ -74,5 +73,7 @@ private:
 	int Teleport_Bricks_Count;
 	SPoint *Teleport_Bricks_Pos;
 	AAdvertisement *Advertisement;
+
+	static AsLevel *Level;
 };
 //------------------------------------------------------------------------------------------------------------
