@@ -91,6 +91,9 @@
     <Filter Include="#Monster\Monster">
       <UniqueIdentifier>{53ae7e0f-438b-4632-a2e0-1e0ac67eb279}</UniqueIdentifier>
     </Filter>
+    <Filter Include="#Monster\Explosive_Ball">
+      <UniqueIdentifier>{621192de-1b0a-4647-9688-41363a17aec6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -161,6 +164,9 @@
     </ClInclude>
     <ClInclude Include="Monster.h">
       <Filter>#Monster\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="Explosive_Ball.h">
+      <Filter>#Monster\Explosive_Ball</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -236,6 +242,9 @@
     </ClCompile>
     <ClCompile Include="Monster.cpp">
       <Filter>#Monster\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Explosive_Ball.cpp">
+      <Filter>#Monster\Explosive_Ball</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
