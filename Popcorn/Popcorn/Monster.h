@@ -48,6 +48,7 @@ private:
 	void Act_Alive();
 	void Act_Destroing();
 	void Redraw_Monster();
+	RECT& Get_Monster_Rect(double x_pos, double y_pos);
 
 	EEye_State Eye_State;
 	EMonster_State Monster_State;

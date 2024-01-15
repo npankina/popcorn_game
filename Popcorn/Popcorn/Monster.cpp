@@ -26,26 +26,36 @@ void AMonster::Finish_Movement()
 void AMonster::Advance(double max_speed) // смещает монстра на 1 кадр
 {
 	double next_step;
+	double next_x_pos, next_y_pos;
+	RECT monster_rect{};
 
 	next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
-	X_Pos += next_step * cos(Direction); // приращение х
-	Y_Pos -= next_step * sin(Direction); // приращение у
+	next_x_pos = X_Pos + next_step * cos(Direction); // приращение х
+	next_y_pos = Y_Pos - next_step * sin(Direction); // приращение у
+
+	monster_rect = Get_Monster_Rect(next_x_pos, next_y_pos);
+
+	if (AsLevel::Has_Brick_At(monster_rect) )
+		return;
 
 	// ограничиваем монстра движением в рамках class Border игры
 	if (Monster_State == EMonster_State::Alive)
 	{
-		if (X_Pos < (double)AsConfig::Level_X_Offset)
-			X_Pos = (double)AsConfig::Level_X_Offset;
+		if (next_x_pos < (double)AsConfig::Level_X_Offset)
+			next_x_pos = (double)AsConfig::Level_X_Offset;
 
-		if (Y_Pos < (double)AsConfig::Level_Y_Offset)
-			Y_Pos = (double)AsConfig::Level_Y_Offset;
+		if (next_y_pos < (double)AsConfig::Level_Y_Offset)
+			next_y_pos = (double)AsConfig::Level_Y_Offset;
 
-		if (X_Pos + (double)Width > (double)AsConfig::Max_X_Pos)
-			X_Pos = (double)(AsConfig::Max_X_Pos - Width);
+		if (next_x_pos + (double)Width > (double)AsConfig::Max_X_Pos)
+			next_x_pos = (double)(AsConfig::Max_X_Pos - Width);
 
-		if (Y_Pos + (double)Width > (double)AsConfig::Max_Y_Pos)
-			Y_Pos = (double)(AsConfig::Max_Y_Pos - Width);
+		if (next_y_pos + (double)Width > (double)AsConfig::Max_Y_Pos)
+			next_y_pos = (double)(AsConfig::Max_Y_Pos - Width);
 	}
+
+	X_Pos = next_x_pos;
+	Y_Pos = next_y_pos;
 }
 //------------------------------------------------------------------------------------------------------------
 double AMonster::Get_Speed()
@@ -130,10 +140,7 @@ void AMonster::Redraw_Monster()
 {
 	Prev_Monster_Rect = Monster_Rect;
 
-	Monster_Rect.left = (int)(X_Pos * AsConfig::D_Global_Scale);
-	Monster_Rect.top = (int)(Y_Pos * AsConfig::D_Global_Scale);
-	Monster_Rect.right = Monster_Rect.left + Width * AsConfig::Global_Scale;
-	Monster_Rect.bottom = Monster_Rect.top + Height * AsConfig::Global_Scale;
+	Monster_Rect = Get_Monster_Rect(X_Pos, Y_Pos);
 
 	AsTools::Invalidate_Rect(Monster_Rect); // закажет перерисовку прямоугольника
 	AsTools::Invalidate_Rect(Prev_Monster_Rect);
@@ -385,5 +392,16 @@ void AMonster::Act_Destroing()
 
 	for (i = 0; i < Explosive_Balls_Count; i++)
 		Explosive_Balls[i].Act();
+}
+//------------------------------------------------------------------------------------------------------------
+RECT& AMonster::Get_Monster_Rect(double x_pos, double y_pos)
+{
+	RECT rect{};
+	rect.left = (int)(x_pos * AsConfig::D_Global_Scale);
+	rect.top = (int)(y_pos * AsConfig::D_Global_Scale);
+	rect.right = rect.left + Width * AsConfig::Global_Scale;
+	rect.bottom = rect.top + Height * AsConfig::Global_Scale;
+
+	return rect;
 }
 //------------------------------------------------------------------------------------------------------------
