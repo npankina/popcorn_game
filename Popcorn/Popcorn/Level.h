@@ -31,7 +31,10 @@ public:
 	void Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width]);
 	bool Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_letter);
 	void Stop();
+
 	static bool Has_Brick_At(int x_pos, int y_pos);
+	static bool Has_Brick_At(RECT &monster_rect);
+
 
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
 
