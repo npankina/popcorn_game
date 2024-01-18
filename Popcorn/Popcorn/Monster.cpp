@@ -27,11 +27,14 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 {
 	double next_step;
 	double next_x_pos, next_y_pos;
+	double origin_direction;
+	bool got_new_direction = false;
 	RECT monster_rect{};
 
 	next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
+	origin_direction = Direction;
 
-	while (true)
+	for (int i = 0; i < 16; i++)
 	{
 		next_x_pos = X_Pos + next_step * cos(Direction); // приращение х
 		next_y_pos = Y_Pos - next_step * sin(Direction); // приращение у
@@ -41,9 +44,17 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 		if (AsLevel::Has_Brick_At(monster_rect))
 			Direction += M_PI / 8.0;
 		else
+		{
+			got_new_direction = true;
 			break;
+		}
 	}
 	
+	if (!got_new_direction)
+	{
+		Direction = origin_direction - M_PI;
+		return;
+	}
 
 	// ограничиваем монстра движением в рамках class Border игры
 	if (Monster_State == EMonster_State::Alive)
