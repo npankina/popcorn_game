@@ -6,9 +6,20 @@ AsMonster_Set::AsMonster_Set()
 : Border(0), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0), Max_Alive_Monsters_Count(0)
 {}
 //------------------------------------------------------------------------------------------------------------
-void AsMonster_Set::Init(AsBorder *border)
+bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos, ABall* ball)
 {
-	Border = border;
+	for (int i = 0; i < Max_Monsters_Count; i++)
+		if (Monsters[i].Check_Hit(next_x_pos, next_y_pos, ball) )
+			return true;
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos)
+{
+	for (int i = 0; i < Max_Monsters_Count; i++)
+		if (Monsters[i].Check_Hit(next_x_pos, next_y_pos))
+			return true;
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Act()
@@ -55,6 +66,11 @@ void AsMonster_Set::Act()
 	}
 
 	AGame_Objects_Set::Act(); // выполняется вызов метода базового класса
+}
+//------------------------------------------------------------------------------------------------------------
+void AsMonster_Set::Init(AsBorder* border)
+{
+	Border = border;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Emit_At_Gate(int gate_index)

@@ -51,7 +51,7 @@ void AsBall_Set::Set_On_Platform(double platform_x_pos)
 	{
 		Balls[i].Set_State(EBall_State::Normal);
 		Balls[i].Set_State(EBall_State::On_Platform, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
-		Balls[i].Release_Timer_Tick = 0;
+		//Balls[i].Release_Timer_Tick = 0; // чтобы мячик не стартовал сам
 	}
 
 	for (; i < AsConfig::Max_Balls_Count; i++)

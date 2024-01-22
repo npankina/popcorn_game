@@ -8,9 +8,17 @@ const EEye_State AMonster::Blink_States[Blink_Stages_Count] = {
 						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing };
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-	: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
-	Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0),
-	Monster_Rect{}, Blink_Ticks{}, Prev_Monster_Rect{}
+: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
+  Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0),
+  Monster_Rect{}, Blink_Ticks{}, Prev_Monster_Rect{}
+{}
+//------------------------------------------------------------------------------------------------------------
+bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall* ball)
+{
+
+}
+//------------------------------------------------------------------------------------------------------------
+bool AMonster::Check_Hit(double next_x_pos, double next_y_pos)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement() { /* заглушка, не используется */ }

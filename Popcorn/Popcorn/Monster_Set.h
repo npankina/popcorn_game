@@ -11,10 +11,14 @@ enum class EMonster_Set_State : unsigned char
 	Waiting_Gate_Closing
 };
 //------------------------------------------------------------------------------------------------------------
-class AsMonster_Set: public AGame_Objects_Set
+class AsMonster_Set: public AHit_Checker, public AGame_Objects_Set
 {
 public:
 	AsMonster_Set();
+
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall* ball);
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos);
+
 	virtual void Act();
 	void Init(AsBorder *border);
 	void Activate(int max_alive_monsters_count);
