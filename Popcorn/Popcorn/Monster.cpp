@@ -13,9 +13,14 @@ AMonster::AMonster()
   Monster_Rect{}, Blink_Ticks{}, Prev_Monster_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
-bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall* ball)
-{
+bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+{ // Если мячик коснулся монстра и направление было скорректировано - возврат true
+	if (!Reflect_On_Circle(next_x_pos, next_y_pos, ball))
+		return false;
 
+	Destroy();
+
+	return true;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AMonster::Check_Hit(double next_x_pos, double next_y_pos)
