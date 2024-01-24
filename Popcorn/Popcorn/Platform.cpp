@@ -22,6 +22,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	double inner_y;
 	double reflection_pos;
 	double ball_x, ball_y;
+	double circle_x, circle_y, circle_radius;
 
 	if (next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
 		return false;
@@ -33,10 +34,18 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 
 
 	// 1. Проверяем отражение от боковых шариков
-	if (Reflect_On_Circle(next_x_pos, next_y_pos, 0.0, ball) )
+	circle_radius = (double)AsConfig::Platform_Circle_Size / 2.0;
+	circle_x = (double)X_Pos + circle_radius;
+	circle_y = (double)AsConfig::Platform_Y_Pos + circle_radius;
+
+	if (AsTools::Reflect_On_Circle(next_x_pos, next_y_pos, circle_x, circle_y, circle_radius, ball) )
 		goto _on_hit;  // От левого
 
-	if (Reflect_On_Circle(next_x_pos, next_y_pos, Get_Current_Platform_Width() - AsConfig::Platform_Circle_Size, ball) )
+
+	circle_x += Get_Current_Platform_Width() - AsConfig::Platform_Circle_Size;
+
+
+	if (AsTools::Reflect_On_Circle(next_x_pos, next_y_pos, circle_x, circle_y, circle_radius, ball) )
 		goto _on_hit;  // От правого
 
 	// 2. Проверяем отражение от центральной части платформы
@@ -711,53 +720,6 @@ void AsPlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
 
 	// 3. Блик
 	Platform_Expanding.Draw_Circle_Highlight(hdc, x, y);
-}
-//------------------------------------------------------------------------------------------------------------
-bool AsPlatform::Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball)
-{
-	double dx, dy;
-	double platform_ball_x, platform_ball_y, platform_ball_radius;
-	double distance, two_radiuses;
-	double alpha, beta, gamma;
-	double related_ball_direction;
-	const double pi_2 = 2.0 * M_PI;
-
-	platform_ball_radius = (double)AsConfig::Platform_Circle_Size / 2.0;
-	platform_ball_x = (double)X_Pos + platform_ball_radius + platform_ball_x_offset;
-	platform_ball_y = (double)AsConfig::Platform_Y_Pos + platform_ball_radius;
-
-	dx = next_x_pos - platform_ball_x;
-	dy = next_y_pos - platform_ball_y;
-
-	distance = sqrt(dx * dx + dy * dy);
-	two_radiuses = platform_ball_radius + ball->Radius;
-
-	if (distance + AsConfig::Moving_Step_Size < two_radiuses)
-	{// Мячик коснулся бокового шарика
-
-		beta = atan2(-dy, dx);
-
-		related_ball_direction = ball->Get_Direction();
-		related_ball_direction -= beta;
-
-		if (related_ball_direction > pi_2)
-			related_ball_direction -= pi_2;
-
-		if (related_ball_direction < 0.0)
-			related_ball_direction += pi_2;
-
-		if (related_ball_direction > M_PI_2 && related_ball_direction < M_PI + M_PI_2)
-		{
-			alpha = beta + M_PI - ball->Get_Direction();
-			gamma = beta + alpha;
-
-			ball->Set_Direction(gamma);
-
-			return true;
-		}
-	}
-
-	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, const AColor **color, int &stroke_len)
