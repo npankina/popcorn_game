@@ -14,7 +14,7 @@ enum class EBall_State : unsigned char
 
 };
 //------------------------------------------------------------------------------------------------------------
-class ABall: public AGame_Object
+class ABall: public AGame_Object, public ABall_Object
 {
 public:
 	ABall();
@@ -29,6 +29,9 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
+	virtual double Get_Direction();
+	virtual void Set_Direction(double new_direction);
+
 	void Set_Speed(double new_speed);
 	void Draw_Teleporting(HDC hdc, int step);
 	void Set_For_Test();
@@ -36,9 +39,6 @@ public:
 	EBall_State Get_State();
 	void Set_State(EBall_State new_state, double x_pos = 0, double y_pos = 0);
 	void Get_Center(double &x_pos, double &y_pos);
-	double Get_Direction();
-	void Set_Direction(double new_direction);
-
 	void Reflect(bool from_horizontal);
 	bool Is_Moving_Up();
 	bool Is_Moving_Left();

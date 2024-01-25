@@ -110,18 +110,14 @@ void AsTools::Get_Fading_Color(const AColor &origin_color, int step, AColor &res
 	result_color = AColor(r, g, b);
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsTools::Reflect_On_Circle(double next_x_pos, double next_y_pos, double circle_x, double circle_y, double circle_radius, ABall* ball)
+bool AsTools::Reflect_On_Circle(double next_x_pos, double next_y_pos, double circle_x, double circle_y, double circle_radius, ABall_Object *ball)
 {
 	double dx, dy;
-	//double platform_ball_x, platform_ball_y; // , platform_ball_radius;
 	double distance, two_radiuses;
 	double alpha, beta, gamma;
 	double related_ball_direction;
 	const double pi_2 = 2.0 * M_PI;
 
-	//platform_ball_radius = (double)AsConfig::Platform_Circle_Size / 2.0;
-	//platform_ball_x = (double)X_Pos + circle_radius + platform_ball_x_offset;
-	//platform_ball_y = (double)AsConfig::Platform_Y_Pos + circle_radius;
 
 	dx = next_x_pos - circle_x;
 	dy = next_y_pos - circle_y;
