@@ -57,7 +57,7 @@ AsLevel::AsLevel()
 	Level = this;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 {// Корректируем позицию при отражении от кирпичей
 
 	int i, j;
@@ -69,15 +69,15 @@ bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	bool got_horizontal_hit, got_vertical_hit;
 	double horizontal_reflection_pos, vertical_reflection_pos;
 
-	if (next_y_pos + ball->Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
+	if (next_y_pos + AsConfig::Ball_Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
 		return false;
 
 	direction = ball->Get_Direction();
 
-	min_ball_x = next_x_pos - ball->Radius;
-	max_ball_x = next_x_pos + ball->Radius;
-	min_ball_y = next_y_pos - ball->Radius;
-	max_ball_y = next_y_pos + ball->Radius;
+	min_ball_x = next_x_pos - AsConfig::Ball_Radius;
+	max_ball_x = next_x_pos + AsConfig::Ball_Radius;
+	min_ball_y = next_y_pos - AsConfig::Ball_Radius;
+	max_ball_y = next_y_pos + AsConfig::Ball_Radius;
 
 	min_level_x = (int)( (min_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width);
 	if (min_level_x < 0)
@@ -381,7 +381,7 @@ bool AsLevel::Has_Brick_At(RECT &monster_rect)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsLevel::On_Hit(int brick_x, int brick_y, ABall *ball, bool vertical_hit)
+bool AsLevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool vertical_hit)
 {
 	EBrick_Type brick_type;
 	bool can_reflect = true;
@@ -480,7 +480,7 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball, bool vertical_hit)
+bool AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall_Object *ball, bool vertical_hit)
 {// Создаём активный кирпич, если можем
 
 	AActive_Brick *active_brick = 0;
@@ -541,7 +541,7 @@ bool AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_ty
 	return true;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsLevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall *ball, bool vertical_hit)
+void AsLevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall_Object *ball, bool vertical_hit)
 {
 	int i;
 	bool got_direction;
@@ -669,14 +669,14 @@ AActive_Brick_Teleport *AsLevel::Select_Destination_Teleport(int source_x, int s
 	return destination_teleport;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsLevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
+bool AsLevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall_Object *ball, double &reflection_pos)
 {
 	double direction = ball->Get_Direction();
 
 	if (ball->Is_Moving_Up() )
 	{// Проверяем попадание в нижнюю грань
 
-		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Low_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, reflection_pos) )
+		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Low_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вниз
 			if (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0)
@@ -688,7 +688,7 @@ bool AsLevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level
 	else
 	{// Проверяем попадание в верхнюю грань
 
-		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Top_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, reflection_pos) )
+		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Top_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вверх
 			if (level_y > 0 && Current_Level[level_y - 1][level_x] == 0)
@@ -701,14 +701,14 @@ bool AsLevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsLevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
+bool AsLevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall_Object *ball, double &reflection_pos)
 {
 	double direction = ball->Get_Direction();
 
 	if (! ball->Is_Moving_Left() )
 	{// Проверяем попадание в левую грань
 
-		if (Hit_Circle_On_Line(Current_Brick_Left_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, ball->Radius, reflection_pos) )
+		if (Hit_Circle_On_Line(Current_Brick_Left_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока влево
 			if (level_x > 0 && Current_Level[level_y][level_x - 1] == 0)
@@ -720,7 +720,7 @@ bool AsLevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int lev
 	else
 	{// Проверяем попадание в правую грань
 
-		if (Hit_Circle_On_Line(Current_Brick_Right_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, ball->Radius, reflection_pos) )
+		if (Hit_Circle_On_Line(Current_Brick_Right_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вправо
 			if (level_x < AsConfig::Level_Width - 1 && Current_Level[level_y][level_x + 1] == 0)

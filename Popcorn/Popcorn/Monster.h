@@ -25,7 +25,7 @@ class AMonster : public AHit_Checker, public AGame_Object
 public:
 	AMonster();
 
-	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall* ball);
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball);
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos);
 
 	virtual void Begin_Movement();
@@ -51,7 +51,7 @@ private:
 	void Act_Alive();
 	void Act_Destroing();
 	void Redraw_Monster();
-	RECT& Get_Monster_Rect(double x_pos, double y_pos);
+	void Get_Monster_Rect(double x_pos, double y_pos, RECT& rect);
 
 	EEye_State Eye_State;
 	EMonster_State Monster_State;

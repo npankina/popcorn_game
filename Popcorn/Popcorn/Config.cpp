@@ -36,6 +36,7 @@ const double AsConfig::Start_Ball_Y_Pos = 184.0;
 const double AsConfig::Ball_Acceleration = 1.001;
 const double AsConfig::Normal_Ball_Speed = 3.0;
 const double AsConfig::Min_Ball_Angle = M_PI / 8.0;
+const double AsConfig::Ball_Radius = 2.0 - 0.5 / Global_Scale;
 
 //------------------------------------------------------------------------------------------------------------
 void AsConfig::Throw()
@@ -123,7 +124,7 @@ bool AsTools::Reflect_On_Circle(double next_x_pos, double next_y_pos, double cir
 	dy = next_y_pos - circle_y;
 
 	distance = sqrt(dx * dx + dy * dy);
-	two_radiuses = circle_radius + ball->Radius;
+	two_radiuses = circle_radius + AsConfig::Ball_Radius;
 
 	if (distance + AsConfig::Moving_Step_Size < two_radiuses)
 	{// Мячик коснулся бокового шарика

@@ -50,7 +50,7 @@ bool AHit_Checker_List::Add_Hit_Checker(AHit_Checker *hit_checker)
 	return true;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AHit_Checker_List::Check_Hit(double x_pos, double y_pos, ABall *ball)
+bool AHit_Checker_List::Check_Hit(double x_pos, double y_pos, ABall_Object *ball)
 {
 	int i;
 

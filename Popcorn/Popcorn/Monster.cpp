@@ -13,9 +13,13 @@ AMonster::AMonster()
   Monster_Rect{}, Blink_Ticks{}, Prev_Monster_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
-bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 { // Если мячик коснулся монстра и направление было скорректировано - возврат true
-	if (!Reflect_On_Circle(next_x_pos, next_y_pos, ball))
+
+	double radius = (double)Width / 2.0;
+
+
+	if (!AsTools::Reflect_On_Circle(next_x_pos, next_y_pos, X_Pos + radius, Y_Pos + radius, radius, ball))
 		return false;
 
 	Destroy();
@@ -24,7 +28,9 @@ bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 }
 //------------------------------------------------------------------------------------------------------------
 bool AMonster::Check_Hit(double next_x_pos, double next_y_pos)
-{}
+{
+	return true;
+}
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement() { /* заглушка, не используется */ }
 //------------------------------------------------------------------------------------------------------------
@@ -52,7 +58,7 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 		next_x_pos = X_Pos + next_step * cos(Direction); // приращение х
 		next_y_pos = Y_Pos - next_step * sin(Direction); // приращение у
 
-		monster_rect = Get_Monster_Rect(next_x_pos, next_y_pos);
+		Get_Monster_Rect(next_x_pos, next_y_pos, monster_rect);
 
 		if (AsLevel::Has_Brick_At(monster_rect))
 			Direction += M_PI / 8.0;
@@ -169,11 +175,12 @@ bool AMonster::Is_Active()
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Redraw_Monster()
 {
+	RECT rect{};
 	Prev_Monster_Rect = Monster_Rect;
 
-	Monster_Rect = Get_Monster_Rect(X_Pos, Y_Pos);
+	Get_Monster_Rect(X_Pos, Y_Pos, rect);
 
-	AsTools::Invalidate_Rect(Monster_Rect); // закажет перерисовку прямоугольника
+	AsTools::Invalidate_Rect(rect); // закажет перерисовку прямоугольника
 	AsTools::Invalidate_Rect(Prev_Monster_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -425,14 +432,11 @@ void AMonster::Act_Destroing()
 		Explosive_Balls[i].Act();
 }
 //------------------------------------------------------------------------------------------------------------
-RECT& AMonster::Get_Monster_Rect(double x_pos, double y_pos)
+void AMonster::Get_Monster_Rect(double x_pos, double y_pos, RECT &rect)
 {
-	RECT rect{};
 	rect.left = (int)(x_pos * AsConfig::D_Global_Scale);
 	rect.top = (int)(y_pos * AsConfig::D_Global_Scale);
 	rect.right = rect.left + Width * AsConfig::Global_Scale;
 	rect.bottom = rect.top + Height * AsConfig::Global_Scale;
-
-	return rect;
 }
 //------------------------------------------------------------------------------------------------------------

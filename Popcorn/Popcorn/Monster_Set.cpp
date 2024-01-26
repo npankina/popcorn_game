@@ -6,7 +6,7 @@ AsMonster_Set::AsMonster_Set()
 : Border(0), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0), Max_Alive_Monsters_Count(0)
 {}
 //------------------------------------------------------------------------------------------------------------
-bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos, ABall* ball)
+bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 {
 	for (int i = 0; i < Max_Monsters_Count; i++)
 		if (Monsters[i].Check_Hit(next_x_pos, next_y_pos, ball) )

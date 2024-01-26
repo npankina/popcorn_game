@@ -15,7 +15,7 @@ AsPlatform::AsPlatform()
 	X_Pos = (double)(AsConfig::Max_X_Pos - AsConfig::Platform_Normal_Width) / 2.0;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 {
 	double inner_left_x, inner_right_x;
 	double inner_top_y, inner_low_y;
@@ -24,7 +24,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	double ball_x, ball_y;
 	double circle_x, circle_y, circle_radius;
 
-	if (next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
+	if (next_y_pos + AsConfig::Ball_Radius < AsConfig::Platform_Y_Pos)
 		return false;
 
 	inner_top_y = (double)(AsConfig::Platform_Y_Pos + 1);
@@ -54,7 +54,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	else
 		inner_y = inner_top_y;  // От верхней грани
 
-	if (Hit_Circle_On_Line(next_y_pos - inner_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
+	if (Hit_Circle_On_Line(next_y_pos - inner_y, next_x_pos, inner_left_x, inner_right_x, AsConfig::Ball_Radius, reflection_pos) )
 	{
 		ball->Reflect(true);
 		goto _on_hit;

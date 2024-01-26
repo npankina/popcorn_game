@@ -10,7 +10,7 @@ public:
 	~AsPlatform();
 	AsPlatform();
 
-	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball);
 
 	virtual void Begin_Movement();
 	virtual void Finish_Movement();

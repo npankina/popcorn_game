@@ -5,11 +5,39 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-class ABall;
+//------------------------------------------------------------------------------------------------------------
+enum class EBall_State : unsigned char
+{
+	Disabled,  // Отключён (не рисуется, не перемещается и не взаимодействует)
+
+	Normal,
+	Lost,
+	On_Platform,
+	On_Parachute,
+	Off_Parachute,
+	Teleporting
+
+};
+//------------------------------------------------------------------------------------------------------------
+class ABall_Object
+{ // интерфейс для мячика, чтобы не создавалась циклическая зависимость
+public:
+	virtual double Get_Direction() = 0;
+	virtual void Set_Direction(double new_direction) = 0;
+	virtual EBall_State Get_State() = 0;
+	virtual void Set_State(EBall_State new_state, double x_pos = 0, double y_pos = 0) = 0;
+	virtual void Reflect(bool from_horizontal) = 0;
+	virtual void Draw_Teleporting(HDC hdc, int step) = 0;
+	virtual void Set_On_Parachute(int brick_x, int brick_y) = 0;
+	virtual bool Is_Moving_Up() = 0;
+	virtual bool Is_Moving_Left() = 0;
+	virtual void Get_Center(double& x_pos, double& y_pos) = 0;
+};
+//------------------------------------------------------------------------------------------------------------
 class AHit_Checker
 {
 public:
-	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball) = 0;
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball) = 0;
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos);
 
 	bool Hit_Circle_On_Line(double y, double next_x_pos, double left_x, double right_x, double radius, double &x);
@@ -20,7 +48,7 @@ class AHit_Checker_List
 public:
 	AHit_Checker_List();
 	bool Add_Hit_Checker(AHit_Checker *hit_checker);
-	bool Check_Hit(double x_pos, double y_pos, ABall *ball);
+	bool Check_Hit(double x_pos, double y_pos, ABall_Object *ball);
 	bool Check_Hit(double x_pos, double y_pos);
 
 private:

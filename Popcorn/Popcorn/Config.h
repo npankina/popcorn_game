@@ -56,14 +56,8 @@ public:
 	static const int Platform_Normal_Inner_Width = Platform_Normal_Width - Platform_Circle_Size;
 
 	static const int Gates_Number = 8;
-};
-//------------------------------------------------------------------------------------------------------------
-class ABall_Object
-{ // интерфейс для мячика, чтобы не создавалась циклическая зависимость
-public:
-	virtual double Get_Direction() = 0;
-	virtual void Set_Direction(double new_direction) = 0;
 
+	static const double Ball_Radius;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsTools
