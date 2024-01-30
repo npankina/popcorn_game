@@ -50,6 +50,10 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 	bool got_new_direction = false;
 	RECT monster_rect{};
 
+	if (!(Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive))
+		return;
+
+
 	next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
 	origin_direction = Direction;
 
@@ -426,10 +430,16 @@ void AMonster::Act_Alive()
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Act_Destroing()
 {
-	int i;
+	bool destroing_is_finished = true;
 
-	for (i = 0; i < Explosive_Balls_Count; i++)
+	for (int i = 0; i < Explosive_Balls_Count; i++)
+	{
 		Explosive_Balls[i].Act();
+		destroing_is_finished &= Explosive_Balls[i].Is_Finished(); // накапливаем результат
+	}
+
+	if (destroing_is_finished)
+		Monster_State = EMonster_State::Missing;
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Get_Monster_Rect(double x_pos, double y_pos, RECT &rect)

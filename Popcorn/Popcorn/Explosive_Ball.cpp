@@ -98,6 +98,8 @@ void AExplosive_Ball::Draw(HDC hdc, RECT& paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AExplosive_Ball::Is_Finished()
 {
+	if (Explosive_Ball_State == EExplosive_Ball_State::Idle)
+		return true;
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
