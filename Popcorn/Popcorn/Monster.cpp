@@ -177,17 +177,6 @@ bool AMonster::Is_Active()
 		return true;
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Redraw_Monster()
-{
-	RECT rect{};
-	Prev_Monster_Rect = Monster_Rect;
-
-	Get_Monster_Rect(X_Pos, Y_Pos, rect);
-
-	AsTools::Invalidate_Rect(rect); // закажет перерисовку прямоугольника
-	AsTools::Invalidate_Rect(Prev_Monster_Rect);
-}
-//------------------------------------------------------------------------------------------------------------
 void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 { // активация монстров
 	double current_timeout = 0.0;
@@ -440,6 +429,17 @@ void AMonster::Act_Destroing()
 
 	if (destroing_is_finished)
 		Monster_State = EMonster_State::Missing;
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Redraw_Monster()
+{
+	RECT rect{};
+	Prev_Monster_Rect = Monster_Rect;
+
+	Get_Monster_Rect(X_Pos, Y_Pos, rect);
+
+	AsTools::Invalidate_Rect(rect); // закажет перерисовку прямоугольника
+	AsTools::Invalidate_Rect(Prev_Monster_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Get_Monster_Rect(double x_pos, double y_pos, RECT &rect)

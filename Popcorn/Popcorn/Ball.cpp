@@ -151,142 +151,6 @@ bool ABall::Is_Finished()
 	return false;  // Заглушка. Не используется, т.к. мячик сам ничего не делает (не анимируется)
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Set_Speed(double new_speed)
-{
-	Ball_Speed = new_speed;
-}
-//------------------------------------------------------------------------------------------------------------
-void ABall::Draw_Teleporting(HDC hdc, int step)
-{
-	int top_y = Ball_Rect.top + step / 2;
-	int low_y = Ball_Rect.bottom - step / 2 - 1;
-
-	if (top_y >= low_y)
-		return;
-
-	AsConfig::White_Color.Select(hdc);
-	Ellipse(hdc, Ball_Rect.left, top_y, Ball_Rect.right - 1, low_y);
-}
-//------------------------------------------------------------------------------------------------------------
-void ABall::Set_For_Test()
-{
-	Testing_Is_Active = true;
-	Rest_Test_Distance = 50.0;
-
-	Set_State(EBall_State::Normal, 130 + Test_Iteration, 90);
-	Ball_Direction = M_PI_4;
-
-	Ball_Speed = AsConfig::Normal_Ball_Speed;
-
-	++Test_Iteration;
-}
-//------------------------------------------------------------------------------------------------------------
-bool ABall::Is_Test_Finished()
-{
-	if (Testing_Is_Active)
-	{
-		if (Rest_Test_Distance <= 0.0)
-		{
-			Testing_Is_Active = false;
-			Set_State(EBall_State::Lost);
-			return true;
-		}
-	}
-
-	return false;
-}
-//------------------------------------------------------------------------------------------------------------
-EBall_State ABall::Get_State()
-{
-	return Ball_State;
-}
-//------------------------------------------------------------------------------------------------------------
-void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
-{
-	switch (new_state)
-	{
-	case EBall_State::Disabled:
-		Ball_Speed = 0.0;
-		//Rest_Distance = 0.0;
-		break;
-
-
-	case EBall_State::Normal:
-		Center_X_Pos = x_pos;
-		Center_Y_Pos = y_pos;
-		Ball_Speed = AsConfig::Normal_Ball_Speed;
-		//Rest_Distance = 0.0;
-		Ball_Direction = M_PI_4;
-		Redraw_Ball();
-		break;
-
-
-	case EBall_State::Lost:
-		if (! (Ball_State == EBall_State::Normal || Ball_State == EBall_State::On_Parachute) )
-			AsConfig::Throw();  // Только из этих состояний можно потерять мячик!
-
-		Ball_Speed = 0.0;
-		Redraw_Ball();
-		Redraw_Parachute();
-		break;
-
-
-	case EBall_State::On_Platform:
-		Center_X_Pos = x_pos;
-		Center_Y_Pos = y_pos;
-		Prev_Ball_Speed = Ball_Speed;
-		Ball_Speed = 0.0;
-		//Rest_Distance = 0.0;
-		Prev_Ball_Direction = Ball_Direction;
-		//Ball_Direction = M_PI_4;
-		Release_Timer_Tick = AsConfig::Current_Timer_Tick + On_Platform_Timeout;
-		Redraw_Ball();
-		break;
-
-
-	case EBall_State::On_Parachute:
-		AsConfig::Throw();  // Для постановки на парашют нужно вызвать специальный метод Set_On_Parachute()
-		break;
-
-
-	case EBall_State::Off_Parachute:
-		if (Ball_State != EBall_State::On_Parachute)
-			AsConfig::Throw();  // В это состояние можно перейти только из EBall_State::On_Parachute!
-
-		Ball_Speed = 0.0;
-		//Rest_Distance = 0.0;
-		Redraw_Ball();
-		Redraw_Parachute();
-		break;
-
-	case EBall_State::Teleporting:
-		if (! (Ball_State == EBall_State::Normal || Ball_State == EBall_State::On_Parachute || Ball_State == EBall_State::Teleporting) )
-			AsConfig::Throw();  // Только из этих состояний можно войти в телепорт!
-
-		Center_X_Pos = x_pos;
-		Center_Y_Pos = y_pos;
-		Ball_Speed = 0.0;
-		//Rest_Distance = 0.0;
-		Redraw_Ball();
-
-		if (Ball_State == EBall_State::On_Parachute)
-			Redraw_Parachute();
-		break;
-
-	default:
-		AsConfig::Throw();
-	}
-
-	Prev_Ball_State = Ball_State;
-	Ball_State = new_state;
-}
-//------------------------------------------------------------------------------------------------------------
-void ABall::Get_Center(double &x_pos, double &y_pos)
-{
-	x_pos = Center_X_Pos;
-	y_pos = Center_Y_Pos;
-}
-//------------------------------------------------------------------------------------------------------------
 double ABall::Get_Direction()
 {
 	return Ball_Direction;
@@ -324,7 +188,91 @@ void ABall::Set_Direction(double new_direction)
 
 	Ball_Direction = new_direction;
 }
+//------------------------------------------------------------------------------------------------------------
+EBall_State ABall::Get_State()
+{
+	return Ball_State;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
+{
+	switch (new_state)
+	{
+	case EBall_State::Disabled:
+		Ball_Speed = 0.0;
+		//Rest_Distance = 0.0;
+		break;
 
+
+	case EBall_State::Normal:
+		Center_X_Pos = x_pos;
+		Center_Y_Pos = y_pos;
+		Ball_Speed = AsConfig::Normal_Ball_Speed;
+		//Rest_Distance = 0.0;
+		Ball_Direction = M_PI_4;
+		Redraw_Ball();
+		break;
+
+
+	case EBall_State::Lost:
+		if (!(Ball_State == EBall_State::Normal || Ball_State == EBall_State::On_Parachute))
+			AsConfig::Throw();  // Только из этих состояний можно потерять мячик!
+
+		Ball_Speed = 0.0;
+		Redraw_Ball();
+		Redraw_Parachute();
+		break;
+
+
+	case EBall_State::On_Platform:
+		Center_X_Pos = x_pos;
+		Center_Y_Pos = y_pos;
+		Prev_Ball_Speed = Ball_Speed;
+		Ball_Speed = 0.0;
+		//Rest_Distance = 0.0;
+		Prev_Ball_Direction = Ball_Direction;
+		//Ball_Direction = M_PI_4;
+		Release_Timer_Tick = AsConfig::Current_Timer_Tick + On_Platform_Timeout;
+		Redraw_Ball();
+		break;
+
+
+	case EBall_State::On_Parachute:
+		AsConfig::Throw();  // Для постановки на парашют нужно вызвать специальный метод Set_On_Parachute()
+		break;
+
+
+	case EBall_State::Off_Parachute:
+		if (Ball_State != EBall_State::On_Parachute)
+			AsConfig::Throw();  // В это состояние можно перейти только из EBall_State::On_Parachute!
+
+		Ball_Speed = 0.0;
+		//Rest_Distance = 0.0;
+		Redraw_Ball();
+		Redraw_Parachute();
+		break;
+
+	case EBall_State::Teleporting:
+		if (!(Ball_State == EBall_State::Normal || Ball_State == EBall_State::On_Parachute || Ball_State == EBall_State::Teleporting))
+			AsConfig::Throw();  // Только из этих состояний можно войти в телепорт!
+
+		Center_X_Pos = x_pos;
+		Center_Y_Pos = y_pos;
+		Ball_Speed = 0.0;
+		//Rest_Distance = 0.0;
+		Redraw_Ball();
+
+		if (Ball_State == EBall_State::On_Parachute)
+			Redraw_Parachute();
+		break;
+
+	default:
+		AsConfig::Throw();
+	}
+
+	Prev_Ball_State = Ball_State;
+	Ball_State = new_state;
+}
 //------------------------------------------------------------------------------------------------------------
 void ABall::Reflect(bool from_horizontal)
 {
@@ -334,20 +282,16 @@ void ABall::Reflect(bool from_horizontal)
 		Set_Direction(M_PI - Ball_Direction);
 }
 //------------------------------------------------------------------------------------------------------------
-bool ABall::Is_Moving_Up()
+void ABall::Draw_Teleporting(HDC hdc, int step)
 {
-	if (Ball_Direction >= 0.0 && Ball_Direction < M_PI)
-		return true;
-	else
-		return false;
-}
-//------------------------------------------------------------------------------------------------------------
-bool ABall::Is_Moving_Left()
-{
-	if (Ball_Direction > M_PI_2 && Ball_Direction < M_PI + M_PI_2)
-		return true;
-	else
-		return false;
+	int top_y = Ball_Rect.top + step / 2;
+	int low_y = Ball_Rect.bottom - step / 2 - 1;
+
+	if (top_y >= low_y)
+		return;
+
+	AsConfig::White_Color.Select(hdc);
+	Ellipse(hdc, Ball_Rect.left, top_y, Ball_Rect.right - 1, low_y);
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Set_On_Parachute(int brick_x, int brick_y)
@@ -370,6 +314,61 @@ void ABall::Set_On_Parachute(int brick_x, int brick_y)
 	Center_Y_Pos = (double)(cell_y + Parachute_Size) - AsConfig::Ball_Radius * 2.0;
 
 	Redraw_Parachute();
+}
+//------------------------------------------------------------------------------------------------------------
+bool ABall::Is_Moving_Up()
+{
+	if (Ball_Direction >= 0.0 && Ball_Direction < M_PI)
+		return true;
+	else
+		return false;
+}
+//------------------------------------------------------------------------------------------------------------
+bool ABall::Is_Moving_Left()
+{
+	if (Ball_Direction > M_PI_2 && Ball_Direction < M_PI + M_PI_2)
+		return true;
+	else
+		return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Get_Center(double& x_pos, double& y_pos)
+{
+	x_pos = Center_X_Pos;
+	y_pos = Center_Y_Pos;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Set_Speed(double new_speed)
+{
+	Ball_Speed = new_speed;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Set_For_Test()
+{
+	Testing_Is_Active = true;
+	Rest_Test_Distance = 50.0;
+
+	Set_State(EBall_State::Normal, 130 + Test_Iteration, 90);
+	Ball_Direction = M_PI_4;
+
+	Ball_Speed = AsConfig::Normal_Ball_Speed;
+
+	++Test_Iteration;
+}
+//------------------------------------------------------------------------------------------------------------
+bool ABall::Is_Test_Finished()
+{
+	if (Testing_Is_Active)
+	{
+		if (Rest_Test_Distance <= 0.0)
+		{
+			Testing_Is_Active = false;
+			Set_State(EBall_State::Lost);
+			return true;
+		}
+	}
+
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Forced_Advance(double direction, double speed, double max_speed)
