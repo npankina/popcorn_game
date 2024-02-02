@@ -53,7 +53,7 @@ void AExplosive_Ball::Draw(HDC hdc, RECT& paint_area)
 	int curr_timeout;
 	int color_index;
 	double ratio;
-	const AColor* color;
+	const AColor *color;
 
 	switch (Explosive_Ball_State)
 	{

@@ -23,7 +23,7 @@ AsBorder::AsBorder()
 //------------------------------------------------------------------------------------------------------------
 AsBorder::~AsBorder()
 {
-	for(int i = 0; i < AsConfig::Gates_Number; i++)
+	for(int i = 0; i < AsConfig::Gates_Count; i++)
 		delete Gates[i];
 }
 //------------------------------------------------------------------------------------------------------------
@@ -34,10 +34,10 @@ void AsBorder::Redraw_Floor()
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Open_Gate(int gate_index, bool short_open)
 {
-	if (gate_index != AsConfig::Gates_Number - 1 && short_open)
+	if (gate_index != AsConfig::Gates_Count - 1 && short_open)
 		AsConfig::Throw(); // самый последний гейт может открываться только short_open
 	
-	if (gate_index >= 0 && gate_index < AsConfig::Gates_Number)
+	if (gate_index >= 0 && gate_index < AsConfig::Gates_Count)
 		Gates[gate_index]->Open_Gate(short_open);
 	else
 		AsConfig::Throw();
@@ -45,32 +45,34 @@ void AsBorder::Open_Gate(int gate_index, bool short_open)
 //------------------------------------------------------------------------------------------------------------
 int AsBorder::Long_Open_Gate()
 {
+	int i;
 	int gate_index;
-	AGate* ptr_gate;
 	bool got_gate = false;
+	AGate *gate;
 
-	gate_index = AsTools::Rand(AsConfig::Gates_Number);
+	gate_index = AsTools::Rand(AsConfig::Gates_Count);
 
-	for (int i = 0; i < AsConfig::Gates_Number; i++)
+	for (i = 0; i < AsConfig::Gates_Count; i++)
 	{
-		ptr_gate = Gates[gate_index];
-		if (ptr_gate->Is_Closed()) // проверяем доступность гейта для выхода монстра
+		gate = Gates[gate_index];
+		if (gate->Is_Closed()) // проверяем доступность гейта для выхода монстра
 		{
-			if (ptr_gate->Level_X_Pos == -1)
+			if (gate->Level_X_Pos == -1)
 			{
 				got_gate = true; // нашли свободный гейт
 				break;
 			}
 
-			if ( ! AsLevel::Has_Brick_At(ptr_gate->Level_X_Pos, ptr_gate->Level_Y_Pos) // если кирпича у гейта нет 
-				and ! AsLevel::Has_Brick_At(ptr_gate->Level_X_Pos, ptr_gate->Level_Y_Pos + 1) ) // и по той же позиции по х кирпича нет = такой гейт нам подходит
+			if ( ! AsLevel::Has_Brick_At(gate->Level_X_Pos, gate->Level_Y_Pos) // если кирпича у гейта нет 
+				and ! AsLevel::Has_Brick_At(gate->Level_X_Pos, gate->Level_Y_Pos + 1) ) // и по той же позиции по х кирпича нет = такой гейт нам подходит
 			{
 				got_gate = true; // нашли свободный гейт
 				break;
 			}
 		}
 		++gate_index;
-		if (gate_index >= AsConfig::Gates_Number)
+
+		if (gate_index >= AsConfig::Gates_Count)
 			gate_index = 0;
 	}
 
@@ -146,7 +148,9 @@ double AsBorder::Get_Speed()
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Act()
 {
-	for(int i = 0; i < AsConfig::Gates_Number; i++)
+	int i;
+
+	for (i = 0; i < AsConfig::Gates_Count; i++)
 		Gates[i]->Act();
 }
 //------------------------------------------------------------------------------------------------------------
@@ -154,18 +158,18 @@ void AsBorder::Clear(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	for (int i = 0; i < AsConfig::Gates_Number; i++)
+	// 1. Стираем гейты
+	for (int i = 0; i < AsConfig::Gates_Count; i++)
 		Gates[i]->Clear(hdc, paint_area);
 
+	// 2. Стираем пол (если надо)
 	if (! AsConfig::Level_Has_Floor)
 		return;
 
 	if (! IntersectRect(&intersection_rect, &paint_area, &Floor_Rect) )
 		return;
 
-	AsConfig::BG_Color.Select(hdc);
-
-	Rectangle(hdc, Floor_Rect.left, Floor_Rect.top, Floor_Rect.right - 1, Floor_Rect.bottom - 1);
+	AsTools::Rect(hdc, Floor_Rect, AsConfig::BG_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw(HDC hdc, RECT &paint_area)
@@ -189,8 +193,8 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 	if (AsConfig::Level_Has_Floor)
 		Draw_Floor(hdc, paint_area);
 
-	// 5. Gates
-	for(i = 0; i < AsConfig::Gates_Number; i++)
+	// 5. Гейты
+	for (i = 0; i < AsConfig::Gates_Count; i++)
 		Gates[i]->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -212,7 +216,7 @@ void AsBorder::Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_bo
 
 	if (top_border)
 	{
-		for(int i = 0; i < AsConfig::Gates_Number; i++)
+		for (int i = 0; i < AsConfig::Gates_Count; i++)
 		{
 			Gates[i]->Get_Y_Size(gate_top_y, gate_low_y);
 
@@ -278,9 +282,9 @@ void AsBorder::Draw_Floor(HDC hdc, RECT &paint_area)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsBorder::Is_Gate_Open(int gates_index)
+bool AsBorder::Is_Gate_Opened(int gates_index)
 {
-	if (gates_index >= 0 && gates_index < AsConfig::Gates_Number)
+	if (gates_index >= 0 && gates_index < AsConfig::Gates_Count)
 		return Gates[gates_index]->Is_Opened();
 	else
 	{
@@ -291,7 +295,7 @@ bool AsBorder::Is_Gate_Open(int gates_index)
 //------------------------------------------------------------------------------------------------------------
 bool AsBorder::Is_Gate_Closed(int gates_index)
 {
-	if (gates_index >= 0 && gates_index < AsConfig::Gates_Number)
+	if (gates_index >= 0 && gates_index < AsConfig::Gates_Count)
 		return Gates[gates_index]->Is_Closed();
 	else
 	{
@@ -302,7 +306,7 @@ bool AsBorder::Is_Gate_Closed(int gates_index)
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Get_Gate_Pos(int gate_index, int &gate_x_pos, int &gate_y_pos)
 {
-	if (gate_index >= 0 && gate_index < AsConfig::Gates_Number)
+	if (gate_index >= 0 && gate_index < AsConfig::Gates_Count)
 		Gates[gate_index]->Get_Pos(gate_x_pos, gate_y_pos);
 	else
 		AsConfig::Throw();

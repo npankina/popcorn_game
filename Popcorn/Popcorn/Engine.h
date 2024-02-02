@@ -35,11 +35,11 @@ public:
 	int On_Timer();
 
 private:
+	void Restart_Level();
 	void Play_Level();
 	void Advance_Movers();
 	void Act();
 	void On_Falling_Letter(AFalling_Letter *falling_letter);
-	void Restart_Level();
 	void Add_Next_Module(int &index, AGame_Object *game_obj);
 
 	EGame_State Game_State;

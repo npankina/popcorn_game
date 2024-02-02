@@ -19,11 +19,13 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	GetSystemTime(&sys_time);
 	SystemTimeToFileTime(&sys_time, &file_time);
+
 	srand(file_time.dwLowDateTime);
 
 	AsConfig::Hwnd = hwnd;
 
 	AActive_Brick_Red_Blue::Setup_Colors();
+	AExplosive_Ball::Setup_Colors();
 
 	Level.Init();
 	Platform.Init(&Ball_Set, &Laser_Beam_Set);
@@ -36,10 +38,8 @@ void AsEngine::Init_Engine(HWND hwnd)
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Platform);
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Monster_Set);
 
-
 	ALaser_Beam::Hit_Checker_List.Add_Hit_Checker(&Level);
 	ALaser_Beam::Hit_Checker_List.Add_Hit_Checker(&Monster_Set);
-
 
 	Level.Set_Current_Level(AsLevel::Level_01);
 
@@ -47,7 +47,6 @@ void AsEngine::Init_Engine(HWND hwnd)
 	//Platform.Set_State(EPS_Normal);
 	//Platform.Set_State(EPlatform_State::Expanding);
 	//Platform.Set_State(EPlatform_State::Laser);
-
 
 	Platform.Redraw_Platform();
 
@@ -70,6 +69,7 @@ void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 {// Отрисовка экрана игры
 
 	int i;
+
 	SetGraphicsMode(hdc, GM_ADVANCED);
 
 	for (i = 0; i < AsConfig::Max_Modules_Count; i++)
@@ -83,7 +83,6 @@ void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key(EKey_Type key_type, bool key_down)
 {
-
 	switch (key_type)
 	{
 	case EKey_Type::Left:
@@ -104,13 +103,6 @@ int AsEngine::On_Key(EKey_Type key_type, bool key_down)
 	return 0;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsEngine::Restart_Level()
-{
-	Border.Open_Gate(7, true);
-	//Border.Open_Gate(5, false);
-	Game_State = EGame_State::Restart_Level;
-}
-//------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Timer()
 {
 	++AsConfig::Current_Timer_Tick;
@@ -118,7 +110,6 @@ int AsEngine::On_Timer()
 	switch (Game_State)
 	{
 	case EGame_State::Test_Ball:
-
 		Ball_Set.Set_For_Test();
 		Game_State = EGame_State::Play_Level;
 		break;
@@ -148,6 +139,12 @@ int AsEngine::On_Timer()
 	Act();
 
 	return 0;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsEngine::Restart_Level()
+{
+	Game_State = EGame_State::Restart_Level;
+	Border.Open_Gate(7, true);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Play_Level()
@@ -227,7 +224,7 @@ void AsEngine::Act()
 
 	// 3. Перезапуск уровня если надо
 	if (Game_State == EGame_State::Restart_Level)
-		if (Border.Is_Gate_Open(AsConfig::Gates_Number - 1) ) // 
+		if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) ) // 
 			Platform.Set_State(EPlatform_State::Rolling);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -279,7 +276,6 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 		Border.Redraw_Floor();
 		//!!! Отобразить на индикаторе!
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
-
 		break;
 
 	//case ELetter_Type::Plus:  // Переход на следующий уровень
@@ -288,7 +284,6 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	}
 
 	falling_letter->Finalize();
-
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Add_Next_Module(int &index, AGame_Object *game_obj)

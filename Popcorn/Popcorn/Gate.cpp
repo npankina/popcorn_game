@@ -5,9 +5,9 @@ const double AGate::Max_Gap_Long_Height = 18.0;
 const double AGate::Gap_Height_Short_Step = Max_Gap_Short_Height / ( (double)AsConfig::FPS / 2.0); // Для анимации за 1/2 сек.
 const double AGate::Gap_Height_Long_Step = Max_Gap_Long_Height / ((double)AsConfig::FPS * 1.5); // За 1.5 сек.
 
-AGate::AGate(int x, int y, int level_x_pos, int level_y_pos)
+AGate::AGate(int x_pos, int y_pos, int level_x_pos, int level_y_pos)
 : Gate_State(EGate_State::Closed), Gate_Transformation(EGate_Transformation::Unknown), 
-  X_Pos(x), Y_Pos(y), Origin_Y_Pos(y), Edge_Count(5), Gate_Close_Tick(0), Level_X_Pos(level_x_pos), Level_Y_Pos(level_y_pos), Gap_Height(0.0), 
+  X_Pos(x_pos), Y_Pos(y_pos), Origin_Y_Pos(y_pos), Edges_Count(5), Gate_Close_Tick(0), Level_X_Pos(level_x_pos), Level_Y_Pos(level_y_pos), Gap_Height(0.0), 
   Gate_Rect{}
 {
 	const int scale = AsConfig::Global_Scale;
@@ -28,12 +28,12 @@ void AGate::Act()
 		break;
 
 	case EGate_State::Short_Open:
-		if (Act_For_Short_Open() )
+		if (Act_For_Open(true, correct_pos) )
 			Redraw_Gate();
 		break;
 
 	case EGate_State::Long_Open:
-		if (Act_For_Long_Open(correct_pos) )
+		if (Act_For_Open(false, correct_pos) )
 		{
 			if (correct_pos)
 			{
@@ -74,211 +74,11 @@ void AGate::Draw(HDC hdc, RECT &paint_area)
 	Draw_Cup(hdc, true);
 	Draw_Cup(hdc, false);
 
-	if (Gate_State == EGate_State::Long_Open && 
-		(Gate_Transformation == EGate_Transformation::Init || Gate_Transformation == EGate_Transformation::Finalize) )
-		Draw_Discharge(hdc); // Рисование "разряда" между чашами лонг гейта
+	if (Gate_State == EGate_State::Long_Open and 
+		(Gate_Transformation == EGate_Transformation::Init or Gate_Transformation == EGate_Transformation::Finalize) )
+		Draw_Charge(hdc); // Рисование "разряда" между чашами лонг гейта
 }
 //------------------------------------------------------------------------------------------------------------
-void AGate::Draw_Discharge(HDC hdc)
-{
-	double ratio = Gap_Height / Max_Gap_Long_Height;
-	int field_y;
-	int dots_count = 4;
-	int dot_x, dot_y;
-
-	if (ratio < 0.2 || ratio > 0.9)
-		return; // Не рисуется "разряд" в начале и конце анимации гейтов
-
-	field_y = (int)round(Origin_Y_Pos + (double)Height / 2.0 - Gap_Height / 2.0) + 1;
-
-	// отрисовка точек формирующих "разряд"
-	for (int i = 0; i < dots_count; i++)
-	{
-		dot_x = 1 + AsTools::Rand(4); // область смещена на 1 от края
-		dot_y = AsTools::Rand( (int)Gap_Height - 1);
-
-		AsTools::Rect(hdc, X_Pos + dot_x, field_y + dot_y, 1, 1, AsConfig::White_Color);
-
-	}
-}
-//------------------------------------------------------------------------------------------------------------
-void AGate::Draw_Cup(HDC hdc, bool is_top)
-{
-	RECT rect{}, gate_rect{};
-	HRGN region;
-	const int scale = AsConfig::Global_Scale;
-	const double d_scale = AsConfig::D_Global_Scale;
-	const int half_size = scale / 2;
-	int x = 0, y = 0;
-	double cup_y_offset;
-	XFORM xform{}, old_xform{};
-
-	xform.eM11 = 1.0f;
-	xform.eM12 = 0.0f;
-	xform.eM21 = 0.0f;
-
-	if (is_top)
-	{
-		xform.eM22 = 1.0f;
-		cup_y_offset = 0.0;
-	}
-	else
-	{
-		xform.eM22 = -1.0f;
-		if (Gate_State == EGate_State::Long_Open)
-			cup_y_offset = (Height + Gap_Height) * d_scale - 1.0;
-		else
-			cup_y_offset = (double)Height * d_scale - 1.0;
-	}
-
-	xform.eDx = (float)(X_Pos * scale);
-	xform.eDy = (float)round(Y_Pos * d_scale + cup_y_offset);
-
-	GetWorldTransform(hdc, &old_xform);
-	SetWorldTransform(hdc, &xform);
-
-	// 1. Полукруглая часть чаши
-	rect.left = x * scale;
-	rect.top = (y + 1) * scale;
-	rect.right = rect.left + 6 * scale;
-	rect.bottom = rect.top + 4 * scale;
-
-	// 1.1. Основа
-	AsConfig::Blue_Color.Select(hdc);
-	AsTools::Round_Rect(hdc, rect, 3);
-
-	// 1.2. Блик слева (область обрезки)
-	rect.left = X_Pos * scale;
-	rect.right = rect.left + 3 * scale;
-
-	if (is_top)
-	{
-		rect.top = (int)round((Y_Pos + 1.0) * d_scale);
-		rect.bottom = rect.top + 4 * scale;
-	}
-	else
-	{
-		rect.top = (int)round((Y_Pos - 1.0) * d_scale + cup_y_offset + 1.0);
-		rect.bottom = rect.top - 4 * scale;
-	}
-
-	region = CreateRectRgnIndirect(&rect);
-	SelectClipRgn(hdc, region);
-
-	AsConfig::Gate_Color.Select_Pen(hdc);
-
-	rect.left = x * scale + half_size;
-	rect.top = (y + 1) * scale + half_size;
-	rect.right = rect.left + 5 * scale + half_size;
-	rect.bottom = rect.top + 5 * scale + half_size;
-
-	AsTools::Round_Rect(hdc, rect, 3);
-
-	SelectClipRgn(hdc, 0);
-	DeleteObject(region);
-
-	// 1.3. Блик снизу
-	AsTools::Rect(hdc, x, y + 4, 4, 1, AsConfig::White_Color);
-
-	// 1.4 "Заплатка" в правом нижнем углу
-	AsTools::Rect(hdc, x + 4, y + 3, 2, 2, AsConfig::Blue_Color);
-
-	// 1.5 Перфорация
-	AsTools::Rect(hdc, x + 4, y + 3, 1, 1, AsConfig::BG_Color);
-
-	// 1.6 Перемычка перед чашей
-	AsTools::Rect(hdc, x + 2, y, 2, 1, AsConfig::Blue_Color);
-
-	Draw_Edges(hdc); // Рисуем перемычки
-
-	SetWorldTransform(hdc, &old_xform);
-}
-//------------------------------------------------------------------------------------------------------------
-void AGate::Draw_Edges(HDC hdc)
-{
-	if (Gate_State == EGate_State::Long_Open)
-		Draw_Long_Opening_Edges(hdc);
-	else
-		Draw_Short_Opening_Edges(hdc);
-}
-//------------------------------------------------------------------------------------------------------------
-void AGate::Draw_Long_Opening_Edges(HDC hdc)
-{
-	double ratio = Gap_Height / Max_Gap_Long_Height;
-	bool is_long_edge = false;
-	int i;
-
-	if (ratio < 0.3)
-	{
-		for (i = 0; i < 4; i++)
-		{
-			Draw_One_Edge(hdc, 5 + i, is_long_edge);
-			is_long_edge = !is_long_edge;
-		}
-
-		if (ratio > 0.1)
-			Draw_Red_Edge(hdc, 9, false, false);
-	}
-	else if (ratio < 0.5)
-	{
-		Draw_One_Edge(hdc, 5, false);
-		Draw_One_Edge(hdc, 6, true);
-		Draw_One_Edge(hdc, 7, true);
-
-		Draw_Red_Edge(hdc, 8, true, true);
-		Draw_Red_Edge(hdc, 9, false, false);
-	}
-	else
-	{
-		for (i = 0; i < 2; i++)
-			Draw_One_Edge(hdc, 5 + i, true);
-
-		Draw_Red_Edge(hdc, 7, true, false);
-		Draw_Red_Edge(hdc, 8, true, true);
-		Draw_Red_Edge(hdc, 9, false, false);
-	}	 
-}
-//------------------------------------------------------------------------------------------------------------
-void AGate::Draw_Short_Opening_Edges(HDC hdc)
-{
-	bool is_long_edge = false;
-	double ratio = 1.0 - Gap_Height / Max_Gap_Short_Height; // коэфф-т от 0..1
-	int count = (int)round(Edge_Count * ratio);
-
-	for (int i = 0; i < count; i++)
-	{
-		Draw_One_Edge(hdc, 5 + i, is_long_edge);
-		is_long_edge = !is_long_edge;
-	}
-}
-//------------------------------------------------------------------------------------------------------------
-void AGate::Draw_One_Edge(HDC hdc, int edge_y_offset, bool is_long)
-{
-	if (is_long)
-	{// Длинное ребро
-		AsTools::Rect(hdc, 0, edge_y_offset, 4, 1, AsConfig::White_Color);
-		AsTools::Rect(hdc, 4, edge_y_offset, 2, 1, AsConfig::Blue_Color);
-	}
-	else
-	{// Короткое ребро
-		AsTools::Rect(hdc, 1, edge_y_offset, 2, 1, AsConfig::Blue_Color);
-		AsTools::Rect(hdc, 4, edge_y_offset, 1, 1, AsConfig::Blue_Color);
-	}
-}
-//------------------------------------------------------------------------------------------------------------
-void AGate::Draw_Red_Edge(HDC hdc, int edge_y_offset, bool is_long, bool has_highlight)
-{
-	if (is_long)
-	{// Длинное ребро
-		AsTools::Rect(hdc, 0, edge_y_offset, 6, 1, AsConfig::Red_Color);
-		if (has_highlight)
-			AsTools::Rect(hdc, 1, edge_y_offset, 1, 1, AsConfig::White_Color);
-	}
-	else
-	{// Короткое ребро
-		AsTools::Rect(hdc, 1, edge_y_offset, 4, 1, AsConfig::Red_Color);
-	}
-}//------------------------------------------------------------------------------------------------------------
 bool AGate::Is_Finished()
 {
 	return false;
@@ -311,7 +111,8 @@ bool AGate::Is_Closed()
 {
 	if (Gate_State == EGate_State::Closed)
 		return true;
-	return false;
+	else
+		return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AGate::Get_Y_Size(int &gate_top_y, int &gate_low_y)
@@ -320,87 +121,68 @@ void AGate::Get_Y_Size(int &gate_top_y, int &gate_low_y)
 	gate_low_y = Gate_Rect.bottom;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AGate::Act_For_Short_Open()
+void AGate::Get_Pos(int &gate_x_pos, int &gate_y_pos)
 {
-	switch (Gate_Transformation)
-	{
-	case EGate_Transformation::Unknown:
-		break;
-
-	case EGate_Transformation::Init:
-		if (Gap_Height < Max_Gap_Short_Height)
-			Gap_Height += Gap_Height_Short_Step;
-		else
-		{
-			Gate_Close_Tick = AsConfig::Current_Timer_Tick + Short_Opening_Timeout;
-			Gate_Transformation = EGate_Transformation::Active;
-		}
-		break;
-
-	case EGate_Transformation::Active:
-		if (AsConfig::Current_Timer_Tick >= Gate_Close_Tick)
-			Gate_Transformation = EGate_Transformation::Finalize;
-		break;
-
-	case EGate_Transformation::Finalize:
-		if (Gap_Height > 0.0)
-		{
-			Gap_Height -= Gap_Height_Short_Step;
-		}
-		else
-		{
-			Gate_Transformation = EGate_Transformation::Unknown;
-			Gate_State = EGate_State::Closed;
-		}
-		break;
-
-	default:
-		AsConfig::Throw();
-	}
-
-	return true;
+	gate_x_pos = X_Pos;
+	gate_y_pos = (int)Origin_Y_Pos;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AGate::Act_For_Long_Open(bool &correct_pos)
+bool AGate::Act_For_Open(bool short_open, bool &correct_pos)
 {
+	double max_gap_height, gap_height_step;
+	int opening_timeout;
+
 	correct_pos = false;
+
+	if (short_open)
+	{
+		max_gap_height = Max_Gap_Short_Height;
+		gap_height_step = Gap_Height_Short_Step;
+		opening_timeout = Short_Opening_Timeout;
+	}
+	else
+	{
+		max_gap_height = Max_Gap_Long_Height;
+		gap_height_step = Gap_Height_Long_Step;
+		opening_timeout = Long_Opening_Timeout;
+	}
 
 	switch (Gate_Transformation)
 	{
-	case EGate_Transformation::Unknown:
-		break;
-
 	case EGate_Transformation::Init:
-		if (Gap_Height < Max_Gap_Long_Height)
+		if (Gap_Height < max_gap_height)
 		{
-			Gap_Height += Gap_Height_Long_Step;
+			Gap_Height += gap_height_step;
 
-			if (Gap_Height > Max_Gap_Long_Height)
-				Gap_Height  = Max_Gap_Long_Height;
-			//Gate_Rect.top = (int)((Y_Pos - (Gap_Height / 2.0) ) * AsConfig::D_Global_Scale);
-			//Gate_Rect.bottom = (int)((Y_Pos + (double)Height + (Gap_Height / 2.0) ) * AsConfig::D_Global_Scale);
+			if (Gap_Height > max_gap_height)
+				Gap_Height = max_gap_height;
+
 			correct_pos = true;
 		}
 		else
 		{
-			Gate_Close_Tick = AsConfig::Current_Timer_Tick + Long_Opening_Timeout;
+			Gate_Close_Tick = AsConfig::Current_Timer_Tick + opening_timeout;
 			Gate_Transformation = EGate_Transformation::Active;
 		}
-		break;
+
+		return true;
+
 
 	case EGate_Transformation::Active:
 		if (AsConfig::Current_Timer_Tick >= Gate_Close_Tick)
 			Gate_Transformation = EGate_Transformation::Finalize;
+
 		break;
+
 
 	case EGate_Transformation::Finalize:
 		if (Gap_Height > 0.0)
 		{
-			Gap_Height -= Gap_Height_Long_Step;
+			Gap_Height -= gap_height_step;
+
 			if (Gap_Height < 0.0)
 				Gap_Height = 0.0;
-			//Gate_Rect.top = (int)((Y_Pos - (Gap_Height / 2.0) ) * AsConfig::D_Global_Scale);
-			//Gate_Rect.bottom = (int)((Y_Pos + (double)Height + (Gap_Height / 2.0) ) * AsConfig::D_Global_Scale);
+
 			correct_pos = true;
 		}
 		else
@@ -408,13 +190,211 @@ bool AGate::Act_For_Long_Open(bool &correct_pos)
 			Gate_Transformation = EGate_Transformation::Unknown;
 			Gate_State = EGate_State::Closed;
 		}
-		break;
+
+		return true;
+
 
 	default:
 		AsConfig::Throw();
 	}
 
-	return true;
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw_Cup(HDC hdc, bool top_cup)
+{
+	const int scale = AsConfig::Global_Scale;
+	const double d_scale = AsConfig::D_Global_Scale;
+	const int half_scale = scale / 2;
+	int x = 0, y = 0;
+	double cup_y_offset;
+	RECT rect{};
+	HRGN region;
+	XFORM xform{}, old_xform{};
+
+	xform.eM11 = 1.0f;
+	xform.eM12 = 0.0f;
+	xform.eM21 = 0.0f;
+	xform.eDx = (float)(X_Pos * scale);
+
+	if (top_cup)
+	{
+		xform.eM22 = 1.0f;
+		cup_y_offset = 0.0;
+	}
+	else
+	{
+		xform.eM22 = -1.0f;
+		if (Gate_State == EGate_State::Long_Open)
+			cup_y_offset = ((double)Height + Gap_Height) * d_scale - 1.0;
+		else
+			cup_y_offset = (double)Height * d_scale - 1.0;
+	}
+
+	xform.eDy = (float)round(Y_Pos * d_scale + cup_y_offset);
+
+	GetWorldTransform(hdc, &old_xform);
+	SetWorldTransform(hdc, &xform);
+
+	// 1. Полукруглая часть чаши
+	rect.left = x * scale;
+	rect.top = (y + 1) * scale;
+	rect.right = rect.left + 6 * scale;
+	rect.bottom = rect.top + 4 * scale;
+
+	// 1.1. Основа
+	AsConfig::Blue_Color.Select(hdc);
+	AsTools::Round_Rect(hdc, rect, 3);
+
+	// 1.2. Блик слева (область обрезки)
+	rect.left = X_Pos * scale;
+	rect.right = rect.left + 3 * scale;
+
+	if (top_cup)
+	{
+		rect.top = (int)round((Y_Pos + 1.0) * d_scale);
+		rect.bottom = rect.top + 4 * scale;
+	}
+	else
+	{
+		rect.top = (int)round((Y_Pos - 1.0) * d_scale + cup_y_offset + 1.0);
+		rect.bottom = rect.top - 4 * scale;
+	}
+
+	region = CreateRectRgnIndirect(&rect);
+	SelectClipRgn(hdc, region);
+
+	AsConfig::Gate_Color.Select_Pen(hdc);
+
+	rect.left = x * scale + half_scale;
+	rect.top = (y + 1) * scale + half_scale;
+	rect.right = rect.left + 5 * scale + half_scale;
+	rect.bottom = rect.top + 5 * scale + half_scale;
+
+	AsTools::Round_Rect(hdc, rect, 3);
+
+	SelectClipRgn(hdc, 0);
+	DeleteObject(region);
+
+	// 1.3. Блик снизу
+	AsTools::Rect(hdc, x, y + 4, 4, 1, AsConfig::White_Color);
+
+	// 1.4 "Заплатка" в правом нижнем углу
+	AsTools::Rect(hdc, x + 4, y + 3, 2, 2, AsConfig::Blue_Color);
+
+	// 1.5 Перфорация
+	AsTools::Rect(hdc, x + 4, y + 3, 1, 1, AsConfig::BG_Color);
+
+	// 1.6 Перемычка перед чашей
+	AsTools::Rect(hdc, x + 2, y, 2, 1, AsConfig::Blue_Color);
+
+	Draw_Edges(hdc); // Рисуем перемычки
+
+	SetWorldTransform(hdc, &old_xform);
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw_Edges(HDC hdc)
+{
+	if (Gate_State == EGate_State::Long_Open)
+		Draw_Long_Opening_Edges(hdc);
+	else
+		Draw_Short_Opening_Edges(hdc);
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw_Short_Opening_Edges(HDC hdc)
+{
+	bool is_long_edge = false;
+	double ratio = 1.0 - Gap_Height / Max_Gap_Short_Height; // коэфф-т от 0..1
+	int count = (int)round(Edges_Count * ratio);
+
+	for (int i = 0; i < count; i++)
+	{
+		Draw_One_Edge(hdc, 5 + i, is_long_edge);
+		is_long_edge = !is_long_edge;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw_Long_Opening_Edges(HDC hdc)
+{
+	int i;
+	double ratio = Gap_Height / Max_Gap_Long_Height;
+	bool is_long_edge = false;
+
+	if (ratio < 0.3)
+	{
+		for (i = 0; i < 4; i++)
+		{
+			Draw_One_Edge(hdc, 5 + i, is_long_edge);
+			is_long_edge = !is_long_edge;
+		}
+
+		if (ratio > 0.1)
+			Draw_Red_Edge(hdc, 9, false, false);
+	}
+	else if (ratio < 0.5)
+	{
+		Draw_One_Edge(hdc, 5, false);
+		Draw_One_Edge(hdc, 6, true);
+		Draw_One_Edge(hdc, 7, true);
+
+		Draw_Red_Edge(hdc, 8, true, true);
+		Draw_Red_Edge(hdc, 9, false, false);
+	}
+	else
+	{
+		for (i = 0; i < 2; i++)
+			Draw_One_Edge(hdc, 5 + i, true);
+
+		Draw_Red_Edge(hdc, 7, true, false);
+		Draw_Red_Edge(hdc, 8, true, true);
+		Draw_Red_Edge(hdc, 9, false, false);
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw_One_Edge(HDC hdc, int edge_y_offset, bool long_edge)
+{
+	if (long_edge)
+	{// Длинное ребро
+		AsTools::Rect(hdc, 0, edge_y_offset, 4, 1, AsConfig::White_Color);
+		AsTools::Rect(hdc, 4, edge_y_offset, 2, 1, AsConfig::Blue_Color);
+	}
+	else
+	{// Короткое ребро
+		AsTools::Rect(hdc, 1, edge_y_offset, 2, 1, AsConfig::Blue_Color);
+		AsTools::Rect(hdc, 4, edge_y_offset, 1, 1, AsConfig::Blue_Color);
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AGate::Draw_Red_Edge(HDC hdc, int edge_y_offset, bool long_edge, bool has_highlight)
+{
+	if (long_edge)
+	{// Длинное ребро
+		AsTools::Rect(hdc, 0, edge_y_offset, 6, 1, AsConfig::Red_Color);
+		if (has_highlight)
+			AsTools::Rect(hdc, 1, edge_y_offset, 1, 1, AsConfig::White_Color);
+	}
+	else // Короткое ребро
+		AsTools::Rect(hdc, 1, edge_y_offset, 4, 1, AsConfig::Red_Color);
+}
+void AGate::Draw_Charge(HDC hdc)
+{
+	int i;
+	int field_y;
+	int dot_x, dot_y;
+	double ratio = Gap_Height / Max_Gap_Long_Height;
+
+	if (ratio < 0.2 || ratio > 0.9)
+		return;  // ￍ￥ ￰￨￱￳￥￬ ￰￠￧￰￿￤ ￢ ￭￠￷￠￫￥ ￨ ￪￮￭￶￥ ￠￭￨￬￠￶￨￨
+
+	field_y = (int)(Origin_Y_Pos + (double)Height / 2.0 - Gap_Height / 2.0) + 1;
+
+	for (i = 0; i < 4; i++)
+	{
+		dot_x = 1 + AsTools::Rand(4);
+		dot_y = AsTools::Rand( (int)Gap_Height - 1);
+
+		AsTools::Rect(hdc, X_Pos + dot_x, field_y + dot_y, 1, 1, AsConfig::White_Color);
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 void AGate::Redraw_Gate()
@@ -428,8 +408,3 @@ void AGate::Redraw_Gate()
 	--Gate_Rect.bottom;
 }
 //------------------------------------------------------------------------------------------------------------
-void AGate::Get_Pos(int &gate_x_pos, int &gate_y_pos)
-{
-	gate_x_pos = X_Pos;
-	gate_y_pos = (int)Origin_Y_Pos;
-}

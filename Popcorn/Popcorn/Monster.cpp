@@ -2,7 +2,7 @@
 
 // class AMonster
 const double AMonster::Max_Cornea_Height = 11.0;
-const double AMonster::Blink_Timeouts[Blink_Stages_Count] = { 0.4, 0.3, 0.8, 0.4, 0.4, 0.4, 0.8 };
+const double AMonster::Blink_Timeouts[Blink_Stages_Count] = { 0.4, 0.2, 0.8, 0.4, 0.4, 0.4, 0.8 };
 const EEye_State AMonster::Blink_States[Blink_Stages_Count] = {
 	EEye_State::Closed, EEye_State::Opening, EEye_State::Staring, EEye_State::Closing,
 						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing };
@@ -29,7 +29,7 @@ bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *bal
 //------------------------------------------------------------------------------------------------------------
 bool AMonster::Check_Hit(double next_x_pos, double next_y_pos)
 {
-	return true;
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement() { /* заглушка, не используется */ }
@@ -128,7 +128,7 @@ void AMonster::Act()
 	AsTools::Invalidate_Rect(Monster_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Clear(HDC hdc, RECT& paint_area)
+void AMonster::Clear(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
@@ -138,7 +138,7 @@ void AMonster::Clear(HDC hdc, RECT& paint_area)
 	AsTools::Ellipse(hdc, Prev_Monster_Rect, AsConfig::BG_Color);
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Draw(HDC hdc, RECT& paint_area)
+void AMonster::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
@@ -169,14 +169,6 @@ bool AMonster::Is_Finished()
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AMonster::Is_Active()
-{
-	if (Monster_State == EMonster_State::Missing)
-		return false;
-	else
-		return true;
-}
-//------------------------------------------------------------------------------------------------------------
 void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 { // активация монстров
 	double current_timeout = 0.0;
@@ -192,6 +184,7 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 	Speed = (double)rand_speed / 10.0;
 
 	emitting_time_offset = (int)((double)AGate::Width / Speed);
+	Alive_Timer_Tick = AsConfig::Current_Timer_Tick + emitting_time_offset;
 
 	if (moving_right)
 		Direction = 0.0; // M_PI / 6.0 - 30 градусов
@@ -199,7 +192,7 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 		Direction = M_PI; // 180 градусов
 
 	Start_Blink_Timeout = AsConfig::Current_Timer_Tick;
-	Alive_Timer_Tick = AsConfig::Current_Timer_Tick + emitting_time_offset;
+	
 
 	for (int i = 0; i < Blink_Stages_Count; i++)
 	{
@@ -211,6 +204,14 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 	Total_Animation_Timeout = tick_offset;
 
 	Redraw_Monster();
+}
+//------------------------------------------------------------------------------------------------------------
+bool AMonster::Is_Active()
+{
+	if (Monster_State == EMonster_State::Missing)
+		return false;
+	else
+		return true;
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Destroy()
@@ -340,7 +341,7 @@ void AMonster::Draw_Alive(HDC hdc)
 	DeleteObject(region);
 
 	// 2.5. 
-	AsConfig::BG_Outcome_Color.Select(hdc);
+	AsConfig::BG_Outcome_Color.Select_Pen(hdc);
 
 	Arc(hdc, cornea_rect.left, cornea_rect.top, cornea_rect.right - 1, cornea_rect.bottom - 1, 0, 0, 0, 0);
 }
@@ -408,7 +409,7 @@ void AMonster::Act_Alive()
 	// рассчет смены направления движени
 	if (AsConfig::Current_Timer_Tick > Next_Direction_Switch_Tick)
 	{
-		Next_Direction_Switch_Tick = AsTools::Rand(AsConfig::FPS); // увеличить счетчик на случайное число [0, 1]
+		Next_Direction_Switch_Tick += AsTools::Rand(AsConfig::FPS); // увеличить счетчик на случайное число [0, 1]
 
 		// выбираем случайное направление монстру -45 / 45 градусов
 		direction_delta = (double)(AsTools::Rand(90) - 45) * M_PI / 180.0; // выбранное случайным образом направление приводим к значиению в радианах
@@ -431,22 +432,21 @@ void AMonster::Act_Destroing()
 		Monster_State = EMonster_State::Missing;
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Redraw_Monster()
-{
-	RECT rect{};
-	Prev_Monster_Rect = Monster_Rect;
-
-	Get_Monster_Rect(X_Pos, Y_Pos, rect);
-
-	AsTools::Invalidate_Rect(rect); // закажет перерисовку прямоугольника
-	AsTools::Invalidate_Rect(Prev_Monster_Rect);
-}
-//------------------------------------------------------------------------------------------------------------
 void AMonster::Get_Monster_Rect(double x_pos, double y_pos, RECT &rect)
 {
 	rect.left = (int)(x_pos * AsConfig::D_Global_Scale);
 	rect.top = (int)(y_pos * AsConfig::D_Global_Scale);
 	rect.right = rect.left + Width * AsConfig::Global_Scale;
 	rect.bottom = rect.top + Height * AsConfig::Global_Scale;
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Redraw_Monster()
+{
+	Prev_Monster_Rect = Monster_Rect;
+
+	Get_Monster_Rect(X_Pos, Y_Pos, Monster_Rect);
+
+	AsTools::Invalidate_Rect(Monster_Rect);
+	AsTools::Invalidate_Rect(Prev_Monster_Rect);
 }
 //------------------------------------------------------------------------------------------------------------

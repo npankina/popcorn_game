@@ -58,7 +58,6 @@ private:
 	void Draw_Line_To(HDC hdc, int x, int y);
 
 	EFalling_Letter_State Falling_Letter_State;
-
 	int X, Y;
 	int Rotation_Step;
 	int Next_Rotation_Tick;
@@ -67,7 +66,6 @@ private:
 	static const int Ticks_Per_Step = 4;
 	static const int Max_Rotation_Step = 16;
 	static const int Brick_Half_Height = AsConfig::Brick_Height * AsConfig::Global_Scale / 2;
-
 
 	static int All_Letters_Popularity;
 	static int Letters_Popularity[ (int)ELetter_Type::Max];  // "Вес" каждой буквы

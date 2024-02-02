@@ -20,7 +20,7 @@ enum class EGate_Transformation : unsigned char
 class AGate : public AGraphics_Object
 {
 public:
-	AGate(int x, int y, int level_x_pos = -1, int level_y_pos = -1);
+	AGate(int x_pos, int y_pos, int level_x_pos = -1, int level_y_pos = -1);
 
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT &paint_area);
@@ -39,22 +39,21 @@ public:
 	static const int Height = 19;
 
 private:
-	void Draw_Cup(HDC hdc, bool is_top);
-	void Draw_Discharge(HDC hdc);
-	void Draw_One_Edge(HDC hdc, int edge_y_offset, bool is_long);
-	void Draw_Red_Edge(HDC hdc, int edge_y_offset, bool is_long, bool has_highlight);
+	bool Act_For_Open(bool short_open, bool &correct_pos);
+	void Draw_Cup(HDC hdc, bool top_cup);
 	void Draw_Edges(HDC hdc);
-	void Draw_Long_Opening_Edges(HDC hdc);
 	void Draw_Short_Opening_Edges(HDC hdc);
-	bool Act_For_Short_Open();
-	bool Act_For_Long_Open(bool &correct_pos);
+	void Draw_Long_Opening_Edges(HDC hdc);
+	void Draw_One_Edge(HDC hdc, int edge_y_offset, bool long_edge);
+	void Draw_Red_Edge(HDC hdc, int edge_y_offset, bool long_edge, bool has_highlight);
+	void Draw_Charge(HDC hdc);
 	void Redraw_Gate();
 
 	EGate_State Gate_State;
 	EGate_Transformation Gate_Transformation;
 	int X_Pos;
 	double Y_Pos, Origin_Y_Pos;
-	int Edge_Count;
+	int Edges_Count;
 	int Gate_Close_Tick;
 	double Gap_Height;
 	RECT Gate_Rect;

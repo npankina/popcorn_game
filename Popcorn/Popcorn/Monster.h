@@ -1,7 +1,8 @@
 ﻿#pragma once
-#include "Explosive_Ball.h"
-#include "Border.h"
 
+#include "Explosive_Ball.h"
+#include "Gate.h"
+#include "Level.h"
 
 //------------------------------------------------------------------------------------------------------------
 enum class EEye_State : unsigned char
@@ -47,11 +48,11 @@ public:
 
 private:
 	void Draw_Alive(HDC hdc);
-	void Draw_Destroing(HDC hdc, RECT& paint_area);
+	void Draw_Destroing(HDC hdc, RECT &paint_area);
 	void Act_Alive();
 	void Act_Destroing();
+	void Get_Monster_Rect(double x_pos, double y_pos, RECT &rect);
 	void Redraw_Monster();
-	void Get_Monster_Rect(double x_pos, double y_pos, RECT& rect);
 
 	EEye_State Eye_State;
 	EMonster_State Monster_State;

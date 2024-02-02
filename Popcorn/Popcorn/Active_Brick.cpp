@@ -353,7 +353,7 @@ AActive_Brick_Teleport::~AActive_Brick_Teleport()
 }
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Teleport::AActive_Brick_Teleport(int level_x, int level_y, ABall_Object *ball, AActive_Brick_Teleport *destination_teleport)
-: AActive_Brick(EBrick_Type::Teleport, level_x, level_y), Teleport_State(ETS_Starting), Animation_Step(0), Ball(0), Destination_Teleport(destination_teleport)
+: AActive_Brick(EBrick_Type::Teleport, level_x, level_y), Teleport_State(ETeleport_State::Starting), Animation_Step(0), Ball(0), Destination_Teleport(destination_teleport)
 {
 	Set_Ball(ball);
 }
@@ -375,9 +375,9 @@ void AActive_Brick_Teleport::Act()
 	{
 		switch (Teleport_State)
 		{
-		case ETS_Starting:
+		case ETeleport_State::Starting:
 			Animation_Step = 0;
-			Teleport_State = ETS_Finishing;
+			Teleport_State = ETeleport_State::Finishing;
 
 			if (Destination_Teleport != 0)
 			{
@@ -386,8 +386,8 @@ void AActive_Brick_Teleport::Act()
 			}
 			break;
 
-		case ETS_Finishing:
-			Teleport_State = ETS_Done;
+		case ETeleport_State::Finishing:
+			Teleport_State = ETeleport_State::Done;
 
 			if (Ball != 0)
 			{
@@ -436,11 +436,11 @@ void AActive_Brick_Teleport::Draw(HDC hdc, RECT &paint_area)
 
 	switch (Teleport_State)
 	{
-	case ETS_Starting:
+	case ETeleport_State::Starting:
 		step = Animation_Step;
 		break;
 
-	case ETS_Finishing:
+	case ETeleport_State::Finishing:
 		step = Max_Animation_Step - Animation_Step;
 		break;
 
@@ -456,7 +456,7 @@ void AActive_Brick_Teleport::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AActive_Brick_Teleport::Is_Finished()
 {
-	if (Teleport_State == ETS_Done)
+	if (Teleport_State == ETeleport_State::Done)
 		return true;
 	else
 		return false;

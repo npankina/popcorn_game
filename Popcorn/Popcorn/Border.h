@@ -23,8 +23,8 @@ public:
 	void Redraw_Floor();
 	void Open_Gate(int gate_index, bool short_open);
 	int Long_Open_Gate();
-	bool Is_Gate_Open(int gates_index);
-	bool Is_Gate_Closed(int gates_index);
+	bool Is_Gate_Opened(int gate_index);
+	bool Is_Gate_Closed(int gate_index);
 	void Get_Gate_Pos(int gate_index, int &gate_x_pos, int &gate_y_pos);
 
 private:
@@ -32,5 +32,5 @@ private:
 	void Draw_Floor(HDC hdc, RECT &paint_area);
 
 	RECT Floor_Rect;
-	AGate *Gates[AsConfig::Gates_Number];
+	AGate *Gates[AsConfig::Gates_Count];
 };

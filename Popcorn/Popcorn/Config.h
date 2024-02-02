@@ -55,7 +55,7 @@ public:
 	static const int Platform_Circle_Size = 7;
 	static const int Platform_Normal_Inner_Width = Platform_Normal_Width - Platform_Circle_Size;
 
-	static const int Gates_Number = 8;
+	static const int Gates_Count = 8;
 
 	static const double Ball_Radius;
 };

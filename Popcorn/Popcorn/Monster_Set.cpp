@@ -24,7 +24,7 @@ bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos)
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Act()
 {
-	int current_alive_count = 0; // для подсчета живых монстров
+	int current_alive_count; // для подсчета живых монстров
 
 	switch (Monster_Set_State)
 	{
@@ -32,7 +32,7 @@ void AsMonster_Set::Act()
 		break;
 
 	case EMonster_Set_State::Selecting_Next_Gate:
-
+	    current_alive_count = 0;
 		for (int i = 0; i < Max_Monsters_Count; i++)
 			if (Monsters[i].Is_Active())
 				++current_alive_count;
@@ -41,13 +41,13 @@ void AsMonster_Set::Act()
 		if (current_alive_count < Max_Alive_Monsters_Count)
 		{
 			Current_Gate_Index = Border->Long_Open_Gate();
-			Monster_Set_State = EMonster_Set_State::Waiting_Gate_Openening; // ждем открытия гейта
+			Monster_Set_State = EMonster_Set_State::Waiting_Gate_Opening; // ждем открытия гейта
 		}
 		break;
 
 
-	case EMonster_Set_State::Waiting_Gate_Openening:
-		if (Border->Is_Gate_Open(Current_Gate_Index)) // открылся ли нужный нам гейт
+	case EMonster_Set_State::Waiting_Gate_Opening:
+		if (Border->Is_Gate_Opened(Current_Gate_Index) )
 		{
 			Emit_At_Gate(Current_Gate_Index); // выпускаем монстра из гейта
 			Monster_Set_State = EMonster_Set_State::Waiting_Gate_Closing; // перевод состояния в ожидание закрытия гейта
@@ -68,7 +68,7 @@ void AsMonster_Set::Act()
 	AGame_Objects_Set::Act(); // выполняется вызов метода базового класса
 }
 //------------------------------------------------------------------------------------------------------------
-void AsMonster_Set::Init(AsBorder* border)
+void AsMonster_Set::Init(AsBorder *border)
 {
 	Border = border;
 }
@@ -79,8 +79,8 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 	bool gate_is_left = false; // задаем движение монстра (все четные гейты находятся справа, а нечетные слева)
 	int gate_x_pos, gate_y_pos;
 
-	if (gate_index < 0 || gate_index > AsConfig::Gates_Number)
-		AsConfig::Throw(); // несуществующий гейт
+	if (gate_index < 0 or gate_index >= AsConfig::Gates_Count)
+		AsConfig::Throw();
 
 	for (int i = 0; i < Max_Monsters_Count; i++)
 	{
@@ -115,7 +115,7 @@ void AsMonster_Set::Activate(int max_alive_monsters_count)
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
 {
-	if (index < 0 || index >= Max_Monsters_Count)
+	if (index < 0 || index >= AsConfig::Max_Balls_Count)
 		return false;
 
 	*game_obj = &Monsters[index++]; //  в указатель помещается адрес объекта, index по ссылке инкрементируется

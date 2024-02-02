@@ -15,8 +15,8 @@ public:
 	AExplosive_Ball();
 
 	virtual void Act();
-	virtual void Clear(HDC hdc, RECT& paint_area);
-	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
 	void Explode(int x_pos, int y_pos, int size, bool is_red, int time_offset, int step_count);
