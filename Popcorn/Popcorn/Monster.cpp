@@ -28,7 +28,18 @@ bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *bal
 }
 //------------------------------------------------------------------------------------------------------------
 bool AMonster::Check_Hit(double next_x_pos, double next_y_pos)
-{
+{ // Возврат true, если в позиции (next_x_pos, next_y_pos) луч коснется монстра
+
+	if (!(Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive))
+		return false;
+
+	if ((next_x_pos >= X_Pos and next_x_pos <= X_Pos + (double)Width)
+		and (next_y_pos >= Y_Pos and next_y_pos <= Y_Pos + (double)Height))
+	{
+		Destroy();
+		return true;
+	}
+
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
