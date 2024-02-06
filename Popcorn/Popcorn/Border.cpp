@@ -54,26 +54,30 @@ int AsBorder::Long_Open_Gate()
 
 	for (i = 0; i < AsConfig::Gates_Count; i++)
 	{
-		gate = Gates[gate_index];
-		if (gate->Is_Closed()) // проверяем доступность гейта для выхода монстра
+		if (gate_index != AsConfig::Gates_Count - 1) // Гейт, из которого выкатывается платформа не выпускает монстров!!
 		{
-			if (gate->Level_X_Pos == -1)
-			{
-				got_gate = true; // нашли свободный гейт
-				break;
-			}
 
-			if ( ! AsLevel::Has_Brick_At(gate->Level_X_Pos, gate->Level_Y_Pos) // если кирпича у гейта нет 
-				and ! AsLevel::Has_Brick_At(gate->Level_X_Pos, gate->Level_Y_Pos + 1) ) // и по той же позиции по х кирпича нет = такой гейт нам подходит
+			gate = Gates[gate_index];
+			if (gate->Is_Closed()) // проверяем доступность гейта для выхода монстра
 			{
-				got_gate = true; // нашли свободный гейт
-				break;
+				if (gate->Level_X_Pos == -1)
+				{
+					got_gate = true; // нашли свободный гейт
+					break;
+				}
+
+				if (!AsLevel::Has_Brick_At(gate->Level_X_Pos, gate->Level_Y_Pos) // если кирпича у гейта нет 
+					and !AsLevel::Has_Brick_At(gate->Level_X_Pos, gate->Level_Y_Pos + 1)) // и по той же позиции по х кирпича нет = такой гейт нам подходит
+				{
+					got_gate = true; // нашли свободный гейт
+					break;
+				}
 			}
+			++gate_index;
+
+			if (gate_index >= AsConfig::Gates_Count)
+				gate_index = 0;
 		}
-		++gate_index;
-
-		if (gate_index >= AsConfig::Gates_Count)
-			gate_index = 0;
 	}
 
 	if (!got_gate)

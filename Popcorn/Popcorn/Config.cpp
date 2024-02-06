@@ -1,6 +1,6 @@
 ﻿#include "Config.h"
 
-bool AsConfig::Level_Has_Floor = true;
+bool AsConfig::Level_Has_Floor = false; // включение - отключение пол в игре
 int AsConfig::Current_Timer_Tick = 0;
 
 const AColor AsConfig::BG_Color(6, 30, 82);

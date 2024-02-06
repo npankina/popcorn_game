@@ -18,6 +18,8 @@ bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *bal
 
 	double radius = (double)Width / 2.0;
 
+	if (!(Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive))
+		return false;
 
 	if (!AsTools::Reflect_On_Circle(next_x_pos, next_y_pos, X_Pos + radius, Y_Pos + radius, radius, ball))
 		return false;
@@ -102,8 +104,8 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 		if (next_x_pos + (double)Width > (double)AsConfig::Max_X_Pos)
 			next_x_pos = (double)(AsConfig::Max_X_Pos - Width);
 
-		if (next_y_pos + (double)Width > (double)AsConfig::Max_Y_Pos)
-			next_y_pos = (double)(AsConfig::Max_Y_Pos - Width);
+		if (next_y_pos + (double)Width > (double)AsConfig::Floor_Y_Pos)
+			next_y_pos = (double)(AsConfig::Floor_Y_Pos - Width);
 	}
 
 	X_Pos = next_x_pos;

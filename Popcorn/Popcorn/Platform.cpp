@@ -511,9 +511,10 @@ void AsPlatform::Act_For_Meltdown_State()
 		break;
 
 	case EPlatform_Substate_Meltdown::Active:
-		Redraw_Platform();
 		break;
 	}
+
+	Redraw_Platform();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Act_For_Rolling_State()
