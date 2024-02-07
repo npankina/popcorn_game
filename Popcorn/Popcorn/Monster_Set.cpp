@@ -113,6 +113,14 @@ void AsMonster_Set::Activate(int max_alive_monsters_count)
 	Max_Alive_Monsters_Count = max_alive_monsters_count;
 }
 //------------------------------------------------------------------------------------------------------------
+void AsMonster_Set::Destroy_All()
+{
+	for (int i = 0; i < Max_Monsters_Count; i++)
+		Monsters[i].Destroy();
+
+	Monster_Set_State = EMonster_Set_State::Idle;
+}
+//------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
 {
 	if (index < 0 || index >= AsConfig::Max_Balls_Count)

@@ -27,6 +27,12 @@ void AsLaser_Beam_Set::Fire(double left_x_pos, double right_x_pos)
 	right->Set_At(right_x_pos, AsConfig::Platform_Y_Pos - 1);
 }
 //------------------------------------------------------------------------------------------------------------
+void AsLaser_Beam_Set::Disable_All()
+{
+	for (int i = 0; i < Max_Laser_Beams_Count; i++)
+		Laser_Beams[i].Disable();
+}
+//------------------------------------------------------------------------------------------------------------
 bool AsLaser_Beam_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
 {
 	if (index < 0 || index >= Max_Laser_Beams_Count)

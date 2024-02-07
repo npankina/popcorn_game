@@ -6,6 +6,7 @@ class AsLaser_Beam_Set: public AGame_Objects_Set
 {
 public:
 	void Fire(double left_x_pos, double right_x_pos);
+	void Disable_All();
 
 private:
 	virtual bool Get_Next_Game_Object(int &index, AGame_Object **game_obj); // iterator

@@ -27,6 +27,7 @@ public:
 
 	void Set_At(double x, double y);
 	bool Is_Active();
+	void Disable();
 
 	static AHit_Checker_List Hit_Checker_List;
 
