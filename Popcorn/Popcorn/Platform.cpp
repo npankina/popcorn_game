@@ -1,5 +1,9 @@
 ﻿#include "Platform.h"
 
+
+// class AsPlatform
+AHit_Checker_List AsPlatform::Hit_Checker_List;
+//------------------------------------------------------------------------------------------------------------
 AsPlatform::~AsPlatform()
 {
 	delete[] Normal_Platform_Image;
@@ -117,6 +121,10 @@ void AsPlatform::Advance(double max_speed)
 			if (Platform_State.Moving == EPlatform_Moving_State::Moving_Right)
 				Ball_Set->On_Platform_Advance(0.0, fabs(Speed), max_speed);
 	}
+
+	Hit_Checker_List.Check_Hit(X_Pos, Y_Pos);
+
+
 }
 //------------------------------------------------------------------------------------------------------------
 double AsPlatform::Get_Speed()

@@ -22,6 +22,14 @@ bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
+bool AsMonster_Set::Check_Hit(RECT &rect)
+{
+	for (int i = 0; i < Max_Monsters_Count; i++)
+		if (Monsters[i].Check_Hit(rect) )
+			return true;
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Act()
 {
 	int current_alive_count; // для подсчета живых монстров

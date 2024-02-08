@@ -33,7 +33,7 @@ public:
 	bool Hit_By(AFalling_Letter *falling_letter);
 	double Get_Middle_Pos();
 
-	double X_Pos;
+	static AHit_Checker_List Hit_Checker_List;
 
 private:
 	bool Set_Transformation_State(EPlatform_State new_state, EPlatform_Transformation &transformation_state);
@@ -58,6 +58,7 @@ private:
 	int Rolling_Step;
 	int Last_Redraw_Timer_Tick;
 	double Speed;
+	double X_Pos;
 	AsBall_Set *Ball_Set;
 
 	int Normal_Platform_Image_Width, Normal_Platform_Image_Height;

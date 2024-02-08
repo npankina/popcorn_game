@@ -45,6 +45,18 @@ bool AMonster::Check_Hit(double next_x_pos, double next_y_pos)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
+bool AMonster::Check_Hit(RECT& rect)
+{ // Возврат true, если в позиции (RECT) прямоугольник коснется монстра
+	
+	if (!(Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive))
+		return false;
+
+
+
+	return true;
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
 void AMonster::Begin_Movement() { /* заглушка, не используется */ }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Finish_Movement()
