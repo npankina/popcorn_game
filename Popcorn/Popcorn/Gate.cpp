@@ -99,7 +99,7 @@ void AGate::Open_Gate(bool short_open)
 //------------------------------------------------------------------------------------------------------------
 bool AGate::Is_Opened()
 {
-	if (Gate_State == EGate_State::Short_Open || Gate_State == EGate_State::Long_Open)
+	if (Gate_State == EGate_State::Short_Open or Gate_State == EGate_State::Long_Open)
 	{
 		if (Gate_Transformation == EGate_Transformation::Active)
 			return true;
@@ -383,8 +383,8 @@ void AGate::Draw_Charge(HDC hdc)
 	int dot_x, dot_y;
 	double ratio = Gap_Height / Max_Gap_Long_Height;
 
-	if (ratio < 0.2 || ratio > 0.9)
-		return;  // ￍ￥ ￰￨￱￳￥￬ ￰￠￧￰￿￤ ￢ ￭￠￷￠￫￥ ￨ ￪￮￭￶￥ ￠￭￨￬￠￶￨￨
+	if (ratio < 0.2 or ratio > 0.9)
+		return;  
 
 	field_y = (int)(Origin_Y_Pos + (double)Height / 2.0 - Gap_Height / 2.0) + 1;
 

@@ -28,7 +28,7 @@ public:
 
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball);
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos);
-	virtual bool Check_Hit(RECT& rect);
+	virtual bool Check_Hit(RECT &rect);
 
 	virtual void Begin_Movement();
 	virtual void Finish_Movement();
@@ -36,8 +36,8 @@ public:
 	virtual double Get_Speed();
 
 	virtual void Act();
-	virtual void Clear(HDC hdc, RECT& paint_area);
-	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
 	bool Is_Active();

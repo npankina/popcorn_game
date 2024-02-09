@@ -34,10 +34,10 @@ void AsBorder::Redraw_Floor()
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Open_Gate(int gate_index, bool short_open)
 {
-	if (gate_index != AsConfig::Gates_Count - 1 && short_open)
+	if (gate_index != AsConfig::Gates_Count - 1 and short_open)
 		AsConfig::Throw(); // самый последний гейт может открываться только short_open
 	
-	if (gate_index >= 0 && gate_index < AsConfig::Gates_Count)
+	if (gate_index >= 0 and gate_index < AsConfig::Gates_Count)
 		Gates[gate_index]->Open_Gate(short_open);
 	else
 		AsConfig::Throw();
@@ -116,7 +116,7 @@ bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *bal
 	}
 
 	// 4. Нижний край
-	if (AsConfig::Level_Has_Floor && next_y_pos + AsConfig::Ball_Radius > AsConfig::Floor_Y_Pos)
+	if (AsConfig::Level_Has_Floor and next_y_pos + AsConfig::Ball_Radius > AsConfig::Floor_Y_Pos)
 	{
 		got_hit = true;
 		ball->Reflect(true);
@@ -224,11 +224,9 @@ void AsBorder::Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_bo
 		{
 			Gates[i]->Get_Y_Size(gate_top_y, gate_low_y);
 
-			if (rect.top >= gate_top_y && rect.bottom <= gate_low_y) // элемент рамки целиком внутри гейта
+			if (rect.top >= gate_top_y and rect.bottom <= gate_low_y) // элемент рамки целиком внутри гейта
 				return; // Гейт целиком закроет элемент рамки
 		}
-
-
 	}
 
 	if (! IntersectRect(&intersection_rect, &paint_area, &rect) )
@@ -288,7 +286,7 @@ void AsBorder::Draw_Floor(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AsBorder::Is_Gate_Opened(int gates_index)
 {
-	if (gates_index >= 0 && gates_index < AsConfig::Gates_Count)
+	if (gates_index >= 0 and gates_index < AsConfig::Gates_Count)
 		return Gates[gates_index]->Is_Opened();
 	else
 	{
@@ -299,7 +297,7 @@ bool AsBorder::Is_Gate_Opened(int gates_index)
 //------------------------------------------------------------------------------------------------------------
 bool AsBorder::Is_Gate_Closed(int gates_index)
 {
-	if (gates_index >= 0 && gates_index < AsConfig::Gates_Count)
+	if (gates_index >= 0 and gates_index < AsConfig::Gates_Count)
 		return Gates[gates_index]->Is_Closed();
 	else
 	{
@@ -310,11 +308,9 @@ bool AsBorder::Is_Gate_Closed(int gates_index)
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Get_Gate_Pos(int gate_index, int &gate_x_pos, int &gate_y_pos)
 {
-	if (gate_index >= 0 && gate_index < AsConfig::Gates_Count)
+	if (gate_index >= 0 and gate_index < AsConfig::Gates_Count)
 		Gates[gate_index]->Get_Pos(gate_x_pos, gate_y_pos);
 	else
 		AsConfig::Throw();
 }
 //------------------------------------------------------------------------------------------------------------
-
-

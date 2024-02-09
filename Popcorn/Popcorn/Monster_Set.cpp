@@ -131,7 +131,7 @@ void AsMonster_Set::Destroy_All()
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
 {
-	if (index < 0 || index >= AsConfig::Max_Balls_Count)
+	if (index < 0 or index >= AsConfig::Max_Balls_Count)
 		return false;
 
 	*game_obj = &Monsters[index++]; //  в указатель помещается адрес объекта, index по ссылке инкрементируется

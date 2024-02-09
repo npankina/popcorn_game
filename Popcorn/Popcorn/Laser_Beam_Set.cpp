@@ -20,7 +20,7 @@ void AsLaser_Beam_Set::Fire(double left_x_pos, double right_x_pos)
 			}
 	}
 
-	if (left == 0 || right == 0)
+	if (left == 0 or right == 0)
 		AsConfig::Throw(); // Не хватило "лазерных лучей"
 
 	left->Set_At(left_x_pos, AsConfig::Platform_Y_Pos - 1);
@@ -35,7 +35,7 @@ void AsLaser_Beam_Set::Disable_All()
 //------------------------------------------------------------------------------------------------------------
 bool AsLaser_Beam_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
 {
-	if (index < 0 || index >= Max_Laser_Beams_Count)
+	if (index < 0 or index >= Max_Laser_Beams_Count)
 		return false;
 
 	*game_obj = &Laser_Beams[index++]; //  в указатель помещается адрес объекта, index по ссылке инкрементируется

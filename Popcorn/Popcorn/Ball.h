@@ -27,7 +27,7 @@ public:
 	virtual void Set_On_Parachute(int brick_x, int brick_y);
 	virtual bool Is_Moving_Up();
 	virtual bool Is_Moving_Left();
-	virtual void Get_Center(double& x_pos, double& y_pos);
+	virtual void Get_Center(double &x_pos, double &y_pos);
 
 
 	void Set_Speed(double new_speed);

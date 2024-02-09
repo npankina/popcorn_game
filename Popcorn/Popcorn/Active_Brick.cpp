@@ -58,7 +58,7 @@ AActive_Brick_Red_Blue::~AActive_Brick_Red_Blue()
 AActive_Brick_Red_Blue::AActive_Brick_Red_Blue(EBrick_Type brick_type, int level_x, int level_y)
 : AActive_Brick(brick_type, level_x, level_y), Fade_Step(0)
 {
-	if (! (brick_type == EBrick_Type::Red || brick_type == EBrick_Type::Blue) )
+	if (! (brick_type == EBrick_Type::Red or brick_type == EBrick_Type::Blue) )
 		AsConfig::Throw();
 }
 //------------------------------------------------------------------------------------------------------------
@@ -568,7 +568,7 @@ void AAdvertisement::Act()
 	else
 		Deformation_Ratio = 1.0;
 
-	if (Ball_Y_Offset > High_Ball_Threshold || Ball_Y_Offset < Low_Ball_Threshold)
+	if (Ball_Y_Offset > High_Ball_Threshold or Ball_Y_Offset < Low_Ball_Threshold)
 		Acceleration_Step = -Acceleration_Step;
 }
 //------------------------------------------------------------------------------------------------------------
@@ -715,8 +715,8 @@ void AAdvertisement::Show_Under_Brick(int level_x, int level_y)
 //------------------------------------------------------------------------------------------------------------
 bool AAdvertisement::Has_Brick_At(int level_x, int level_y)
 {
-	if (level_x >= Level_X && level_x <= Level_X + Width)
-		if (level_y >= Level_Y && level_y <= Level_Y + Height)
+	if (level_x >= Level_X and level_x <= Level_X + Width)
+		if (level_y >= Level_Y and level_y <= Level_Y + Height)
 			return true;
 
 	return false;

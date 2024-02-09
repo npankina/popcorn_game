@@ -293,7 +293,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Add_Next_Module(int &index, AGame_Object *game_obj)
 {
-	if (index >= 0 && index < AsConfig::Max_Modules_Count)
+	if (index >= 0 and index < AsConfig::Max_Modules_Count)
 		Modules[index++] = game_obj;
 	else
 		AsConfig::Throw();

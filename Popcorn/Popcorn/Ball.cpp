@@ -15,7 +15,7 @@ void ABall::Begin_Movement()
 //------------------------------------------------------------------------------------------------------------
 void ABall::Finish_Movement()
 {
-	if (Ball_State == EBall_State::Disabled || Ball_State == EBall_State::Lost)
+	if (Ball_State == EBall_State::Disabled or Ball_State == EBall_State::Lost)
 		return;
 
 	Redraw_Ball();
@@ -40,7 +40,7 @@ void ABall::Advance(double max_speed)
 	double next_x_pos, next_y_pos;
 	double next_step;
 
-	if (Ball_State == EBall_State::Disabled || Ball_State == EBall_State::Lost || Ball_State == EBall_State::On_Platform || Ball_State == EBall_State::Teleporting)
+	if (Ball_State == EBall_State::Disabled or Ball_State == EBall_State::Lost or Ball_State == EBall_State::On_Platform or Ball_State == EBall_State::Teleporting)
 		return;
 
 	next_step = Ball_Speed / max_speed * AsConfig::Moving_Step_Size;
@@ -97,7 +97,7 @@ void ABall::Clear(HDC hdc, RECT &paint_area)
 	if (Ball_State == EBall_State::Disabled)
 		return;
 
-	if ( (Ball_State == EBall_State::Teleporting || Ball_State == EBall_State::Lost) && Ball_State == Prev_Ball_State)
+	if ( (Ball_State == EBall_State::Teleporting or Ball_State == EBall_State::Lost) and Ball_State == Prev_Ball_State)
 		return;
 
 	// 1. Очищаем фон
@@ -116,7 +116,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	if (Ball_State == EBall_State::Disabled)
 		return;
 
-	if ( (Ball_State == EBall_State::Teleporting || Ball_State == EBall_State::Lost) && Ball_State == Prev_Ball_State)
+	if ( (Ball_State == EBall_State::Teleporting or Ball_State == EBall_State::Lost) and Ball_State == Prev_Ball_State)
 		return;
 
 	switch (Ball_State)
@@ -180,11 +180,11 @@ void ABall::Set_Direction(double new_direction)
 
 	// 2.2. Справа
 	// 2.2.1. Сверху
-	if (new_direction > M_PI - AsConfig::Min_Ball_Angle && new_direction < M_PI)
+	if (new_direction > M_PI - AsConfig::Min_Ball_Angle and new_direction < M_PI)
 		new_direction = M_PI - AsConfig::Min_Ball_Angle;
 
 	// 2.2.1. Снизу
-	if (new_direction >= M_PI && new_direction < M_PI + AsConfig::Min_Ball_Angle)
+	if (new_direction >= M_PI and new_direction < M_PI + AsConfig::Min_Ball_Angle)
 		new_direction = M_PI + AsConfig::Min_Ball_Angle;
 
 	Ball_Direction = new_direction;
@@ -216,7 +216,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 
 
 	case EBall_State::Lost:
-		if (!(Ball_State == EBall_State::Normal || Ball_State == EBall_State::On_Parachute))
+		if (!(Ball_State == EBall_State::Normal or Ball_State == EBall_State::On_Parachute))
 			AsConfig::Throw();  // Только из этих состояний можно потерять мячик!
 
 		Ball_Speed = 0.0;
@@ -254,7 +254,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 		break;
 
 	case EBall_State::Teleporting:
-		if (!(Ball_State == EBall_State::Normal || Ball_State == EBall_State::On_Parachute || Ball_State == EBall_State::Teleporting))
+		if (!(Ball_State == EBall_State::Normal or Ball_State == EBall_State::On_Parachute or Ball_State == EBall_State::Teleporting))
 			AsConfig::Throw();  // Только из этих состояний можно войти в телепорт!
 
 		Center_X_Pos = x_pos;
@@ -319,7 +319,7 @@ void ABall::Set_On_Parachute(int brick_x, int brick_y)
 //------------------------------------------------------------------------------------------------------------
 bool ABall::Is_Moving_Up()
 {
-	if (Ball_Direction >= 0.0 && Ball_Direction < M_PI)
+	if (Ball_Direction >= 0.0 and Ball_Direction < M_PI)
 		return true;
 	else
 		return false;
@@ -327,13 +327,13 @@ bool ABall::Is_Moving_Up()
 //------------------------------------------------------------------------------------------------------------
 bool ABall::Is_Moving_Left()
 {
-	if (Ball_Direction > M_PI_2 && Ball_Direction < M_PI + M_PI_2)
+	if (Ball_Direction > M_PI_2 and Ball_Direction < M_PI + M_PI_2)
 		return true;
 	else
 		return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Get_Center(double& x_pos, double& y_pos)
+void ABall::Get_Center(double &x_pos, double &y_pos)
 {
 	x_pos = Center_X_Pos;
 	y_pos = Center_Y_Pos;

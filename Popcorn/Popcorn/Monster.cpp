@@ -45,15 +45,20 @@ bool AMonster::Check_Hit(double next_x_pos, double next_y_pos)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AMonster::Check_Hit(RECT& rect)
+bool AMonster::Check_Hit(RECT &rect)
 { // Возврат true, если в позиции (RECT) прямоугольник коснется монстра
 	
-	if (!(Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive))
+	RECT intersection_rect;
+
+	if ( ! (Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive) )
 		return false;
 
+	if ( IntersectRect(&intersection_rect, &rect, &Monster_Rect) )
+	{
+		Destroy();
+		return true;
+	}
 
-
-	return true;
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
@@ -371,7 +376,7 @@ void AMonster::Draw_Alive(HDC hdc)
 	Arc(hdc, cornea_rect.left, cornea_rect.top, cornea_rect.right - 1, cornea_rect.bottom - 1, 0, 0, 0, 0);
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Draw_Destroing(HDC hdc, RECT& paint_area)
+void AMonster::Draw_Destroing(HDC hdc, RECT &paint_area)
 {
 	int i;
 

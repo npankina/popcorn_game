@@ -70,7 +70,7 @@ _on_hit:
 	if (ball->Get_State() == EBall_State::On_Parachute)
 		ball->Set_State(EBall_State::Off_Parachute);
 
-	if (Platform_State == EPlatform_State::Glue && Platform_State.Glue == EPlatform_Transformation::Active)
+	if (Platform_State == EPlatform_State::Glue and Platform_State.Glue == EPlatform_Transformation::Active)
 	{
 		ball->Get_Center(ball_x, ball_y);
 		ball->Set_State(EBall_State::On_Platform, ball_x, ball_y);
@@ -98,7 +98,7 @@ void AsPlatform::Advance(double max_speed)
 {
 	double next_step;
 
-	if (Platform_State.Moving == EPlatform_Moving_State::Stopping || Platform_State.Moving == EPlatform_Moving_State::Stop)
+	if (Platform_State.Moving == EPlatform_Moving_State::Stopping or Platform_State.Moving == EPlatform_Moving_State::Stop)
 		return;
 
 	next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
@@ -112,8 +112,8 @@ void AsPlatform::Advance(double max_speed)
 	}
 
 	// Смещаем приклеенные мячики
-	if ( (Platform_State == EPlatform_State::Regular && Platform_State.Regular == EPlatform_Substate_Regular::Ready)
-		|| (Platform_State == EPlatform_State::Glue && Platform_State.Glue == EPlatform_Transformation::Active) )
+	if ( (Platform_State == EPlatform_State::Regular and Platform_State.Regular == EPlatform_Substate_Regular::Ready)
+		or (Platform_State == EPlatform_State::Glue and Platform_State.Glue == EPlatform_Transformation::Active) )
 	{
 		if (Platform_State.Moving == EPlatform_Moving_State::Moving_Left)
 			Ball_Set->On_Platform_Advance(M_PI, fabs(Speed), max_speed);
@@ -122,9 +122,7 @@ void AsPlatform::Advance(double max_speed)
 				Ball_Set->On_Platform_Advance(0.0, fabs(Speed), max_speed);
 	}
 
-	Hit_Checker_List.Check_Hit(X_Pos, Y_Pos);
-
-
+	Hit_Checker_List.Check_Hit(Platform_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 double AsPlatform::Get_Speed()
@@ -197,6 +195,7 @@ void AsPlatform::Clear(HDC hdc, RECT &paint_area)
 	}
 	// else - no break!
 
+	case EPlatform_State::Meltdown:
 	case EPlatform_State::Rolling:
 	case EPlatform_State::Glue:
 	case EPlatform_State::Laser:	
@@ -218,7 +217,7 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 	switch (Platform_State)
 	{
 	case EPlatform_State::Regular:
-		if (Platform_State.Regular == EPlatform_Substate_Regular::Ready || Platform_State.Regular == EPlatform_Substate_Regular::Normal)
+		if (Platform_State.Regular == EPlatform_Substate_Regular::Ready or Platform_State.Regular == EPlatform_Substate_Regular::Normal)
 			Draw_Normal_State(hdc, paint_area);
 		break;
 
@@ -338,7 +337,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 //	EPlatform_Transformation *transformation_state = 0;
 //	EPlatform_State next_state;
 //
-//	if (Platform_State == EPlatform_State::Regular && Platform_State.Regular == new_regular_state)
+//	if (Platform_State == EPlatform_State::Regular and Platform_State.Regular == new_regular_state)
 //		return;
 //
 //	if (new_regular_state == EPlatform_Substate_Regular::Normal)
@@ -421,8 +420,8 @@ void AsPlatform::Redraw_Platform()
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Move(bool to_left, bool key_down)
 {
-	if (! (Has_State(EPlatform_Substate_Regular::Normal) || Platform_State == EPlatform_State::Glue 
-		|| Platform_State == EPlatform_State::Expanding || Platform_State == EPlatform_State::Laser) )
+	if (! (Has_State(EPlatform_Substate_Regular::Normal) or Platform_State == EPlatform_State::Glue 
+		or Platform_State == EPlatform_State::Expanding or Platform_State == EPlatform_State::Laser) )
 		return;
 
 	if (to_left)
@@ -430,10 +429,10 @@ void AsPlatform::Move(bool to_left, bool key_down)
 	else
 		Right_Key_Down = key_down;
 
-	if (Left_Key_Down && Right_Key_Down)
+	if (Left_Key_Down and Right_Key_Down)
 		return;  // Игнорируем одновременное нажатие двух клавиш
 
-	if (! Left_Key_Down && ! Right_Key_Down)
+	if (! Left_Key_Down and ! Right_Key_Down)
 	{
 		Speed = 0.0;
 		Platform_State.Moving = EPlatform_Moving_State::Stopping;
@@ -602,7 +601,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 
 	AsTools::Round_Rect(hdc, inner_rect, 3);
 
-	if (Normal_Platform_Image == 0 && Has_State(EPlatform_Substate_Regular::Ready) )
+	if (Normal_Platform_Image == 0 and Has_State(EPlatform_Substate_Regular::Ready) )
 		Get_Normal_Platform_Image(hdc);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -778,7 +777,7 @@ bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, const AColor **co
 double AsPlatform::Get_Current_Platform_Width()
 {
 	//--- вычисляем ширину платформы для разных состояний
-	if (Platform_State == EPlatform_State::Rolling && Platform_State.Rolling == EPlatform_Substate_Rolling::Roll_In)
+	if (Platform_State == EPlatform_State::Rolling and Platform_State.Rolling == EPlatform_Substate_Rolling::Roll_In)
 		return (double)AsConfig::Platform_Circle_Size;
 	else if (Platform_State == EPlatform_State::Expanding)
 		return Platform_Expanding.Expanding_Platform_Width;

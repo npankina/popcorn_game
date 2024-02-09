@@ -45,10 +45,10 @@ void AExplosive_Ball::Act()
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-void AExplosive_Ball::Clear(HDC hdc, RECT& paint_area)
+void AExplosive_Ball::Clear(HDC hdc, RECT &paint_area)
 {} // Заглушка, не используется
 //------------------------------------------------------------------------------------------------------------
-void AExplosive_Ball::Draw(HDC hdc, RECT& paint_area)
+void AExplosive_Ball::Draw(HDC hdc, RECT &paint_area)
 {
 	int curr_timeout;
 	int color_index;

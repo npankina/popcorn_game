@@ -10,7 +10,7 @@ void AsBall_Set::Act()
 		curr_ball = &Balls[i];
 
 		if (curr_ball->Get_State() == EBall_State::On_Platform)
-			if (curr_ball->Release_Timer_Tick != 0 && AsConfig::Current_Timer_Tick >= curr_ball->Release_Timer_Tick)
+			if (curr_ball->Release_Timer_Tick != 0 and AsConfig::Current_Timer_Tick >= curr_ball->Release_Timer_Tick)
 				curr_ball->Release();
 	}
 }
@@ -225,7 +225,7 @@ void AsBall_Set::On_Platform_Advance(double direction, double platform_speed, do
 //------------------------------------------------------------------------------------------------------------
 bool AsBall_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
 {
-	if (index < 0 || index >= AsConfig::Max_Balls_Count)
+	if (index < 0 or index >= AsConfig::Max_Balls_Count)
 		return false;
 
 	*game_obj = &Balls[index++]; //  в указатель помещается адрес объекта, index по ссылке инкрементируется

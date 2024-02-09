@@ -159,7 +159,7 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	const AColor *front_color, *back_color;
 	XFORM xform{}, old_xform{};
 
-	if (! (Brick_Type == EBrick_Type::Blue || Brick_Type == EBrick_Type::Red))
+	if (! (Brick_Type == EBrick_Type::Blue or Brick_Type == EBrick_Type::Red))
 		return;  // Падающие буквы могут быть только от кирпичей такого типа
 
 	// Корректируем шаг вращения и угол поворота
@@ -170,7 +170,7 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	else
 		rotation_angle = 2.0 * M_PI / (double)Max_Rotation_Step * (double)(8 - Rotation_Step);
 
-	if (Rotation_Step > 4 && Rotation_Step <= 12)
+	if (Rotation_Step > 4 and Rotation_Step <= 12)
 	{
 		if (Brick_Type == EBrick_Type::Blue)
 			switch_color = true;
@@ -188,7 +188,7 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	Set_Brick_Letter_Colors(switch_color, &front_color, &back_color);
 
 
-	if (Rotation_Step == 4 || Rotation_Step == 12)
+	if (Rotation_Step == 4 or Rotation_Step == 12)
 	{
 		// Выводим фон
 		back_color->Select(hdc);
@@ -231,7 +231,7 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 
 		Rectangle(hdc, 0, -Brick_Half_Height, AsConfig::Brick_Width * AsConfig::Global_Scale - 1, Brick_Half_Height);
 
-		if (Rotation_Step > 4 && Rotation_Step <= 12)
+		if (Rotation_Step > 4 and Rotation_Step <= 12)
 		{
 			AsConfig::Letter_Color.Select_Pen(hdc);
 

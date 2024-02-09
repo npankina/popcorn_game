@@ -31,7 +31,7 @@ public:
 	virtual void Set_On_Parachute(int brick_x, int brick_y) = 0;
 	virtual bool Is_Moving_Up() = 0;
 	virtual bool Is_Moving_Left() = 0;
-	virtual void Get_Center(double& x_pos, double& y_pos) = 0;
+	virtual void Get_Center(double &x_pos, double &y_pos) = 0;
 };
 //------------------------------------------------------------------------------------------------------------
 class AMover

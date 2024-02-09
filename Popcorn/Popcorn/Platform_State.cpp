@@ -79,7 +79,7 @@ EPlatform_State AsPlatform_State::Set_State(EPlatform_Substate_Regular new_regul
 {
 	EPlatform_Transformation *transformation_state = 0;
 
-	if (Current_State == EPlatform_State::Regular && Regular == new_regular_state)
+	if (Current_State == EPlatform_State::Regular and Regular == new_regular_state)
 		return EPlatform_State::Unknown;
 
 	if (new_regular_state == EPlatform_Substate_Regular::Normal)

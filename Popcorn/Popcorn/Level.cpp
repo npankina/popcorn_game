@@ -112,7 +112,7 @@ bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball
 
 			got_vertical_hit = Check_Vertical_Hit(next_x_pos, next_y_pos, j, i, ball, vertical_reflection_pos);
 
-			if (got_horizontal_hit && got_vertical_hit)
+			if (got_horizontal_hit and got_vertical_hit)
 			{
 				if (On_Hit(j, i, ball, true) )
 				{
@@ -155,10 +155,10 @@ bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos)
 	level_x_index = (int)( (next_x_pos - AsConfig::Level_X_Offset) / (double)(AsConfig::Cell_Width) );
 	level_y_index = (int)( (next_y_pos - AsConfig::Level_Y_Offset) / (double)(AsConfig::Cell_Height) );
 
-	if (level_x_index < 0 || level_x_index >= AsConfig::Level_Width)
+	if (level_x_index < 0 or level_x_index >= AsConfig::Level_Width)
 		return false;
 
-	if (level_y_index < 0 || level_y_index >= AsConfig::Level_Height)
+	if (level_y_index < 0 or level_y_index >= AsConfig::Level_Height)
 		return false;
 
 	if (Current_Level[level_y_index][level_x_index] == 0)
@@ -318,7 +318,7 @@ bool AsLevel::Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_lett
 	if (Falling_Letters_Count == 0)
 		return false;
 
-	if (index < 0 || index >= AsConfig::Max_Falling_Letters_Count)
+	if (index < 0 or index >= AsConfig::Max_Falling_Letters_Count)
 		return false;
 
 	while (index < AsConfig::Max_Falling_Letters_Count)
@@ -388,7 +388,7 @@ bool AsLevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool vertical
 
 	brick_type = (EBrick_Type)Current_Level[brick_y][brick_x];
 
-	if (ball == 0 && brick_type == EBrick_Type::Parachute)
+	if (ball == 0 and brick_type == EBrick_Type::Parachute)
 	{
 		brick_type = EBrick_Type::Red;
 		Current_Level[brick_y][brick_x] = (char)EBrick_Type::Red;
@@ -430,7 +430,7 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 	AFalling_Letter *falling_letter;
 
 
-	if (! (brick_type == EBrick_Type::Red || brick_type == EBrick_Type::Blue) )
+	if (! (brick_type == EBrick_Type::Red or brick_type == EBrick_Type::Blue) )
 		return false;
 
 	if (AsTools::Rand(AsConfig::Hits_Per_Letter) != 0)
@@ -586,22 +586,22 @@ void AsLevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall_Object *
 		switch (direction)
 		{
 		case EDirection_Type::Left:
-			if (dest_brick_x > 0 && (EBrick_Type)Current_Level[dest_brick_y][dest_brick_x - 1] == EBrick_Type::None)
+			if (dest_brick_x > 0 and (EBrick_Type)Current_Level[dest_brick_y][dest_brick_x - 1] == EBrick_Type::None)
 				got_direction = true;
 			break;
 
 		case EDirection_Type::Up:
-			if (dest_brick_y > 0 && (EBrick_Type)Current_Level[dest_brick_y - 1][dest_brick_x] == EBrick_Type::None)
+			if (dest_brick_y > 0 and (EBrick_Type)Current_Level[dest_brick_y - 1][dest_brick_x] == EBrick_Type::None)
 				got_direction = true;
 			break;
 
 		case EDirection_Type::Right:
-			if (dest_brick_x < AsConfig::Level_Width - 1 && (EBrick_Type)Current_Level[dest_brick_y][dest_brick_x + 1] == EBrick_Type::None)
+			if (dest_brick_x < AsConfig::Level_Width - 1 and (EBrick_Type)Current_Level[dest_brick_y][dest_brick_x + 1] == EBrick_Type::None)
 				got_direction = true;
 			break;
 
 		case EDirection_Type::Down:
-			if (dest_brick_y < AsConfig::Level_Height - 1 && (EBrick_Type)Current_Level[dest_brick_y + 1][dest_brick_x] == EBrick_Type::None)
+			if (dest_brick_y < AsConfig::Level_Height - 1 and (EBrick_Type)Current_Level[dest_brick_y + 1][dest_brick_x] == EBrick_Type::None)
 				got_direction = true;
 			break;
 
@@ -655,7 +655,7 @@ AActive_Brick_Teleport *AsLevel::Select_Destination_Teleport(int source_x, int s
 
 	dest_index = AsTools::Rand(Teleport_Bricks_Count);
 
-	if (Teleport_Bricks_Pos[dest_index].X == source_x && Teleport_Bricks_Pos[dest_index].Y == source_y)
+	if (Teleport_Bricks_Pos[dest_index].X == source_x and Teleport_Bricks_Pos[dest_index].Y == source_y)
 	{// Если случайно выбрали текущий телепорт - переходим к следующему
 
 		++dest_index;
@@ -679,7 +679,7 @@ bool AsLevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level
 		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Low_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вниз
-			if (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0)
+			if (level_y < AsConfig::Level_Height - 1 and Current_Level[level_y + 1][level_x] == 0)
 				return true;
 			else
 				return false;
@@ -691,7 +691,7 @@ bool AsLevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level
 		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Top_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вверх
-			if (level_y > 0 && Current_Level[level_y - 1][level_x] == 0)
+			if (level_y > 0 and Current_Level[level_y - 1][level_x] == 0)
 				return true;
 			else
 				return false;
@@ -711,7 +711,7 @@ bool AsLevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int lev
 		if (Hit_Circle_On_Line(Current_Brick_Left_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока влево
-			if (level_x > 0 && Current_Level[level_y][level_x - 1] == 0)
+			if (level_x > 0 and Current_Level[level_y][level_x - 1] == 0)
 				return true;
 			else
 				return false;
@@ -723,7 +723,7 @@ bool AsLevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int lev
 		if (Hit_Circle_On_Line(Current_Brick_Right_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вправо
-			if (level_x < AsConfig::Level_Width - 1 && Current_Level[level_y][level_x + 1] == 0)
+			if (level_x < AsConfig::Level_Width - 1 and Current_Level[level_y][level_x + 1] == 0)
 				return true;
 			else
 				return false;
@@ -742,7 +742,7 @@ void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, int level_x, int level_y)
 	switch (brick_type)
 	{
 	case EBrick_Type::None:
-		if (Advertisement != 0 && Advertisement->Has_Brick_At(level_x, level_y) )
+		if (Advertisement != 0 and Advertisement->Has_Brick_At(level_x, level_y) )
 			break;
 		// else - No break!
 
