@@ -15,7 +15,7 @@ void ABall::Begin_Movement()
 //------------------------------------------------------------------------------------------------------------
 void ABall::Finish_Movement()
 {
-	if (Ball_State == EBall_State::Disabled or Ball_State == EBall_State::Lost)
+	if (Ball_State == EBall_State::Disabled or Ball_State == EBall_State::Lost or Ball_State == EBall_State::On_Platform)
 		return;
 
 	Redraw_Ball();
