@@ -113,6 +113,34 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 //------------------------------------------------------------------------------------------------------------
+void On_Paint(HWND hwnd)
+{
+	HDC hdc;
+	PAINTSTRUCT ps;
+	int dc_width, dc_height;
+	HDC mem_dc;
+	HBITMAP mem_bitmap;
+	RECT rect{};
+
+	hdc = BeginPaint(hwnd, &ps);
+
+	GetClientRect(hwnd, &rect);
+	mem_dc = CreateCompatibleDC(hdc);
+	dc_width = rect.right - rect.left;
+	dc_height = rect.bottom - rect.top;
+	mem_bitmap = CreateCompatibleBitmap(hdc, dc_width, dc_height);
+	SelectObject(mem_dc, mem_bitmap);
+
+	Engine.Draw_Frame(mem_dc, ps.rcPaint); // рисование теперь происходит в новый контекст устройства (наш буфер)
+	BitBlt(hdc, 0, 0, dc_width, dc_height, mem_dc, 0, 0, SRCCOPY); // скопировали пиксели (рисунок) из нашего буфера в windows
+
+	DeleteObject(mem_bitmap);
+	DeleteObject(mem_dc);
+
+
+	EndPaint(hwnd, &ps);
+}
+//------------------------------------------------------------------------------------------------------------
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -126,11 +154,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId;
-	HDC hdc;
-	PAINTSTRUCT ps;
-
-
-
+	
 	switch (message)
 	{
 	case WM_COMMAND:
@@ -149,35 +173,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
 
-	break;
+		break;
 
 	case WM_PAINT:
-	{
-		hdc = BeginPaint(hWnd, &ps);
-
-		int dc_width, dc_height;
-		HDC mem_dc;
-		HBITMAP mem_bitmap;
-		RECT rect{};
-
-		GetClientRect(hWnd, &rect);
-		mem_dc = CreateCompatibleDC(hdc);
-		dc_width = rect.right - rect.left;
-		dc_height = rect.bottom - rect.top;
-		mem_bitmap = CreateCompatibleBitmap(hdc, dc_width, dc_height);
-		SelectObject(mem_dc, mem_bitmap);
-
-		Engine.Draw_Frame(mem_dc, ps.rcPaint); // рисование теперь происходит в новый контекст устройства (наш буфер)
-		BitBlt(hdc, 0, 0, dc_width, dc_height, mem_dc, 0, 0, SRCCOPY); // скопировали пиксели (рисунок) из нашего буфера в windows
-
-		DeleteObject(mem_bitmap);
-		DeleteObject(mem_dc);
-
-
-		EndPaint(hWnd, &ps);
-	}
-	break;
-
+		On_Paint(hWnd);
+		break;
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
