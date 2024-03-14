@@ -8,9 +8,9 @@
 
 
 // Global Variables:
-int Frame_DC_Width, Frame_DC_Height;
-HDC Frame_DC;
-HBITMAP Frame_Bitmap;
+int Frame_DC_Width = 0, Frame_DC_Height = 0;
+HDC Frame_DC = 0;
+HBITMAP Frame_Bitmap = 0;
 
 AsEngine Engine;
 HINSTANCE hInst;                                // current instance
