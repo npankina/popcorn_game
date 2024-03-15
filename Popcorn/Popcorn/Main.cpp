@@ -119,6 +119,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //------------------------------------------------------------------------------------------------------------
 void On_Paint(HWND hwnd)
 {
+	int dc_width, dc_height;
 	HDC hdc;
 	PAINTSTRUCT ps;
 	RECT rect{};
@@ -126,18 +127,27 @@ void On_Paint(HWND hwnd)
 	hdc = BeginPaint(hwnd, &ps);
 
 	GetClientRect(hwnd, &rect);
-	Frame_DC = CreateCompatibleDC(hdc);
-	Frame_DC_Width = rect.right - rect.left;
-	Frame_DC_Height = rect.bottom - rect.top;
-	Frame_Bitmap = CreateCompatibleBitmap(hdc, Frame_DC_Width, Frame_DC_Height);
-	SelectObject(Frame_DC, Frame_Bitmap);
+	dc_width = rect.right - rect.left;
+	dc_height = rect.bottom - rect.top;
+
+	if (dc_width != Frame_DC_Width and dc_height != Frame_DC_Height)
+	{
+		if (Frame_Bitmap != 0)
+			DeleteObject(Frame_Bitmap);
+
+		if (Frame_DC != 0)
+			DeleteObject(Frame_DC);
+
+		Frame_DC_Width = dc_width;
+		Frame_DC_Height = dc_height;
+
+		Frame_DC = CreateCompatibleDC(hdc);
+		Frame_Bitmap = CreateCompatibleBitmap(hdc, Frame_DC_Width, Frame_DC_Height);
+		SelectObject(Frame_DC, Frame_Bitmap);
+	}
 
 	Engine.Draw_Frame(Frame_DC, ps.rcPaint); // рисование теперь происходит в новый контекст устройства (наш буфер)
 	BitBlt(hdc, 0, 0, Frame_DC_Width, Frame_DC_Height, Frame_DC, 0, 0, SRCCOPY); // скопировали пиксели (рисунок) из нашего буфера в windows
-
-	DeleteObject(Frame_Bitmap);
-	DeleteObject(Frame_DC);
-
 
 	EndPaint(hwnd, &ps);
 }
