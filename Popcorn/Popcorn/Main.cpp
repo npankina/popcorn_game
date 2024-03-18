@@ -8,10 +8,7 @@
 
 
 // Global Variables:
-int Frame_DC_Width = 0, Frame_DC_Height = 0;
-HDC Frame_DC = 0;
-HBITMAP Frame_Bitmap = 0;
-
+AsFrame_DC Frame_DC;
 AsEngine Engine;
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
@@ -117,37 +114,17 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 //------------------------------------------------------------------------------------------------------------
-void On_Paint(HWND hwnd)
+void On_Paint(HWND hwnd, HDC hdc)
 {
 	int dc_width, dc_height;
-	HDC hdc;
+	HDC hdc, frame_dc;
 	PAINTSTRUCT ps;
-	RECT rect{};
 
 	hdc = BeginPaint(hwnd, &ps);
+	frame_dc = Frame_DC.Get_DC(hwnd, hdc);
 
-	GetClientRect(hwnd, &rect);
-	dc_width = rect.right - rect.left;
-	dc_height = rect.bottom - rect.top;
-
-	if (dc_width != Frame_DC_Width and dc_height != Frame_DC_Height)
-	{
-		if (Frame_Bitmap != 0)
-			DeleteObject(Frame_Bitmap);
-
-		if (Frame_DC != 0)
-			DeleteObject(Frame_DC);
-
-		Frame_DC_Width = dc_width;
-		Frame_DC_Height = dc_height;
-
-		Frame_DC = CreateCompatibleDC(hdc);
-		Frame_Bitmap = CreateCompatibleBitmap(hdc, Frame_DC_Width, Frame_DC_Height);
-		SelectObject(Frame_DC, Frame_Bitmap);
-	}
-
-	Engine.Draw_Frame(Frame_DC, ps.rcPaint); // рисование теперь происходит в новый контекст устройства (наш буфер)
-	BitBlt(hdc, 0, 0, Frame_DC_Width, Frame_DC_Height, Frame_DC, 0, 0, SRCCOPY); // скопировали пиксели (рисунок) из нашего буфера в windows
+	Engine.Draw_Frame(frame_dc, ps.rcPaint); // рисование теперь происходит в новый контекст устройства (наш буфер)
+	BitBlt(hdc, 0, 0, Frame_DC.Width, Frame_DC.Height, frame_dc, 0, 0, SRCCOPY); // скопировали пиксели (рисунок) из нашего буфера в windows
 
 	EndPaint(hwnd, &ps);
 }
