@@ -20,6 +20,56 @@ BOOL InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 //------------------------------------------------------------------------------------------------------------
+
+
+
+
+// class AsFrame_DC
+//------------------------------------------------------------------------------------------------------------
+HDC AsFrame_DC::Get_DC(HWND hwnd, HDC hdc)
+{
+	int dc_width, dc_height;
+	RECT rect{};
+
+	GetClientRect(hwnd, &rect);
+	dc_width = rect.right - rect.left;
+	dc_height = rect.bottom - rect.top;
+
+	if (dc_width != Width and dc_height != Height)
+	{
+		if (Frame_Bitmap != 0)
+			DeleteObject(Frame_Bitmap);
+
+		if (Frame_DC != 0)
+			DeleteObject(Frame_DC);
+
+		Width = dc_width;
+		Height = dc_height;
+
+		Frame_DC = CreateCompatibleDC(hdc);
+		Frame_Bitmap = CreateCompatibleBitmap(hdc, Width, Height);
+		SelectObject(Frame_DC, Frame_Bitmap);
+
+		AsTools::Rect(Frame_DC, rect, AsConfig::BG_Color);
+	}
+
+	return Frame_DC;
+}
+//------------------------------------------------------------------------------------------------------------
+AsFrame_DC::~AsFrame_DC()
+{
+	if (Frame_Bitmap != 0)
+		DeleteObject(Frame_Bitmap);
+
+	if (Frame_DC != 0)
+		DeleteObject(Frame_DC);
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
+//------------------------------------------------------------------------------------------------------------
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
@@ -114,9 +164,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 //------------------------------------------------------------------------------------------------------------
-void On_Paint(HWND hwnd, HDC hdc)
+void On_Paint(HWND hwnd)
 {
-	int dc_width, dc_height;
 	HDC hdc, frame_dc;
 	PAINTSTRUCT ps;
 
@@ -164,6 +213,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_PAINT:
+
 		On_Paint(hWnd);
 		break;
 
