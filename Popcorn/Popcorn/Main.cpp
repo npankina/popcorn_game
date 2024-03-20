@@ -4,21 +4,9 @@
 #include "framework.h"
 #include "Main.h"
 
-#define MAX_LOADSTRING 100
-
-
 // Global Variables:
-AsFrame_DC Frame_DC;
-AsEngine Engine;
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-
-// Forward declarations of functions included in this code module:
-ATOM MyRegisterClass(HINSTANCE hInstance);
-BOOL InitInstance(HINSTANCE, int);
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
+AsMain_Window Main_Window;
+AsMain_Window * AsMain_Window::Self = 0;
 //------------------------------------------------------------------------------------------------------------
 
 
@@ -37,32 +25,32 @@ HDC AsFrame_DC::Get_DC(HWND hwnd, HDC hdc)
 
 	if (dc_width != Width and dc_height != Height)
 	{
-		if (Frame_Bitmap != 0)
-			DeleteObject(Frame_Bitmap);
+		if (Bitmap != 0)
+			DeleteObject(Bitmap);
 
-		if (Frame_DC != 0)
-			DeleteObject(Frame_DC);
+		if (Hdc != 0)
+			DeleteObject(Hdc);
 
 		Width = dc_width;
 		Height = dc_height;
 
-		Frame_DC = CreateCompatibleDC(hdc);
-		Frame_Bitmap = CreateCompatibleBitmap(hdc, Width, Height);
-		SelectObject(Frame_DC, Frame_Bitmap);
+		Hdc = CreateCompatibleDC(hdc);
+		Bitmap = CreateCompatibleBitmap(hdc, Width, Height);
+		SelectObject(Hdc, Bitmap);
 
-		AsTools::Rect(Frame_DC, rect, AsConfig::BG_Color);
+		AsTools::Rect(Hdc, rect, AsConfig::BG_Color);
 	}
 
-	return Frame_DC;
+	return Hdc;
 }
 //------------------------------------------------------------------------------------------------------------
 AsFrame_DC::~AsFrame_DC()
 {
-	if (Frame_Bitmap != 0)
-		DeleteObject(Frame_Bitmap);
+	if (Bitmap != 0)
+		DeleteObject(Bitmap);
 
-	if (Frame_DC != 0)
-		DeleteObject(Frame_DC);
+	if (Hdc != 0)
+		DeleteObject(Hdc);
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -72,18 +60,23 @@ AsFrame_DC::~AsFrame_DC()
 //------------------------------------------------------------------------------------------------------------
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
+	return Main_Window.Main(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+}
+//------------------------------------------------------------------------------------------------------------
+int APIENTRY AsMain_Window::Main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
+{
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	// TODO: Place code here.
 
 	// Initialize global strings
-	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-	LoadStringW(hInstance, IDC_POPCORN, szWindowClass, MAX_LOADSTRING);
-	MyRegisterClass(hInstance);
+	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_String_Size);
+	LoadStringW(hInstance, IDC_POPCORN, szWindowClass, MAX_String_Size);
+	Register_Class(hInstance);
 
 	// Perform application initialization:
-	if (!InitInstance(hInstance, nCmdShow))
+	if (!Init_Instance(hInstance, nCmdShow))
 		return FALSE;
 
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_POPCORN));
@@ -103,19 +96,15 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	return (int)msg.wParam;
 }
 //------------------------------------------------------------------------------------------------------------
-//
-//  FUNCTION: MyRegisterClass()
-//
-//  PURPOSE: Registers the window class.
-//
-ATOM MyRegisterClass(HINSTANCE hInstance)
-{
+ATOM AsMain_Window::Register_Class(HINSTANCE hInstance)
+{ // Registers the window class.
+
 	WNDCLASSEXW wcex{};
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WndProc;
+	wcex.lpfnWndProc = Window_Proc;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = hInstance;
@@ -129,18 +118,9 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassExW(&wcex);
 }
 //------------------------------------------------------------------------------------------------------------
-//
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
-//
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
+BOOL AsMain_Window::Init_Instance(HINSTANCE hInstance, int nCmdShow)
+{ // Saves instance handle and creates main window
+
 	hInst = hInstance; // Store instance handle in our global variable
 
 	RECT window_rect{};
@@ -164,7 +144,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 //------------------------------------------------------------------------------------------------------------
-void On_Paint(HWND hwnd)
+void AsMain_Window::On_Paint(HWND hwnd)
 {
 	HDC hdc, frame_dc;
 	PAINTSTRUCT ps;
@@ -178,18 +158,9 @@ void On_Paint(HWND hwnd)
 	EndPaint(hwnd, &ps);
 }
 //------------------------------------------------------------------------------------------------------------
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE: Processes messages for the main window.
-//
-//  WM_COMMAND  - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY  - post a quit message and return
-//
-//
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+LRESULT CALLBACK AsMain_Window::Window_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{ // Processes messages for the main window.
+
 	int wmId;
 	
 	switch (message)
@@ -261,7 +232,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 //------------------------------------------------------------------------------------------------------------
 // Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK AsMain_Window::About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 	switch (message)
