@@ -6,7 +6,6 @@
 
 // Global Variables:
 AsMain_Window Main_Window;
-AsMain_Window * AsMain_Window::Self = 0;
 //------------------------------------------------------------------------------------------------------------
 
 
@@ -63,30 +62,44 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	return Main_Window.Main(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
 }
 //------------------------------------------------------------------------------------------------------------
-int APIENTRY AsMain_Window::Main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
-{
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	// TODO: Place code here.
+
+
+
+// class AsMain_Window
+AsMain_Window *AsMain_Window::Self = 0;
+//------------------------------------------------------------------------------------------------------------
+AsMain_Window::AsMain_Window()
+: Instance(0), szTitle{}, szWindowClass{}
+{
+	Self = this;
+}
+//------------------------------------------------------------------------------------------------------------
+int APIENTRY AsMain_Window::Main(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR command_line, int command_show)
+{
+	MSG msg;
+	HACCEL accel_table;
+
+	Instance = instance; // Store instance handle in our global variable
+
+	UNREFERENCED_PARAMETER(prev_instance);
+	UNREFERENCED_PARAMETER(command_line);
 
 	// Initialize global strings
-	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_String_Size);
-	LoadStringW(hInstance, IDC_POPCORN, szWindowClass, MAX_String_Size);
-	Register_Class(hInstance);
+	LoadStringW(instance, IDS_APP_TITLE, szTitle, MAX_String_Size);
+	LoadStringW(instance, IDC_POPCORN, szWindowClass, MAX_String_Size);
+	Register_Class();
 
 	// Perform application initialization:
-	if (!Init_Instance(hInstance, nCmdShow))
+	if ( !Init_Instance(command_show))
 		return FALSE;
 
-	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_POPCORN));
-
-	MSG msg;
+	accel_table = LoadAccelerators(instance, MAKEINTRESOURCE(IDC_POPCORN));
 
 	// Main message loop:
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		if (!TranslateAccelerator(msg.hwnd, accel_table, &msg))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -96,7 +109,7 @@ int APIENTRY AsMain_Window::Main(HINSTANCE hInstance, HINSTANCE hPrevInstance, L
 	return (int)msg.wParam;
 }
 //------------------------------------------------------------------------------------------------------------
-ATOM AsMain_Window::Register_Class(HINSTANCE hInstance)
+ATOM AsMain_Window::Register_Class()
 { // Registers the window class.
 
 	WNDCLASSEXW wcex{};
@@ -107,8 +120,8 @@ ATOM AsMain_Window::Register_Class(HINSTANCE hInstance)
 	wcex.lpfnWndProc = Window_Proc;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_POPCORN));
+	wcex.hInstance = Instance;
+	wcex.hIcon = LoadIcon(Instance, MAKEINTRESOURCE(IDI_POPCORN));
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground = AsConfig::BG_Color.Get_Brush(); // цвет фона игры
 	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_POPCORN);
@@ -118,12 +131,12 @@ ATOM AsMain_Window::Register_Class(HINSTANCE hInstance)
 	return RegisterClassExW(&wcex);
 }
 //------------------------------------------------------------------------------------------------------------
-BOOL AsMain_Window::Init_Instance(HINSTANCE hInstance, int nCmdShow)
+BOOL AsMain_Window::Init_Instance(int command_show)
 { // Saves instance handle and creates main window
 
-	hInst = hInstance; // Store instance handle in our global variable
-
 	RECT window_rect{};
+	HWND hwnd;
+
 	window_rect.left = 0;
 	window_rect.top = 0;
 	window_rect.right = 320 * 3;
@@ -131,15 +144,15 @@ BOOL AsMain_Window::Init_Instance(HINSTANCE hInstance, int nCmdShow)
 
 	AdjustWindowRect(&window_rect, WS_OVERLAPPEDWINDOW, TRUE);
 
-	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, 0, 0, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top, 0, 0, hInstance, 0);
+	hwnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, 0, 0, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top, 0, 0, Instance, 0);
 
-	if (hWnd == 0)
+	if (hwnd == 0)
 		return FALSE;
 
-	Engine.Init_Engine(hWnd);
+	Engine.Init_Engine(hwnd);
 
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
+	ShowWindow(hwnd, command_show);
+	UpdateWindow(hwnd);
 
 	return TRUE;
 }
@@ -172,7 +185,7 @@ LRESULT CALLBACK AsMain_Window::Window_Proc(HWND hWnd, UINT message, WPARAM wPar
 		switch (wmId)
 		{
 		case IDM_ABOUT:
-			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+			DialogBox(Self->Instance, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 			break;
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
@@ -180,54 +193,59 @@ LRESULT CALLBACK AsMain_Window::Window_Proc(HWND hWnd, UINT message, WPARAM wPar
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
-
 		break;
+
 
 	case WM_PAINT:
 
-		On_Paint(hWnd);
+		Self->On_Paint(hWnd);
 		break;
+
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 
+
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
 		case VK_LEFT:
-			return Engine.On_Key(EKey_Type::Left, true);
+			return Self->Engine.On_Key(EKey_Type::Left, true);
 
 		case VK_RIGHT:
-			return Engine.On_Key(EKey_Type::Right, true);
+			return Self->Engine.On_Key(EKey_Type::Right, true);
 
 		case VK_SPACE:
-			return Engine.On_Key(EKey_Type::Space, true);
+			return Self->Engine.On_Key(EKey_Type::Space, true);
 		}
 		break;
+
 
 	case WM_KEYUP:
 		switch (wParam)
 		{
 		case VK_LEFT:
-			return Engine.On_Key(EKey_Type::Left, false);
+			return Self->Engine.On_Key(EKey_Type::Left, false);
 
 		case VK_RIGHT:
-			return Engine.On_Key(EKey_Type::Right, false);
+			return Self->Engine.On_Key(EKey_Type::Right, false);
 
 		case VK_SPACE:
-			return Engine.On_Key(EKey_Type::Space, false);
+			return Self->Engine.On_Key(EKey_Type::Space, false);
 		}
 		break;
 
+
 	case WM_TIMER:
 		if (wParam == Timer_ID)
-			return Engine.On_Timer();
+			return Self->Engine.On_Timer();
 		break;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
+
 	return 0;
 }
 //------------------------------------------------------------------------------------------------------------
@@ -240,6 +258,7 @@ INT_PTR CALLBACK AsMain_Window::About(HWND hDlg, UINT message, WPARAM wParam, LP
 	case WM_INITDIALOG:
 		return (INT_PTR)TRUE;
 
+
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK or LOWORD(wParam) == IDCANCEL)
 		{
@@ -248,6 +267,7 @@ INT_PTR CALLBACK AsMain_Window::About(HWND hDlg, UINT message, WPARAM wParam, LP
 		}
 		break;
 	}
+
 	return (INT_PTR)FALSE;
 }
 //------------------------------------------------------------------------------------------------------------

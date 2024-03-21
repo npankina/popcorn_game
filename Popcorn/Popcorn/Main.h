@@ -22,11 +22,11 @@ class AsMain_Window
 {
 public:
 	AsMain_Window();
-	int APIENTRY Main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow);
+	int APIENTRY Main(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR command_line, int command_show);
 
 private:
-	ATOM Register_Class(HINSTANCE hInstance);
-	BOOL Init_Instance(HINSTANCE hInstance, int nCmdShow);
+	ATOM Register_Class();
+	BOOL Init_Instance(int command_show);
 	void On_Paint(HWND hwnd);
 
 	static LRESULT CALLBACK Window_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -37,7 +37,7 @@ private:
 
 	AsFrame_DC Frame_DC;
 	AsEngine Engine;
-	HINSTANCE hInst;                                // current instance
+	HINSTANCE Instance;                                // current instance
 	WCHAR szTitle[MAX_String_Size];                  // The title bar text
 	WCHAR szWindowClass[MAX_String_Size];            // the main window class name
 };
