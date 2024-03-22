@@ -7,6 +7,9 @@ const EEye_State AMonster::Blink_States[Blink_Stages_Count] = {
 	EEye_State::Closed, EEye_State::Opening, EEye_State::Staring, EEye_State::Closing,
 						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing };
 //------------------------------------------------------------------------------------------------------------
+AMonster::~AMonster()
+{}
+//------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
 : X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
   Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0),

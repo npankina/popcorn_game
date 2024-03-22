@@ -24,6 +24,7 @@ enum class EMonster_State : unsigned char
 class AMonster : public AHit_Checker, public AGame_Object
 {
 public:
+	virtual ~AMonster(); // чтобы уничтожать объект производного типа имея указатель на базовый класс
 	AMonster();
 
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball);
@@ -47,10 +48,12 @@ public:
 	static const int Width = 16;
 	static const int Height = 16;
 
+protected:
+	virtual void Draw_Alive(HDC hdc) = 0; // для реализации в производном классе
+	virtual void Act_Alive() = 0;
+
 private:
-	void Draw_Alive(HDC hdc);
 	void Draw_Destroing(HDC hdc, RECT &paint_area);
-	void Act_Alive();
 	void Act_Destroing();
 	void Get_Monster_Rect(double x_pos, double y_pos, RECT &rect);
 	void Redraw_Monster();
@@ -73,5 +76,21 @@ private:
 	static const double Max_Cornea_Height;
 	static const double Blink_Timeouts[Blink_Stages_Count];
 	static const EEye_State Blink_States[Blink_Stages_Count];
+};
+//------------------------------------------------------------------------------------------------------------
+class AMonster_Eye : public AMonster
+{
+public:
+private:
+	virtual void Draw_Alive(HDC hdc);
+	virtual void Act_Alive();
+};
+//------------------------------------------------------------------------------------------------------------
+class AMonster_Comet : public AMonster
+{
+public:
+private:
+	virtual void Draw_Alive(HDC hdc);
+	virtual void Act_Alive();
 };
 //------------------------------------------------------------------------------------------------------------
