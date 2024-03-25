@@ -1,19 +1,13 @@
 ﻿#include "Monster.h"
 
 // class AMonster
-const double AMonster::Max_Cornea_Height = 11.0;
-const double AMonster::Blink_Timeouts[Blink_Stages_Count] = { 0.4, 0.2, 0.8, 0.4, 0.4, 0.4, 0.8 };
-const EEye_State AMonster::Blink_States[Blink_Stages_Count] = {
-	EEye_State::Closed, EEye_State::Opening, EEye_State::Staring, EEye_State::Closing,
-						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing };
 //------------------------------------------------------------------------------------------------------------
 AMonster::~AMonster()
 {}
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Start_Blink_Timeout(0), Total_Animation_Timeout(0), Cornea_Height(Max_Cornea_Height),
-  Eye_State(EEye_State::Closed), Monster_State(EMonster_State::Missing), Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0),
-  Monster_Rect{}, Blink_Ticks{}, Prev_Monster_Rect{}
+: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Total_Animation_Timeout(0), Monster_State(EMonster_State::Missing), 
+  Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0), Monster_Rect{}, Prev_Monster_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
 bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
@@ -295,7 +289,62 @@ void AMonster::Destroy()
 	//Explosive_Balls[3].Explode(Monster_Rect.left + 30, Monster_Rect.top + 20, 15, 15, 10);
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Draw_Alive(HDC hdc)
+void AMonster::Draw_Destroing(HDC hdc, RECT &paint_area)
+{
+	int i;
+
+	for (i = 0; i < Explosive_Balls_Count; i++)
+		Explosive_Balls[i].Draw(hdc, paint_area);
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Act_Destroing()
+{
+	bool destroing_is_finished = true;
+
+	for (int i = 0; i < Explosive_Balls_Count; i++)
+	{
+		Explosive_Balls[i].Act();
+		destroing_is_finished &= Explosive_Balls[i].Is_Finished(); // накапливаем результат
+	}
+
+	if (destroing_is_finished)
+		Monster_State = EMonster_State::Missing;
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Get_Monster_Rect(double x_pos, double y_pos, RECT &rect)
+{
+	rect.left = (int)(x_pos * AsConfig::D_Global_Scale);
+	rect.top = (int)(y_pos * AsConfig::D_Global_Scale);
+	rect.right = rect.left + Width * AsConfig::Global_Scale;
+	rect.bottom = rect.top + Height * AsConfig::Global_Scale;
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Redraw_Monster()
+{
+	Prev_Monster_Rect = Monster_Rect;
+
+	Get_Monster_Rect(X_Pos, Y_Pos, Monster_Rect);
+
+	AsTools::Invalidate_Rect(Monster_Rect);
+	AsTools::Invalidate_Rect(Prev_Monster_Rect);
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
+// class AMonster_Eye
+const double AMonster_Eye::Max_Cornea_Height = 11.0;
+const double AMonster_Eye::Blink_Timeouts[Blink_Stages_Count] = { 0.4, 0.2, 0.8, 0.4, 0.4, 0.4, 0.8 };
+const EEye_State AMonster_Eye::Blink_States[Blink_Stages_Count] = {
+	EEye_State::Closed, EEye_State::Opening, EEye_State::Staring, EEye_State::Closing,
+						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing };
+//------------------------------------------------------------------------------------------------------------
+AMonster_Eye::AMonster_Eye()
+: Eye_State(EEye_State::Closed), Start_Blink_Timeout(0), Cornea_Height(Max_Cornea_Height), Blink_Ticks{}
+{}
+//------------------------------------------------------------------------------------------------------------
+void AMonster_Eye::Draw_Alive(HDC hdc)
 {
 	const int scale = AsConfig::Global_Scale;
 	const double d_scale = AsConfig::D_Global_Scale;
@@ -379,15 +428,7 @@ void AMonster::Draw_Alive(HDC hdc)
 	Arc(hdc, cornea_rect.left, cornea_rect.top, cornea_rect.right - 1, cornea_rect.bottom - 1, 0, 0, 0, 0);
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Draw_Destroing(HDC hdc, RECT &paint_area)
-{
-	int i;
-
-	for (i = 0; i < Explosive_Balls_Count; i++)
-		Explosive_Balls[i].Draw(hdc, paint_area);
-}
-//------------------------------------------------------------------------------------------------------------
-void AMonster::Act_Alive()
+void AMonster_Eye::Act_Alive()
 { // занимается состояниями монстров
 	int i;
 	int curr_tick_offset;
@@ -451,35 +492,18 @@ void AMonster::Act_Alive()
 
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Act_Destroing()
-{
-	bool destroing_is_finished = true;
 
-	for (int i = 0; i < Explosive_Balls_Count; i++)
-	{
-		Explosive_Balls[i].Act();
-		destroing_is_finished &= Explosive_Balls[i].Is_Finished(); // накапливаем результат
-	}
 
-	if (destroing_is_finished)
-		Monster_State = EMonster_State::Missing;
-}
+
+
+// class AMonster_Comet
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Get_Monster_Rect(double x_pos, double y_pos, RECT &rect)
-{
-	rect.left = (int)(x_pos * AsConfig::D_Global_Scale);
-	rect.top = (int)(y_pos * AsConfig::D_Global_Scale);
-	rect.right = rect.left + Width * AsConfig::Global_Scale;
-	rect.bottom = rect.top + Height * AsConfig::Global_Scale;
-}
+AMonster_Comet::AMonster_Comet()
+{}
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Redraw_Monster()
-{
-	Prev_Monster_Rect = Monster_Rect;
-
-	Get_Monster_Rect(X_Pos, Y_Pos, Monster_Rect);
-
-	AsTools::Invalidate_Rect(Monster_Rect);
-	AsTools::Invalidate_Rect(Prev_Monster_Rect);
-}
+void AMonster_Comet::Draw_Alive(HDC hdc)
+{}
+//------------------------------------------------------------------------------------------------------------
+void AMonster_Comet::Act_Alive()
+{}
 //------------------------------------------------------------------------------------------------------------

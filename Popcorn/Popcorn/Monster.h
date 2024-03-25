@@ -52,43 +52,49 @@ protected:
 	virtual void Draw_Alive(HDC hdc) = 0; // для реализации в производном классе
 	virtual void Act_Alive() = 0;
 
+	EMonster_State Monster_State;
+	RECT Monster_Rect, Prev_Monster_Rect;
+	int Total_Animation_Timeout;
+	int Next_Direction_Switch_Tick, Alive_Timer_Tick;
+	double Speed, Direction;
+
 private:
 	void Draw_Destroing(HDC hdc, RECT &paint_area);
 	void Act_Destroing();
 	void Get_Monster_Rect(double x_pos, double y_pos, RECT &rect);
 	void Redraw_Monster();
 
-	EEye_State Eye_State;
-	EMonster_State Monster_State;
 	double X_Pos, Y_Pos;
-	double Speed, Direction;
-	double Cornea_Height;
-	int Start_Blink_Timeout, Total_Animation_Timeout;
-	int Next_Direction_Switch_Tick, Alive_Timer_Tick;
-	RECT Monster_Rect, Prev_Monster_Rect;
 
-	static const int Blink_Stages_Count = 7;
 	static const int Explosive_Balls_Count = 20;
 
-	int Blink_Ticks[Blink_Stages_Count];
 	AExplosive_Ball Explosive_Balls[Explosive_Balls_Count];
+};
+//------------------------------------------------------------------------------------------------------------
+class AMonster_Eye : public AMonster
+{
+public:
+	AMonster_Eye();
+private:
+	virtual void Draw_Alive(HDC hdc);
+	virtual void Act_Alive();
+
+	EEye_State Eye_State;
+	double Cornea_Height;
+	int Start_Blink_Timeout;
+
+	static const int Blink_Stages_Count = 7;
+	int Blink_Ticks[Blink_Stages_Count];
 
 	static const double Max_Cornea_Height;
 	static const double Blink_Timeouts[Blink_Stages_Count];
 	static const EEye_State Blink_States[Blink_Stages_Count];
 };
 //------------------------------------------------------------------------------------------------------------
-class AMonster_Eye : public AMonster
-{
-public:
-private:
-	virtual void Draw_Alive(HDC hdc);
-	virtual void Act_Alive();
-};
-//------------------------------------------------------------------------------------------------------------
 class AMonster_Comet : public AMonster
 {
 public:
+	AMonster_Comet();
 private:
 	virtual void Draw_Alive(HDC hdc);
 	virtual void Act_Alive();
