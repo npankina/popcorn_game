@@ -51,12 +51,12 @@ public:
 protected:
 	virtual void Draw_Alive(HDC hdc) = 0; // для реализации в производном классе
 	virtual void Act_Alive() = 0;
+	virtual void On_Activation() = 0;
 
 	EMonster_State Monster_State;
 	RECT Monster_Rect, Prev_Monster_Rect;
-	int Total_Animation_Timeout;
-	int Next_Direction_Switch_Tick, Alive_Timer_Tick;
-	double Speed, Direction;
+	int Next_Direction_Switch_Tick;
+	double Direction;
 
 private:
 	void Draw_Destroing(HDC hdc, RECT &paint_area);
@@ -65,9 +65,10 @@ private:
 	void Redraw_Monster();
 
 	double X_Pos, Y_Pos;
+	double Speed;
+	int Alive_Timer_Tick;
 
 	static const int Explosive_Balls_Count = 20;
-
 	AExplosive_Ball Explosive_Balls[Explosive_Balls_Count];
 };
 //------------------------------------------------------------------------------------------------------------
@@ -78,10 +79,11 @@ public:
 private:
 	virtual void Draw_Alive(HDC hdc);
 	virtual void Act_Alive();
+	virtual void On_Activation();
 
 	EEye_State Eye_State;
 	double Cornea_Height;
-	int Start_Blink_Timeout;
+	int Start_Blink_Timeout, Total_Animation_Timeout;
 
 	static const int Blink_Stages_Count = 7;
 	int Blink_Ticks[Blink_Stages_Count];
@@ -98,5 +100,6 @@ public:
 private:
 	virtual void Draw_Alive(HDC hdc);
 	virtual void Act_Alive();
+	virtual void On_Activation();
 };
 //------------------------------------------------------------------------------------------------------------

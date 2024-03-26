@@ -6,7 +6,7 @@ AMonster::~AMonster()
 {}
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Total_Animation_Timeout(0), Monster_State(EMonster_State::Missing), 
+: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Monster_State(EMonster_State::Missing), 
   Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0), Monster_Rect{}, Prev_Monster_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
@@ -198,8 +198,6 @@ bool AMonster::Is_Finished()
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 { // активация монстров
-	double current_timeout = 0.0;
-	int tick_offset;
 	int emitting_time_offset;
 	int rand_speed;
 
@@ -218,18 +216,7 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 	else
 		Direction = M_PI; // 180 градусов
 
-	Start_Blink_Timeout = AsConfig::Current_Timer_Tick;
-	
-
-	for (int i = 0; i < Blink_Stages_Count; i++)
-	{
-		current_timeout += Blink_Timeouts[i];
-		tick_offset = (int)((double)AsConfig::FPS * current_timeout);
-		Blink_Ticks[i] = tick_offset;
-	}
-
-	Total_Animation_Timeout = tick_offset;
-
+	On_Activation();
 	Redraw_Monster();
 }
 //------------------------------------------------------------------------------------------------------------
@@ -341,7 +328,7 @@ const EEye_State AMonster_Eye::Blink_States[Blink_Stages_Count] = {
 						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing };
 //------------------------------------------------------------------------------------------------------------
 AMonster_Eye::AMonster_Eye()
-: Eye_State(EEye_State::Closed), Start_Blink_Timeout(0), Cornea_Height(Max_Cornea_Height), Blink_Ticks{}
+: Eye_State(EEye_State::Closed), Start_Blink_Timeout(0), Cornea_Height(Max_Cornea_Height), Total_Animation_Timeout(0), Blink_Ticks{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Eye::Draw_Alive(HDC hdc)
@@ -489,7 +476,24 @@ void AMonster_Eye::Act_Alive()
 		direction_delta = (double)(AsTools::Rand(90) - 45) * M_PI / 180.0; // выбранное случайным образом направление приводим к значиению в радианах
 		Direction += direction_delta;
 	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster_Eye::On_Activation()
+{
+	double current_timeout = 0.0;
+	int tick_offset;
 
+	Start_Blink_Timeout = AsConfig::Current_Timer_Tick;
+
+
+	for (int i = 0; i < Blink_Stages_Count; i++)
+	{
+		current_timeout += Blink_Timeouts[i];
+		tick_offset = (int)((double)AsConfig::FPS * current_timeout);
+		Blink_Ticks[i] = tick_offset;
+	}
+
+	Total_Animation_Timeout = tick_offset;
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -505,5 +509,8 @@ void AMonster_Comet::Draw_Alive(HDC hdc)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::Act_Alive()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AMonster_Comet::On_Activation()
 {}
 //------------------------------------------------------------------------------------------------------------
