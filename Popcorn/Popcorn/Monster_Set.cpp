@@ -4,7 +4,9 @@
 // class AsMonster_Set
 AsMonster_Set::AsMonster_Set()
 : Border(0), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0), Max_Alive_Monsters_Count(0)
-{}
+{
+	memset(Monsters, 0, sizeof(AMonster*) * Max_Monsters_Count); // обнуляем указатели в массиве
+}
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 {
