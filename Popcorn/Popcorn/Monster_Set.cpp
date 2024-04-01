@@ -44,7 +44,7 @@ void AsMonster_Set::Act()
 	case EMonster_Set_State::Selecting_Next_Gate:
 	    current_alive_count = 0;
 		for (int i = 0; i < Max_Monsters_Count; i++)
-			if (Monsters[i] != 0 and Monsters[i]->Is_Active())
+			if (Monsters[i] != 0 and ! Monsters[i]->Is_Finished())
 				++current_alive_count;
 
 		// добавляем нового монстра, если можно
@@ -75,6 +75,16 @@ void AsMonster_Set::Act()
 		AsConfig::Throw();
 	}
 
+	if (Monster_Set_State != EMonster_Set_State::Idle)
+	{
+		for (int i = 0; i < Max_Monsters_Count; i++)
+			if (Monsters[i] != 0 and Monsters[i]->Is_Finished())
+			{
+				delete Monsters[i];
+				Monsters[i] = 0;
+			}
+	}
+
 	AGame_Objects_Set::Act(); // выполняется вызов метода базового класса
 }
 //------------------------------------------------------------------------------------------------------------
@@ -94,9 +104,10 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 
 	for (int i = 0; i < Max_Monsters_Count; i++)
 	{
-		if (Monsters[i] != 0 and !Monsters[i]->Is_Active() )
+		if (Monsters[i] == 0)
 		{
-			monster = Monsters[i];
+			monster = new AMonster_Eye();
+			Monsters[i] = monster;
 			break;
 		}
 	}

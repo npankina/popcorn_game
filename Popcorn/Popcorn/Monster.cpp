@@ -63,7 +63,7 @@ void AMonster::Begin_Movement() { /* заглушка, не использует
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Finish_Movement()
 {
-	if (!Is_Active()) // только у активных монстров заказывать перерисовку
+	if (Is_Finished()) // только у активных монстров заказывать перерисовку
 		return;
 
 	Redraw_Monster();
@@ -193,6 +193,8 @@ void AMonster::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AMonster::Is_Finished()
 {
+	if (Monster_State == EMonster_State::Missing)
+		return true;
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
@@ -218,14 +220,6 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 
 	On_Activation();
 	Redraw_Monster();
-}
-//------------------------------------------------------------------------------------------------------------
-bool AMonster::Is_Active()
-{
-	if (Monster_State == EMonster_State::Missing)
-		return false;
-	else
-		return true;
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Destroy()

@@ -41,7 +41,6 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
-	bool Is_Active();
 	void Activate(int x_pos, int y_pos, bool moving_right);
 	void Destroy();
 
