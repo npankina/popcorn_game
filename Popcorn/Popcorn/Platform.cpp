@@ -271,14 +271,15 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 	switch (new_state)
 	{
 	case EPlatform_State::Regular:
-		AsConfig::Throw();  // Состояние EPlatform_State::Regular устанавлвается неявно при вызове Set_State(EPlatform_Substate_Regular new_regular_state)
+		AsConfig::Throw();  // Состояние EPlatform_State::Regular устанавливается неявно при вызове Set_State(EPlatform_Substate_Regular new_regular_state)
 		break;
 
 	case EPlatform_State::Meltdown:
-		{ //--- сохраняем новое состояние платформы в переменную, чтобы отыгрывать анимацию в правильном порядке (отложенное сост.)
+		if (Platform_State != EPlatform_State::Regular)
+		{ // сохраняем новое состояние платформы в переменную, чтобы отыгрывать анимацию в правильном порядке (отложенное сост.)
 			Platform_State.Set_Next_State(new_state);
 			return;
-		} //--- иначе мы применяем то состояние, которое запрошено
+		} // иначе мы применяем то состояние, которое запрошено
 
 		Speed = 0.0;
 		Platform_State.Meltdown = EPlatform_Substate_Meltdown::Init;

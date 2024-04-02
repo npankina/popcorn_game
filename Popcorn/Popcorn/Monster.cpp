@@ -145,6 +145,7 @@ void AMonster::Act()
 
 	case EMonster_State::Alive:
 		Act_Alive();
+		Change_Direction();
 		break;
 
 	case EMonster_State::Destroing:
@@ -224,6 +225,9 @@ void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Destroy()
 {
+	if (!(Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive))
+		return;
+
 	int i;
 	int half_width = Width * AsConfig::Global_Scale / 2;
 	int half_height = Height * AsConfig::Global_Scale / 2;
@@ -310,11 +314,26 @@ void AMonster::Redraw_Monster()
 	AsTools::Invalidate_Rect(Prev_Monster_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
+void AMonster::Change_Direction()
+{// рассчет смены направления движения
+	double direction_delta;
+
+	if (AsConfig::Current_Timer_Tick > Next_Direction_Switch_Tick)
+	{
+		Next_Direction_Switch_Tick += AsTools::Rand(AsConfig::FPS); // увеличить счетчик на случайное число [0, 1]
+
+		// выбираем случайное направление монстру -45 / 45 градусов
+		direction_delta = (double)(AsTools::Rand(90) - 45) * M_PI / 180.0; // выбранное случайным образом направление приводим к значиению в радианах
+		Direction += direction_delta;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
 
 
 
 
 // class AMonster_Eye
+//------------------------------------------------------------------------------------------------------------
 const double AMonster_Eye::Max_Cornea_Height = 11.0;
 const double AMonster_Eye::Blink_Timeouts[Blink_Stages_Count] = { 0.4, 0.2, 0.8, 0.4, 0.4, 0.4, 0.8 };
 const EEye_State AMonster_Eye::Blink_States[Blink_Stages_Count] = {
@@ -415,7 +434,6 @@ void AMonster_Eye::Act_Alive()
 	int curr_tick_offset;
 	int prev_tick;
 	double ratio;
-	double direction_delta;
 
 	// рассчеты для анимации
 	if (Monster_State == EMonster_State::Missing)
@@ -459,16 +477,6 @@ void AMonster_Eye::Act_Alive()
 
 	default:
 		AsConfig::Throw();
-	}
-
-	// рассчет смены направления движени
-	if (AsConfig::Current_Timer_Tick > Next_Direction_Switch_Tick)
-	{
-		Next_Direction_Switch_Tick += AsTools::Rand(AsConfig::FPS); // увеличить счетчик на случайное число [0, 1]
-
-		// выбираем случайное направление монстру -45 / 45 градусов
-		direction_delta = (double)(AsTools::Rand(90) - 45) * M_PI / 180.0; // выбранное случайным образом направление приводим к значиению в радианах
-		Direction += direction_delta;
 	}
 }
 //------------------------------------------------------------------------------------------------------------

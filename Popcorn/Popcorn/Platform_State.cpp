@@ -24,15 +24,15 @@ void AsPlatform_State::Set_Next_State(EPlatform_State next_state)
 
 	switch (Current_State)
 	{
-	case EPlatform_State::Regular: 
-		AsConfig::Throw(); // обычное состояние само не заканчивается, переключение в другое состояние должно быть явным
+	case EPlatform_State::Regular:
+		AsConfig::Throw();
 		break;
 
 	case EPlatform_State::Meltdown:
-		return; // игнорируем любое состояние после Meltdown, т.к. после него перезапускается игровой процесс
+		return;
 
 	case EPlatform_State::Rolling:
-		AsConfig::Throw(); // состояние Rolling само должно переключаться в следующее
+		AsConfig::Throw(); 
 		break;
 
 	case EPlatform_State::Glue:
@@ -60,13 +60,11 @@ EPlatform_State AsPlatform_State::Get_Next_State()
 }
 //------------------------------------------------------------------------------------------------------------
 EPlatform_State AsPlatform_State::Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state)
-{// Возврат: если не Unknown, надо перейти в это состояние
-
+{
 	EPlatform_State next_state;
 
 	Current_State = EPlatform_State::Regular;
 
-	// Если есть отложенное состояние, то переведем в него, иначе в Regular
 	next_state = Get_Next_State();
 
 	if (next_state == EPlatform_State::Unknown)
@@ -102,12 +100,11 @@ EPlatform_State AsPlatform_State::Set_State(EPlatform_Substate_Regular new_regul
 		if (transformation_state != 0)
 		{
 			if (*transformation_state == EPlatform_Transformation::Unknown)	
-				// Финализация состояния закончилась
 				return Set_Next_Or_Regular_State(new_regular_state);
 			/*if (next_state != EPlatform_State::Unknown)
 			Set_State(next_state);*/
 			else
-				*transformation_state = EPlatform_Transformation::Finalize; // Запускаем финализацию состояния
+				*transformation_state = EPlatform_Transformation::Finalize;
 
 			return EPlatform_State::Unknown;
 		}
