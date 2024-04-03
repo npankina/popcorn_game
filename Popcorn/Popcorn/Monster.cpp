@@ -508,7 +508,10 @@ AMonster_Comet::AMonster_Comet()
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::Draw_Alive(HDC hdc)
-{}
+{
+	if (Monster_State == EMonster_State::Missing)
+		return;
+}
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::Act_Alive()
 {}
