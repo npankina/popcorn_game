@@ -509,8 +509,29 @@ AMonster_Comet::AMonster_Comet()
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::Draw_Alive(HDC hdc)
 {
+	XFORM xform, old_xform;
+	double alpha;
+	double monster_radius;
+
 	if (Monster_State == EMonster_State::Missing)
 		return;
+
+	alpha = 0.0;// -2.0 * M_PI / (double)Max_Rolling_Step * (double)Rolling_Step;
+	monster_radius = ( (double)Width * AsConfig::Global_Scale) / 2.0;
+
+	xform.eM11 = (float)cos(alpha);
+	xform.eM12 = (float)sin(alpha);
+	xform.eM21 = (float)-sin(alpha);
+	xform.eM22 = (float)cos(alpha);
+	xform.eDx = (float)(X_Pos + monster_radius);
+	xform.eDy = (float)(Y_Pos + monster_radius);
+	GetWorldTransform(hdc, &old_xform);
+	SetWorldTransform(hdc, &xform);
+
+
+
+	SetWorldTransform(hdc, &old_xform);
+
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::Act_Alive()

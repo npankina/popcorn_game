@@ -56,6 +56,7 @@ protected:
 	RECT Monster_Rect, Prev_Monster_Rect;
 	int Next_Direction_Switch_Tick;
 	double Direction;
+	double X_Pos, Y_Pos;
 
 private:
 	void Draw_Destroing(HDC hdc, RECT &paint_area);
@@ -64,7 +65,6 @@ private:
 	void Redraw_Monster();
 	void Change_Direction();
 
-	double X_Pos, Y_Pos;
 	double Speed;
 	int Alive_Timer_Tick;
 
