@@ -509,15 +509,20 @@ AMonster_Comet::AMonster_Comet()
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::Draw_Alive(HDC hdc)
 {
-	XFORM xform, old_xform;
 	double alpha;
 	double monster_radius;
+	const int scale = AsConfig::Global_Scale;
+	int ball_size = 4 * scale + scale / 2;
+	XFORM xform{}, old_xform{};
+	RECT rect{};
 
 	if (Monster_State == EMonster_State::Missing)
 		return;
 
+	AsTools::Rect(hdc, Monster_Rect, AsConfig::Blue_Color); // заливка прямоугольника монстра синим цветом для лучшей отладки при отрисовке
+
 	alpha = 0.0;// -2.0 * M_PI / (double)Max_Rolling_Step * (double)Rolling_Step;
-	monster_radius = ( (double)Width * AsConfig::Global_Scale) / 2.0;
+	monster_radius = ( (double)Width * scale) / 2.0;
 
 	xform.eM11 = (float)cos(alpha);
 	xform.eM12 = (float)sin(alpha);
@@ -528,7 +533,12 @@ void AMonster_Comet::Draw_Alive(HDC hdc)
 	GetWorldTransform(hdc, &old_xform);
 	SetWorldTransform(hdc, &xform);
 
+	rect.left = (int)(-monster_radius);
+	rect.top = -ball_size / 2;
+	rect.right = rect.left + ball_size;
+	rect.bottom = rect.top + ball_size;
 
+	AsTools::Ellipse(hdc, rect, AsConfig::White_Color);
 
 	SetWorldTransform(hdc, &old_xform);
 
