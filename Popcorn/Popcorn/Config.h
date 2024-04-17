@@ -15,6 +15,7 @@ public:
 	static const AColor Advertisement_Blue_Table, Advertisement_Red_Table;
 	static const AColor Platform_Inner_Color, Platform_Circle_Color, Highlight_Color, Truss_Color, Gun_Color;
 	static const AColor Monster_Dark_Red_Color, Monster_Cornea_Color, Monster_Iris_Color, BG_Outcome_Color, Explosion_Red_Color, Explosion_Blue_Color;
+	static const AColor Monster_Comet_Tail;
 	static HWND Hwnd;
 
 	static const double D_Global_Scale;

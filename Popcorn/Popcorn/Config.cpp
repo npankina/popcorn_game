@@ -26,6 +26,7 @@ const AColor AsConfig::Monster_Iris_Color(BG_Color, Blue_Color, 2);
 const AColor AsConfig::BG_Outcome_Color(BG_Color, 2);
 const AColor AsConfig::Explosion_Red_Color(AsConfig::White_Color, AsConfig::Red_Color, 0);
 const AColor AsConfig::Explosion_Blue_Color(AsConfig::White_Color, AsConfig::Blue_Color, 0);
+const AColor AsConfig::Monster_Comet_Tail(230, 25, 229, Global_Scale);
 
 
 HWND AsConfig::Hwnd;
