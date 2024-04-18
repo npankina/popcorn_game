@@ -523,40 +523,43 @@ void AMonster_Comet::Draw_Alive(HDC hdc)
 	AsTools::Rect(hdc, Monster_Rect, AsConfig::Blue_Color); // заливка прямоугольника монстра синим цветом для лучшей отладки при отрисовке
 
 	alpha = 0.0;// -2.0 * M_PI / (double)Max_Rolling_Step * (double)Rolling_Step;
-	monster_radius = (double)Width * d_scale / 2.0;
+	monster_radius = ( (double)Width * d_scale / 2.0) - 1.0;
 
-	xform.eM11 = (float)cos(alpha);
-	xform.eM12 = (float)sin(alpha);
-	xform.eM21 = (float)-sin(alpha);
-	xform.eM22 = (float)cos(alpha);
-	xform.eDx = (float)(X_Pos * d_scale + monster_radius);
-	xform.eDy = (float)(Y_Pos * d_scale + monster_radius);
 	GetWorldTransform(hdc, &old_xform);
-	SetWorldTransform(hdc, &xform);
 
-	rect.left = (int)(-monster_radius);
-	rect.top = -ball_size / 2;
-	rect.right = rect.left + ball_size;
-	rect.bottom = rect.top + ball_size;
+	for (int i = 0; i < 2; i++)
+	{
+		xform.eM11 = (float)cos(alpha);
+		xform.eM12 = (float)sin(alpha);
+		xform.eM21 = (float)-sin(alpha);
+		xform.eM22 = (float)cos(alpha);
+		xform.eDx = (float)(X_Pos * d_scale + monster_radius);
+		xform.eDy = (float)(Y_Pos * d_scale + monster_radius);
+		SetWorldTransform(hdc, &xform);
 
-	AsTools::Ellipse(hdc, rect, AsConfig::White_Color);
-	AsConfig::Monster_Comet_Tail.Select_Pen(hdc);
+		alpha += M_PI;
 
-	rect.left = (int)(-monster_radius + 2.0 * d_scale);
-	rect.top = (int)(-monster_radius + 2.0 * d_scale);
-	rect.right = (int)(monster_radius - 2.0 * d_scale);
-	rect.bottom = (int)(monster_radius - 2.0 * d_scale);
+		rect.left = (int)(-monster_radius);
+		rect.top = -ball_size / 2;
+		rect.right = rect.left + ball_size;
+		rect.bottom = rect.top + ball_size;
 
-	Arc(hdc, rect.left, rect.top, rect.right - 1, rect.bottom- 1, 0, (int)(-monster_radius), (int)(-monster_radius), (int)(-4 * d_scale));
+		AsTools::Ellipse(hdc, rect, AsConfig::White_Color);
+		AsConfig::Monster_Comet_Tail.Select_Pen(hdc);
 
-	rect.left += scale;
-	rect.right -= scale;
-	rect.bottom -= scale;
-	Arc(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1, 0, (int)(-monster_radius), (int)(-monster_radius), (int)(-4 * d_scale));
+		rect.left = (int)(-monster_radius + 2.0 * d_scale);
+		rect.top = (int)(-monster_radius + 2.0 * d_scale);
+		rect.right = (int)(monster_radius - 2.0 * d_scale);
+		rect.bottom = (int)(monster_radius - 2.0 * d_scale);
 
+		Arc(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1, 0, (int)(-monster_radius), (int)(-monster_radius), (int)(-4 * d_scale));
 
+		rect.left += scale;
+		rect.right -= scale;
+		rect.bottom -= scale;
+		Arc(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1, 0, (int)(-monster_radius), (int)(-monster_radius), (int)(-4 * d_scale));
+	}
 	SetWorldTransform(hdc, &old_xform);
-
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::Act_Alive()
