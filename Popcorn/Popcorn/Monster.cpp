@@ -505,7 +505,21 @@ void AMonster_Eye::On_Activation()
 // class AMonster_Comet
 //------------------------------------------------------------------------------------------------------------
 AMonster_Comet::AMonster_Comet()
-{}
+: Current_Angle(0), Ticks_Per_Rotation(0)
+{
+	int rotation_tick_delta = Max_Ticks_Per_Rotation - Min_Ticks_Per_Rotation;
+	Ticks_Per_Rotation = AsTools::Rand(rotation_tick_delta) + Min_Ticks_Per_Rotation;
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster_Comet::Clear(HDC hdc, RECT& paint_area)
+{
+	RECT intersection_rect;
+
+	if (!IntersectRect(&intersection_rect, &paint_area, &Prev_Monster_Rect))
+		return;
+
+	AsTools::Rect(hdc, Prev_Monster_Rect, AsConfig::BG_Color);
+}
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::Draw_Alive(HDC hdc)
 {
@@ -520,9 +534,9 @@ void AMonster_Comet::Draw_Alive(HDC hdc)
 	if (Monster_State == EMonster_State::Missing)
 		return;
 
-	AsTools::Rect(hdc, Monster_Rect, AsConfig::Blue_Color); // заливка прямоугольника монстра синим цветом для лучшей отладки при отрисовке
+	//AsTools::Rect(hdc, Monster_Rect, AsConfig::Blue_Color); // заливка прямоугольника монстра синим цветом для лучшей отладки при отрисовке
 
-	alpha = 0.0;// -2.0 * M_PI / (double)Max_Rolling_Step * (double)Rolling_Step;
+	alpha = Current_Angle;
 	monster_radius = ( (double)Width * d_scale / 2.0) - 1.0;
 
 	GetWorldTransform(hdc, &old_xform);
@@ -563,7 +577,18 @@ void AMonster_Comet::Draw_Alive(HDC hdc)
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::Act_Alive()
-{}
+{
+	int time_offset;
+	double ratio;
+
+	if (Monster_State == EMonster_State::Missing)
+		return;
+
+	time_offset = (AsConfig::Current_Timer_Tick - Alive_Timer_Tick) % Ticks_Per_Rotation; // интервал смещения обновляется каждые 20 кадров
+	ratio = (double)time_offset / Ticks_Per_Rotation;
+
+	Current_Angle = -ratio * 2.0 * M_PI;
+}
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Comet::On_Activation()
 {}

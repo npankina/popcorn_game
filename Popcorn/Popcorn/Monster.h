@@ -55,6 +55,8 @@ protected:
 	EMonster_State Monster_State;
 	RECT Monster_Rect, Prev_Monster_Rect;
 	int Next_Direction_Switch_Tick;
+	int Alive_Timer_Tick;
+
 	double Direction;
 	double X_Pos, Y_Pos;
 
@@ -66,7 +68,6 @@ private:
 	void Change_Direction();
 
 	double Speed;
-	int Alive_Timer_Tick;
 
 	static const int Explosive_Balls_Count = 20;
 	AExplosive_Ball Explosive_Balls[Explosive_Balls_Count];
@@ -97,9 +98,17 @@ class AMonster_Comet : public AMonster
 {
 public:
 	AMonster_Comet();
+
 private:
+	virtual void Clear(HDC hdc, RECT& paint_area); // переопределен метод базового класса
 	virtual void Draw_Alive(HDC hdc);
 	virtual void Act_Alive();
 	virtual void On_Activation();
+
+	double Current_Angle;
+	int Ticks_Per_Rotation;
+
+	static const int Min_Ticks_Per_Rotation = AsConfig::FPS * 2;
+	static const int Max_Ticks_Per_Rotation = AsConfig::FPS * 4;
 };
 //------------------------------------------------------------------------------------------------------------
