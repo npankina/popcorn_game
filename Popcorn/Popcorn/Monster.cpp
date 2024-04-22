@@ -139,14 +139,18 @@ void AMonster::Act()
 		return;
 
 	case EMonster_State::Emitting:
+		Act_Alive();
+
 		if (AsConfig::Current_Timer_Tick >= Alive_Timer_Tick)
 			Monster_State = EMonster_State::Alive;
 		break;
+
 
 	case EMonster_State::Alive:
 		Act_Alive();
 		Change_Direction();
 		break;
+
 
 	case EMonster_State::Destroing:
 		Act_Destroing();

@@ -98,6 +98,7 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 	AMonster *monster = 0;
 	bool gate_is_left = false; // задаем движение монстра (все четные гейты находятся справа, а нечетные слева)
 	int gate_x_pos, gate_y_pos;
+	int monster_type;
 
 	if (gate_index < 0 or gate_index >= AsConfig::Gates_Count)
 		AsConfig::Throw();
@@ -106,8 +107,13 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 	{
 		if (Monsters[i] == 0)
 		{
-			//monster = new AMonster_Eye();
-			monster = new AMonster_Comet();
+			monster_type = AsTools::Rand(2);
+
+			if (monster_type == 0)
+				monster = new AMonster_Eye();
+			else 
+				monster = new AMonster_Comet();
+
 			Monsters[i] = monster;
 			break;
 		}
