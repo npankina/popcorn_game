@@ -22,7 +22,22 @@ enum class EGame_State : unsigned char
 	Restart_Level
 };
 //------------------------------------------------------------------------------------------------------------
-const int Timer_ID = WM_USER + 1;
+class AsInfo_Panel : public AGame_Object
+{
+public:
+	virtual void Begin_Movement();
+	virtual void Finish_Movement();
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT& paint_area);
+	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual bool Is_Finished();
+
+	AsInfo_Panel();
+};
 //------------------------------------------------------------------------------------------------------------
 class AsEngine
 {
@@ -33,6 +48,9 @@ public:
 	void Draw_Frame(HDC hdc, RECT &paint_area);
 	int On_Key(EKey_Type key_type, bool key_down);
 	int On_Timer();
+
+	const int Timer_ID;
+
 
 private:
 	void Restart_Level();
@@ -52,6 +70,7 @@ private:
 	AsBall_Set Ball_Set;
 	AsLaser_Beam_Set Laser_Beam_Set;
 	AsMonster_Set Monster_Set;
+	AsInfo_Panel Info_Panel;
 
 	//AMover *Movers[AsConfig::Max_Movers_Count];  // UNO; Движущиеся в данный момент объекты
 	//AGraphics_Object *Modules[AsConfig::Max_Modules_Count];  // UNO; Главные графические объекты (модули) игры

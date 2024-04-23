@@ -34,6 +34,8 @@ private:
 	static AsMain_Window *Self;
 
 	static const int MAX_String_Size = 100;
+	const int Timer_ID = WM_USER + 1;
+
 
 	AsFrame_DC Frame_DC;
 	AsEngine Engine;

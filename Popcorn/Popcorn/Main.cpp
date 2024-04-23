@@ -37,6 +37,9 @@ HDC AsFrame_DC::Get_DC(HWND hwnd, HDC hdc)
 		Bitmap = CreateCompatibleBitmap(hdc, Width, Height);
 		SelectObject(Hdc, Bitmap);
 
+		++rect.right;
+		++rect.bottom;
+
 		AsTools::Rect(Hdc, rect, AsConfig::BG_Color);
 	}
 
@@ -238,7 +241,7 @@ LRESULT CALLBACK AsMain_Window::Window_Proc(HWND hWnd, UINT message, WPARAM wPar
 
 
 	case WM_TIMER:
-		if (wParam == Timer_ID)
+		if (wParam == Self->Engine.Timer_ID)
 			return Self->Engine.On_Timer();
 		break;
 

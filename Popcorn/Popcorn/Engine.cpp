@@ -1,13 +1,53 @@
 ﻿#include "Engine.h"
 
+
+// class AsInfo_Panel
+//------------------------------------------------------------------------------------------------------------
+AsInfo_Panel::AsInfo_Panel()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Begin_Movement()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Finish_Movement()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Advance(double max_speed)
+{}
+//------------------------------------------------------------------------------------------------------------
+double AsInfo_Panel::Get_Speed()
+{
+	return 0.0;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Act()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Clear(HDC hdc, RECT& paint_area)
+{}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
+{
+	AsTools::Rect(hdc, 213, 7, 100, 99, AsConfig::Blue_Color);
+	AsTools::Rect(hdc, 208, 108, 110, 90, AsConfig::Red_Color);
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsInfo_Panel::Is_Finished()
+{
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(AsConfig::Initial_Life_Count), Modules{}
+: Timer_ID(WM_USER + 1), Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(AsConfig::Initial_Life_Count), Modules{}
 {
 	//memset(Movers, 0, sizeof(Movers) );
 	//memset(Modules, 0, sizeof(Modules) );
-
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Init_Engine(HWND hwnd)
@@ -65,7 +105,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Add_Next_Module(index, &Ball_Set);
 	Add_Next_Module(index, &Laser_Beam_Set);
 	Add_Next_Module(index, &Monster_Set);
-
+	Add_Next_Module(index, &Info_Panel);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
