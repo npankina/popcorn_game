@@ -37,6 +37,11 @@ public:
 	virtual bool Is_Finished();
 
 	AsInfo_Panel();
+
+private:
+	void Choose_Font();
+
+	HFONT Logo_Pop_Font, Logo_Corn_Font;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsEngine
