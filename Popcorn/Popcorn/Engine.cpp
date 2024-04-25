@@ -3,25 +3,15 @@
 
 // class AsInfo_Panel
 //------------------------------------------------------------------------------------------------------------
-AsInfo_Panel::AsInfo_Panel()
-: Logo_Pop_Font{}, Logo_Corn_Font{}
-{ // Установка шрифта для Лого
-
-	LOGFONT log_font{};
-
-	log_font.lfHeight = -128;
-	log_font.lfWeight = 900;
-	log_font.lfOutPrecision = 3;
-	log_font.lfClipPrecision = 2;
-	log_font.lfQuality = 1;
-	log_font.lfPitchAndFamily = 34;
-	wcscpy_s(log_font.lfFaceName, L"Arial Black");
-
-	Logo_Pop_Font = CreateFontIndirect(&log_font);
-
-	log_font.lfHeight = -96;
-	Logo_Corn_Font = CreateFontIndirect(&log_font);
+AsInfo_Panel::~AsInfo_Panel()
+{
+	delete Shadow_Color;
+	delete Highlight_Color;
 }
+//------------------------------------------------------------------------------------------------------------
+AsInfo_Panel::AsInfo_Panel()
+: Logo_Pop_Font{}, Logo_Corn_Font{}, Shadow_Color(nullptr), Highlight_Color(nullptr)
+{}
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Begin_Movement()
 {}
@@ -50,6 +40,10 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 	int logo_y_pos = 0;
 	int shadow_x_offset = 5 * scale;
 	int shadow_y_offset = 5 * scale;
+	int score_x = 208;
+	int score_y = 108;
+	int score_width = 110;
+	int score_height = 90;
 	const wchar_t *pop_str = L"POP"; // задаем строку в 2 байта
 	const wchar_t *corn_str = L"CORN";
 
@@ -74,13 +68,45 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 	TextOut(hdc, logo_x_pos - 5 * scale, logo_y_pos + 44 * scale, corn_str, 4); // main letters
 
 
-	// Таблица счета
-	AsTools::Rect(hdc, 208, 108, 110, 90, AsConfig::Red_Color);
+	// 2. Таблица счета
+	AsTools::Rect(hdc, score_x, score_y, score_width, score_height, AsConfig::Red_Color);
+
+	Highlight_Color->Select_Pen(hdc);
+	MoveToEx(hdc, (score_x + 2) * scale, (score_y + score_height - 2) * scale, 0);
+	LineTo(hdc, (score_x + 2) * scale, (score_y + 2) * scale);
+	LineTo(hdc, (score_x + score_width - 2) * scale, (score_y + 2) * scale);
+
+	Shadow_Color->Select_Pen(hdc);
+	MoveToEx(hdc, (score_x + score_width - 2) * scale, (score_y + 2) * scale, 0);
+	LineTo(hdc, (score_x + score_width - 2) * scale, (score_y + score_height - 2) * scale);
+	LineTo(hdc, (score_x + 2) * scale, (score_y + score_height - 2) * scale);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsInfo_Panel::Is_Finished()
 {
 	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Init()
+{
+	Shadow_Color = new AColor(AsConfig::BG_Color, AsConfig::Global_Scale);
+	Highlight_Color = new AColor(AsConfig::White_Color, AsConfig::Global_Scale);
+
+	// Установка шрифта для Лого
+	LOGFONT log_font{};
+
+	log_font.lfHeight = -128;
+	log_font.lfWeight = 900;
+	log_font.lfOutPrecision = 3;
+	log_font.lfClipPrecision = 2;
+	log_font.lfQuality = 1;
+	log_font.lfPitchAndFamily = 34;
+	wcscpy_s(log_font.lfFaceName, L"Arial Black");
+
+	Logo_Pop_Font = CreateFontIndirect(&log_font);
+
+	log_font.lfHeight = -96;
+	Logo_Corn_Font = CreateFontIndirect(&log_font);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Choose_Font()
@@ -94,7 +120,6 @@ void AsInfo_Panel::Choose_Font()
 	cf.nFontType = SCREEN_FONTTYPE;
 
 	ChooseFont(&cf);
-
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -132,6 +157,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Monster_Set.Init(&Border);
 
 	AFalling_Letter::Init();
+	Info_Panel.Init();
 
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Level);

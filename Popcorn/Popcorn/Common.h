@@ -60,7 +60,9 @@ public:
 class AColor
 {
 public:
+	~AColor();
 	AColor();
+
 	AColor(unsigned char r, unsigned char g, unsigned char b);
 	AColor(const AColor &color, int pen_size);
 	AColor(unsigned char r, unsigned char g, unsigned char b, int pen_size);

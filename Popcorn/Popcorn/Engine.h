@@ -25,6 +25,9 @@ enum class EGame_State : unsigned char
 class AsInfo_Panel : public AGame_Object
 {
 public:
+	~AsInfo_Panel();
+	AsInfo_Panel();
+
 	virtual void Begin_Movement();
 	virtual void Finish_Movement();
 	virtual void Advance(double max_speed);
@@ -36,12 +39,13 @@ public:
 	virtual void Draw(HDC hdc, RECT& paint_area);
 	virtual bool Is_Finished();
 
-	AsInfo_Panel();
+	void Init();
 
 private:
 	void Choose_Font();
 
 	HFONT Logo_Pop_Font, Logo_Corn_Font;
+	AColor *Shadow_Color, *Highlight_Color;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsEngine
@@ -50,7 +54,7 @@ public:
 	AsEngine();
 
 	void Init_Engine(HWND hwnd);
-	void Draw_Frame(HDC hdc, RECT &paint_area);
+	void Draw_Frame(HDC hdc, RECT& paint_area);
 	int On_Key(EKey_Type key_type, bool key_down);
 	int On_Timer();
 
@@ -62,8 +66,8 @@ private:
 	void Play_Level();
 	void Advance_Movers();
 	void Act();
-	void On_Falling_Letter(AFalling_Letter *falling_letter);
-	void Add_Next_Module(int &index, AGame_Object *game_obj);
+	void On_Falling_Letter(AFalling_Letter* falling_letter);
+	void Add_Next_Module(int& index, AGame_Object* game_obj);
 
 	EGame_State Game_State;
 	double Rest_Distance;
@@ -79,6 +83,6 @@ private:
 
 	//AMover *Movers[AsConfig::Max_Movers_Count];  // UNO; Движущиеся в данный момент объекты
 	//AGraphics_Object *Modules[AsConfig::Max_Modules_Count];  // UNO; Главные графические объекты (модули) игры
-	
-	AGame_Object *Modules[AsConfig::Max_Modules_Count]; // UNO Главные графические объекты игры
+
+	AGame_Object* Modules[AsConfig::Max_Modules_Count]; // UNO Главные графические объекты игры
 };

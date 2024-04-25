@@ -20,31 +20,40 @@ AGraphics_Object::~AGraphics_Object()
 
 // AColor
 //------------------------------------------------------------------------------------------------------------
+AColor::~AColor()
+{
+	if (Pen != 0)
+		DeleteObject(Pen);
+
+	if (Brush != 0)
+		DeleteObject(Brush);
+}
+//------------------------------------------------------------------------------------------------------------
 AColor::AColor()
 : R(0), G(0), B(0), Pen(0), Brush(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 AColor::AColor(unsigned char r, unsigned char g, unsigned char b)
-	: R(r), G(g), B(b), Pen(0), Brush(0)
+: R(r), G(g), B(b), Pen(0), Brush(0)
 {
 	Pen = CreatePen(PS_SOLID, 0, RGB(r, g, b) );
 	Brush = CreateSolidBrush(RGB(r, g, b) );
 }
 //------------------------------------------------------------------------------------------------------------
 AColor::AColor(const AColor &color, int pen_size)
-	: R(color.R), G(color.G), B(color.B), Pen(0), Brush(0)
+: R(color.R), G(color.G), B(color.B), Pen(0), Brush(0)
 {
 	Pen = CreatePen(PS_SOLID, pen_size, color.Get_RGB() );
 }
 //------------------------------------------------------------------------------------------------------------
 AColor::AColor(unsigned char r, unsigned char g, unsigned char b, int pen_size)
-	: R(r), G(g), B(b), Pen(0), Brush(0)
+: R(r), G(g), B(b), Pen(0), Brush(0)
 {
 	Pen = CreatePen(PS_SOLID, pen_size, RGB(r, g, b) );
 }
 //------------------------------------------------------------------------------------------------------------
 AColor::AColor(const AColor &pen_color, const AColor &brush_color, int pen_size)
-	: R(0), G(0), B(0), Pen(0), Brush(0)
+: R(0), G(0), B(0), Pen(0), Brush(0)
 {
 	Pen = CreatePen(PS_SOLID, pen_size, pen_color.Get_RGB() );
 	Brush = CreateSolidBrush(brush_color.Get_RGB() );
