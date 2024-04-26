@@ -7,10 +7,11 @@ AsInfo_Panel::~AsInfo_Panel()
 {
 	delete Shadow_Color;
 	delete Highlight_Color;
+	delete Dark_Blue;
 }
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::AsInfo_Panel()
-: Logo_Pop_Font{}, Logo_Corn_Font{}, Shadow_Color(nullptr), Highlight_Color(nullptr)
+	: Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Shadow_Color(nullptr), Highlight_Color(nullptr), Dark_Blue(nullptr)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Begin_Movement()
@@ -44,8 +45,11 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 	int score_y = 108;
 	int score_width = 110;
 	int score_height = 90;
+	int str_left_offset, str_top_offset;
 	const wchar_t *pop_str = L"POP"; // задаем строку в 2 байта
 	const wchar_t *corn_str = L"CORN";
+	const wchar_t *name_str = L"Computer";
+	SIZE str_size;
 
 	// 1. Logo
 	AsTools::Rect(hdc, 211, 5, 104, 100, AsConfig::Blue_Color);
@@ -56,7 +60,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 	// 1.1. "POP"
 	SelectObject(hdc, Logo_Pop_Font);
 	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
-	TextOut(hdc, logo_x_pos + shadow_x_offset, logo_y_pos + shadow_y_offset, pop_str, 3); // shadow
+	TextOut(hdc, logo_x_pos + shadow_x_offset, logo_y_pos + shadow_y_offset, pop_str, wcslen(pop_str) ); // shadow
 	SetTextColor(hdc, AsConfig::Red_Color.Get_RGB());
 	TextOut(hdc, logo_x_pos, logo_y_pos, pop_str, 3); // main letters
 
@@ -65,12 +69,19 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
 	TextOut(hdc, logo_x_pos + shadow_x_offset - 5 * scale, logo_y_pos + shadow_y_offset + 44 * scale, corn_str, 4); // shadow
 	SetTextColor(hdc, AsConfig::Red_Color.Get_RGB());
-	TextOut(hdc, logo_x_pos - 5 * scale, logo_y_pos + 44 * scale, corn_str, 4); // main letters
+	TextOut(hdc, logo_x_pos - 5 * scale, logo_y_pos + 44 * scale, corn_str, wcslen(corn_str) ); // main letters
 
 
 	// 2. Таблица счета
-	AsTools::Rect(hdc, score_x, score_y, score_width, score_height, AsConfig::Red_Color);
+	// 2.1. Рамка
+	AsTools::Rect(hdc, score_x, score_y, score_width, 2, AsConfig::Red_Color);
+	AsTools::Rect(hdc, score_x, score_y + score_height - 2, score_width, 2, AsConfig::Red_Color);
+	AsTools::Rect(hdc, score_x, score_y, 2, score_height, AsConfig::Red_Color);
+	AsTools::Rect(hdc, score_x + score_width - 2, score_y, 2, score_height, AsConfig::Red_Color);
 
+	AsTools::Rect(hdc, score_x + 2, score_y + 2, score_width - 4, score_height - 4, *Dark_Blue);
+
+	// 2.2. Бордюр
 	Highlight_Color->Select_Pen(hdc);
 	MoveToEx(hdc, (score_x + 2) * scale, (score_y + score_height - 2) * scale, 0);
 	LineTo(hdc, (score_x + 2) * scale, (score_y + 2) * scale);
@@ -80,6 +91,23 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 	MoveToEx(hdc, (score_x + score_width - 2) * scale, (score_y + 2) * scale, 0);
 	LineTo(hdc, (score_x + score_width - 2) * scale, (score_y + score_height - 2) * scale);
 	LineTo(hdc, (score_x + 2) * scale, (score_y + score_height - 2) * scale);
+
+	// 2.3. Имя игрока
+	AsTools::Rect(hdc, score_x + 5, score_y + 5, score_width - 2 * 5, 16, AsConfig::Red_Color);
+	SelectObject(hdc, Player_Name_Font);
+	SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
+
+	GetTextExtentPoint32(hdc, name_str, wcslen(name_str), &str_size);
+
+	str_left_offset = (score_x + 5 + (score_width - 2 * 5) / 2) * scale - str_size.cx / 2;
+	str_top_offset = (score_y + 5 + 16 / 2) * scale - str_size.cy / 2;
+
+	TextOut(hdc, str_left_offset, str_top_offset, name_str, wcslen(name_str) );
+
+	// 2.4. Считаем очки
+	AsTools::Rect(hdc, score_x + 5, score_y + 27, score_width - 2 * 5, 16, AsConfig::Red_Color);
+
+
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsInfo_Panel::Is_Finished()
@@ -91,6 +119,7 @@ void AsInfo_Panel::Init()
 {
 	Shadow_Color = new AColor(AsConfig::BG_Color, AsConfig::Global_Scale);
 	Highlight_Color = new AColor(AsConfig::White_Color, AsConfig::Global_Scale);
+	Dark_Blue = new AColor(0, 170, 170);
 
 	// Установка шрифта для Лого
 	LOGFONT log_font{};
@@ -107,6 +136,20 @@ void AsInfo_Panel::Init()
 
 	log_font.lfHeight = -96;
 	Logo_Corn_Font = CreateFontIndirect(&log_font);
+
+
+	// Установка шрифта для имени Игрока
+
+	log_font.lfHeight = -48;
+	log_font.lfWeight = 700;
+	log_font.lfOutPrecision = 3;
+	log_font.lfClipPrecision = 2;
+	log_font.lfQuality = 1;
+	log_font.lfPitchAndFamily = 49;
+	wcscpy_s(log_font.lfFaceName, L"Consolas");
+
+	log_font.lfHeight = -46;
+	Player_Name_Font = CreateFontIndirect(&log_font);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Choose_Font()

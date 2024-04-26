@@ -44,8 +44,8 @@ public:
 private:
 	void Choose_Font();
 
-	HFONT Logo_Pop_Font, Logo_Corn_Font;
-	AColor *Shadow_Color, *Highlight_Color;
+	HFONT Logo_Pop_Font, Logo_Corn_Font, Player_Name_Font;
+	AColor *Shadow_Color, *Highlight_Color, *Dark_Blue;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsEngine
