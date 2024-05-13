@@ -43,9 +43,16 @@ public:
 
 private:
 	void Choose_Font();
+	void Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str);
 
 	HFONT Logo_Pop_Font, Logo_Corn_Font, Player_Name_Font;
 	AColor *Shadow_Color, *Highlight_Color, *Dark_Blue;
+
+	static const int Score_X = 208;
+	static const int Score_Y = 108;
+	static const int Score_Width = 110;
+	static const int Score_Height = 90;
+	static const int Score_Value_Offset = 22;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsEngine

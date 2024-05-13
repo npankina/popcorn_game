@@ -41,15 +41,11 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 	int logo_y_pos = 0;
 	int shadow_x_offset = 5 * scale;
 	int shadow_y_offset = 5 * scale;
-	int score_x = 208;
-	int score_y = 108;
-	int score_width = 110;
-	int score_height = 90;
-	int str_left_offset, str_top_offset;
 	const wchar_t *pop_str = L"POP"; // задаем строку в 2 байта
 	const wchar_t *corn_str = L"CORN";
 	const wchar_t *name_str = L"Computer";
-	SIZE str_size;
+	const wchar_t *score_str = L"SCORE:000000";
+	RECT rect;
 
 	// 1. Logo
 	AsTools::Rect(hdc, 211, 5, 104, 100, AsConfig::Blue_Color);
@@ -74,40 +70,65 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 
 	// 2. Таблица счета
 	// 2.1. Рамка
-	AsTools::Rect(hdc, score_x, score_y, score_width, 2, AsConfig::Red_Color);
-	AsTools::Rect(hdc, score_x, score_y + score_height - 2, score_width, 2, AsConfig::Red_Color);
-	AsTools::Rect(hdc, score_x, score_y, 2, score_height, AsConfig::Red_Color);
-	AsTools::Rect(hdc, score_x + score_width - 2, score_y, 2, score_height, AsConfig::Red_Color);
+	AsTools::Rect(hdc, Score_X, Score_Y, Score_Width, 2, AsConfig::Red_Color);
+	AsTools::Rect(hdc, Score_X, Score_Y + Score_Height - 2, Score_Width, 2, AsConfig::Red_Color);
+	AsTools::Rect(hdc, Score_X, Score_Y, 2, Score_Height, AsConfig::Red_Color);
+	AsTools::Rect(hdc, Score_X + Score_Width - 2, Score_Y, 2, Score_Height, AsConfig::Red_Color);
 
-	AsTools::Rect(hdc, score_x + 2, score_y + 2, score_width - 4, score_height - 4, *Dark_Blue);
+	AsTools::Rect(hdc, Score_X + 2, Score_Y + 2, Score_Width - 4, Score_Height - 4, *Dark_Blue);
 
 	// 2.2. Бордюр
 	Highlight_Color->Select_Pen(hdc);
-	MoveToEx(hdc, (score_x + 2) * scale, (score_y + score_height - 2) * scale, 0);
-	LineTo(hdc, (score_x + 2) * scale, (score_y + 2) * scale);
-	LineTo(hdc, (score_x + score_width - 2) * scale, (score_y + 2) * scale);
+	MoveToEx(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale, 0);
+	LineTo(hdc, (Score_X + 2) * scale, (Score_Y + 2) * scale);
+	LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale);
 
 	Shadow_Color->Select_Pen(hdc);
-	MoveToEx(hdc, (score_x + score_width - 2) * scale, (score_y + 2) * scale, 0);
-	LineTo(hdc, (score_x + score_width - 2) * scale, (score_y + score_height - 2) * scale);
-	LineTo(hdc, (score_x + 2) * scale, (score_y + score_height - 2) * scale);
+	MoveToEx(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale, 0);
+	LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + Score_Height - 2) * scale);
+	LineTo(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale);
 
 	// 2.3. Имя игрока
-	AsTools::Rect(hdc, score_x + 5, score_y + 5, score_width - 2 * 5, 16, AsConfig::Red_Color);
+	rect.left = (Score_X + 5) * scale;
+	rect.top = (Score_Y + 5) * scale;
+	rect.right = rect.left + (Score_Width - 2 * 5) * scale;
+	rect.bottom = rect.top + 16 * scale;
+
+	Draw_String(hdc, rect, name_str);
+
+	// 2.4. Считаем очки
+	//AsTools::Rect(hdc, Score_X + 5, Score_Y + 27, Score_Width - 2 * 5, 16, AsConfig::Red_Color);
+	rect.top += Score_Value_Offset * scale;
+	rect.bottom += Score_Value_Offset * scale;
+
+	Draw_String(hdc, rect, score_str);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str)
+{
+	int str_left_offset, str_top_offset;
+	const int scale = AsConfig::Global_Scale;
+	SIZE str_size;
+
+	// 1. Выводим прямоугольник фона
+	AsTools::Rect(hdc, rect, AsConfig::Red_Color);
+
+	// 2. Выводим строку с именем Игрока
 	SelectObject(hdc, Player_Name_Font);
 	SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
 
 	GetTextExtentPoint32(hdc, name_str, wcslen(name_str), &str_size);
 
-	str_left_offset = (score_x + 5 + (score_width - 2 * 5) / 2) * scale - str_size.cx / 2;
-	str_top_offset = (score_y + 5 + 16 / 2) * scale - str_size.cy / 2;
+	str_left_offset = rect.left + (rect.right - rect.left) / 2 - str_size.cx / 2;
+	str_top_offset = rect.top + (rect.bottom - rect.top) / 2 - str_size.cy / 2 - scale;
 
-	TextOut(hdc, str_left_offset, str_top_offset, name_str, wcslen(name_str) );
+	// 2.1. Вывод тени
+	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
+	TextOut(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, name_str, wcslen(name_str));
 
-	// 2.4. Считаем очки
-	AsTools::Rect(hdc, score_x + 5, score_y + 27, score_width - 2 * 5, 16, AsConfig::Red_Color);
-
-
+	// 2.2. Вывод строки
+	SetTextColor(hdc, AsConfig::Blue_Color.Get_RGB());
+	TextOut(hdc, str_left_offset, str_top_offset, name_str, wcslen(name_str));
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsInfo_Panel::Is_Finished()
