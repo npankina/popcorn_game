@@ -43,6 +43,7 @@ public:
 	void Get_Letter_Cell(RECT &rect);
 	void Finalize();
 	void Test_Draw_All_Steps(HDC hdc);
+	void Show_Full_Size();
 
 	static void Init();
 	static ELetter_Type Get_Random_Letter_Type();

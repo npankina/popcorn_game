@@ -8,11 +8,30 @@ AsInfo_Panel::~AsInfo_Panel()
 	delete Shadow_Color;
 	delete Highlight_Color;
 	delete Dark_Blue;
+
+	if (Logo_Pop_Font != 0)
+		DeleteObject(Logo_Pop_Font);
+
+	if (Logo_Corn_Font != 0)
+		DeleteObject(Logo_Corn_Font);
+
+	if (Player_Name_Font != 0)
+		DeleteObject(Player_Name_Font);
+
+	if (Score_Font != 0)
+		DeleteObject(Score_Font);
 }
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::AsInfo_Panel()
-	: Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Shadow_Color(nullptr), Highlight_Color(nullptr), Dark_Blue(nullptr)
-{}
+: Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Score_Font{}, Shadow_Color(nullptr), Highlight_Color(nullptr), Dark_Blue(nullptr),
+  Letter_P(EBrick_Type::Blue, ELetter_Type::P, 216 * AsConfig::Global_Scale, 155 * AsConfig::Global_Scale),
+  Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 155 * AsConfig::Global_Scale),
+  Letter_M(EBrick_Type::Blue, ELetter_Type::M, 296 * AsConfig::Global_Scale, 155 * AsConfig::Global_Scale)
+{
+	Letter_P.Show_Full_Size();
+	Letter_G.Show_Full_Size();
+	Letter_M.Show_Full_Size();
+}
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Begin_Movement()
 {}
@@ -94,17 +113,22 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 	rect.right = rect.left + (Score_Width - 2 * 5) * scale;
 	rect.bottom = rect.top + 16 * scale;
 
-	Draw_String(hdc, rect, name_str);
+	Draw_String(hdc, rect, name_str, true);
 
 	// 2.4. Считаем очки
 	//AsTools::Rect(hdc, Score_X + 5, Score_Y + 27, Score_Width - 2 * 5, 16, AsConfig::Red_Color);
 	rect.top += Score_Value_Offset * scale;
 	rect.bottom += Score_Value_Offset * scale;
 
-	Draw_String(hdc, rect, score_str);
+	Draw_String(hdc, rect, score_str, false);
+
+	// 3. Буквы индикаторы
+	Letter_P.Draw(hdc, paint_area);
+	Letter_G.Draw(hdc, paint_area);
+	Letter_M.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str)
+void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str, bool draw_name)
 {
 	int str_left_offset, str_top_offset;
 	const int scale = AsConfig::Global_Scale;
@@ -113,8 +137,12 @@ void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str)
 	// 1. Выводим прямоугольник фона
 	AsTools::Rect(hdc, rect, AsConfig::Red_Color);
 
-	// 2. Выводим строку с именем Игрока
-	SelectObject(hdc, Player_Name_Font);
+	// 2. Выводим строку
+	if (draw_name)
+		SelectObject(hdc, Player_Name_Font);
+	else 
+		SelectObject(hdc, Score_Font);
+	
 	SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
 
 	GetTextExtentPoint32(hdc, name_str, wcslen(name_str), &str_size);
@@ -127,7 +155,11 @@ void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str)
 	TextOut(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, name_str, wcslen(name_str));
 
 	// 2.2. Вывод строки
-	SetTextColor(hdc, AsConfig::Blue_Color.Get_RGB());
+	if (draw_name)
+		SetTextColor(hdc, AsConfig::Blue_Color.Get_RGB());
+	else
+		SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
+
 	TextOut(hdc, str_left_offset, str_top_offset, name_str, wcslen(name_str));
 }
 //------------------------------------------------------------------------------------------------------------
@@ -171,6 +203,11 @@ void AsInfo_Panel::Init()
 
 	log_font.lfHeight = -46;
 	Player_Name_Font = CreateFontIndirect(&log_font);
+
+	// Установка шрифта для счета
+	log_font.lfHeight = -44;
+	Score_Font = CreateFontIndirect(&log_font);
+
 }
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Choose_Font()
