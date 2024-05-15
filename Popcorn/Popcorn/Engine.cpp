@@ -24,9 +24,9 @@ AsInfo_Panel::~AsInfo_Panel()
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::AsInfo_Panel()
 : Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Score_Font{}, Shadow_Color(nullptr), Highlight_Color(nullptr), Dark_Blue(nullptr),
-  Letter_P(EBrick_Type::Blue, ELetter_Type::P, 216 * AsConfig::Global_Scale, 155 * AsConfig::Global_Scale),
-  Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 155 * AsConfig::Global_Scale),
-  Letter_M(EBrick_Type::Blue, ELetter_Type::M, 296 * AsConfig::Global_Scale, 155 * AsConfig::Global_Scale)
+  Letter_P(EBrick_Type::Blue, ELetter_Type::P, 214 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale),
+  Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 153 * AsConfig::Global_Scale),
+  Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale)
 {
 	Letter_P.Show_Full_Size();
 	Letter_G.Show_Full_Size();
@@ -115,17 +115,53 @@ void AsInfo_Panel::Draw(HDC hdc, RECT& paint_area)
 
 	Draw_String(hdc, rect, name_str, true);
 
-	// 2.4. Считаем очки
+	// 3. Считаем очки
 	//AsTools::Rect(hdc, Score_X + 5, Score_Y + 27, Score_Width - 2 * 5, 16, AsConfig::Red_Color);
 	rect.top += Score_Value_Offset * scale;
 	rect.bottom += Score_Value_Offset * scale;
 
 	Draw_String(hdc, rect, score_str, false);
 
-	// 3. Буквы индикаторы
+	// 4. Буквы индикаторы
 	Letter_P.Draw(hdc, paint_area);
 	Letter_G.Draw(hdc, paint_area);
 	Letter_M.Draw(hdc, paint_area);
+
+	// 5. Индикаторы
+	AsTools::Rect(hdc, Score_X + 8, Score_Y + 55, 12, 30, AsConfig::Teleport_Portal_Color); // left
+	AsTools::Rect(hdc, Score_X + 27, Score_Y + 55, 56, 30, AsConfig::Teleport_Portal_Color); // right
+	AsTools::Rect(hdc, Score_X + 90, Score_Y + 54, 12, 30, AsConfig::Teleport_Portal_Color); // middle
+
+	// 6. Выыод кол-ва жизней на индикатор
+		for (int i = 0; i < 4; i++) // y
+		for (int j = 0; j < 3; j++) // x
+			Draw_Extra_Life(hdc, 33 + j * 16, 57 + i * 7);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Draw_Extra_Life(HDC hdc, int x_pos, int y_pos)
+{
+	const int scale = AsConfig::Global_Scale;
+	RECT rect;
+
+	rect.left = (Score_X + x_pos) * scale;
+	rect.top = (Score_Y + y_pos) * scale;
+	rect.right = rect.left + 4 * scale;
+	rect.bottom = rect.top + 5 * scale;
+
+	AsTools::Ellipse(hdc, rect, AsConfig::Red_Color);
+
+	rect.left += 8 * scale;
+	rect.right += 8 * scale;
+
+	AsTools::Ellipse(hdc, rect, AsConfig::Red_Color);
+
+	rect.left = (Score_X + x_pos + 2) * scale;
+	rect.top = (Score_Y + y_pos + 1) * scale;
+	rect.right = rect.left + 8 * scale;
+	rect.bottom = rect.top + 3 * scale;
+
+	AsConfig::Blue_Color.Select(hdc);
+	AsTools::Round_Rect(hdc, rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str, bool draw_name)
