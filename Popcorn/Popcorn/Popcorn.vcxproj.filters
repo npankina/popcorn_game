@@ -19,15 +19,6 @@
     <Filter Include="Engine">
       <UniqueIdentifier>{e118474c-45b2-425e-82c4-c699d6611796}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Level">
-      <UniqueIdentifier>{22ca32b3-df65-4159-9c58-7781ed0c9a3d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Active_Brick">
-      <UniqueIdentifier>{780dc0b4-e07c-4ab7-af94-933a4818deb1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Falling_Letter">
-      <UniqueIdentifier>{c42d6390-b0b1-4f43-b45d-57ed95a6954d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="#Ball">
       <UniqueIdentifier>{c21faa94-897b-48ef-87b0-534a1316110a}</UniqueIdentifier>
     </Filter>
@@ -94,6 +85,21 @@
     <Filter Include="#Monster\Explosive_Ball">
       <UniqueIdentifier>{621192de-1b0a-4647-9688-41363a17aec6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="#Screen">
+      <UniqueIdentifier>{e096ff1e-4eb5-48a6-a576-bb4dd078f0cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Screen\Info_Panel">
+      <UniqueIdentifier>{90c5d65e-fd1a-4dcb-bda2-416897c3d8fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Screen\Level">
+      <UniqueIdentifier>{22ca32b3-df65-4159-9c58-7781ed0c9a3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Screen\Falling_Letter">
+      <UniqueIdentifier>{c42d6390-b0b1-4f43-b45d-57ed95a6954d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Screen\Active_Brick">
+      <UniqueIdentifier>{780dc0b4-e07c-4ab7-af94-933a4818deb1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -115,7 +121,7 @@
       <Filter>#Border\Border</Filter>
     </ClInclude>
     <ClInclude Include="Level.h">
-      <Filter>Level</Filter>
+      <Filter>#Screen\Level</Filter>
     </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>#Tools\Config</Filter>
@@ -127,10 +133,10 @@
       <Filter>#Platform\Platform</Filter>
     </ClInclude>
     <ClInclude Include="Active_Brick.h">
-      <Filter>Active_Brick</Filter>
+      <Filter>#Screen\Active_Brick</Filter>
     </ClInclude>
     <ClInclude Include="Falling_Letter.h">
-      <Filter>Falling_Letter</Filter>
+      <Filter>#Screen\Falling_Letter</Filter>
     </ClInclude>
     <ClInclude Include="Ball_Set.h">
       <Filter>#Ball\Ball_Set</Filter>
@@ -168,6 +174,9 @@
     <ClInclude Include="Explosive_Ball.h">
       <Filter>#Monster\Explosive_Ball</Filter>
     </ClInclude>
+    <ClInclude Include="Info_Panel.h">
+      <Filter>#Screen\Info_Panel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Popcorn.rc">
@@ -193,7 +202,7 @@
       <Filter>#Border\Border</Filter>
     </ClCompile>
     <ClCompile Include="Level.cpp">
-      <Filter>Level</Filter>
+      <Filter>#Screen\Level</Filter>
     </ClCompile>
     <ClCompile Include="Config.cpp">
       <Filter>#Tools\Config</Filter>
@@ -205,10 +214,10 @@
       <Filter>#Platform\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Active_Brick.cpp">
-      <Filter>Active_Brick</Filter>
+      <Filter>#Screen\Active_Brick</Filter>
     </ClCompile>
     <ClCompile Include="Falling_Letter.cpp">
-      <Filter>Falling_Letter</Filter>
+      <Filter>#Screen\Falling_Letter</Filter>
     </ClCompile>
     <ClCompile Include="Ball_Set.cpp">
       <Filter>#Ball\Ball_Set</Filter>
@@ -245,6 +254,9 @@
     </ClCompile>
     <ClCompile Include="Explosive_Ball.cpp">
       <Filter>#Monster\Explosive_Ball</Filter>
+    </ClCompile>
+    <ClCompile Include="Info_Panel.cpp">
+      <Filter>#Screen\Info_Panel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
