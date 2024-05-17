@@ -24,12 +24,14 @@ public:
 private:
 	void Choose_Font();
 	void Draw_Extra_Life(HDC hdc, int x_pos, int y_pos);
-	void Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str, bool draw_name);
+	void Show_Extra_Lifes(HDC hdc);
+	void Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw_name);
 
 	HFONT Logo_Pop_Font, Logo_Corn_Font, Player_Name_Font, Score_Font;
 	AColor *Shadow_Color, *Highlight_Color, *Dark_Blue;
 
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
+	AString Player_Name;
 
 	static const int Score_X = 208;
 	static const int Score_Y = 108;

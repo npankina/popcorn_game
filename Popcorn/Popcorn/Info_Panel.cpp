@@ -1,5 +1,6 @@
 ﻿#include "Info_Panel.h"
 
+
 // class AsInfo_Panel
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::~AsInfo_Panel()
@@ -22,7 +23,7 @@ AsInfo_Panel::~AsInfo_Panel()
 }
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::AsInfo_Panel()
-	: Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Score_Font{}, Shadow_Color(nullptr), Highlight_Color(nullptr), Dark_Blue(nullptr),
+: Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Score_Font{}, Shadow_Color(nullptr), Highlight_Color(nullptr), Dark_Blue(nullptr),
 	Letter_P(EBrick_Type::Blue, ELetter_Type::P, 214 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale),
 	Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 153 * AsConfig::Global_Scale),
 	Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale)
@@ -32,22 +33,38 @@ AsInfo_Panel::AsInfo_Panel()
 	Letter_M.Show_Full_Size();
 }
 //------------------------------------------------------------------------------------------------------------
-void AsInfo_Panel::Begin_Movement()
+void AsInfo_Panel::Begin_Movement() // Заглушка, не используется.
 {}
 //------------------------------------------------------------------------------------------------------------
-void AsInfo_Panel::Finish_Movement()
+void AsInfo_Panel::Finish_Movement() // Заглушка, не используется.
 {}
 //------------------------------------------------------------------------------------------------------------
-void AsInfo_Panel::Advance(double max_speed)
+void AsInfo_Panel::Advance(double max_speed) // Заглушка, не используется.
 {}
 //------------------------------------------------------------------------------------------------------------
-double AsInfo_Panel::Get_Speed()
+bool AsInfo_Panel::Is_Finished() // Заглушка, не используется.
+{
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+double AsInfo_Panel::Get_Speed() // Заглушка, не используется.
 {
 	return 0.0;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Act()
-{}
+{
+	//const int scale = AsConfig::Global_Scale;
+	//RECT rect{};
+
+	//rect.left = 211 * scale;
+	//rect.top = 5 * scale;
+	//rect.right = rect.left + 104 * scale;
+	//rect.bottom = 199 * scale;
+
+	//AsTools::Invalidate_Rect(rect);
+}
+
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Clear(HDC hdc, RECT &paint_area)
 {}
@@ -61,8 +78,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 	int shadow_y_offset = 5 * scale;
 	const wchar_t *pop_str = L"POP"; // задаем строку в 2 байта
 	const wchar_t *corn_str = L"CORN";
-	const wchar_t *name_str = L"Computer";
-	const wchar_t *score_str = L"SCORE:000000";
+	AString score_str = L"SCORE:";
 	RECT rect;
 
 	// 1. Logo
@@ -112,13 +128,15 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 	rect.right = rect.left + (Score_Width - 2 * 5) * scale;
 	rect.bottom = rect.top + 16 * scale;
 
-	Draw_String(hdc, rect, name_str, true);
+	Player_Name = L"Computer";
+	Draw_String(hdc, rect, Player_Name, true);
 
 	// 3. Считаем очки
 	//AsTools::Rect(hdc, Score_X + 5, Score_Y + 27, Score_Width - 2 * 5, 16, AsConfig::Red_Color);
 	rect.top += Score_Value_Offset * scale;
 	rect.bottom += Score_Value_Offset * scale;
 
+	score_str.Append(AsConfig::Current_Score);
 	Draw_String(hdc, rect, score_str, false);
 
 	// 4. Буквы индикаторы
@@ -132,9 +150,25 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 	AsTools::Rect(hdc, Score_X + 90, Score_Y + 54, 12, 30, AsConfig::Teleport_Portal_Color); // middle
 
 	// 6. Выыод кол-ва жизней на индикатор
-	for (int i = 0; i < 4; i++) // y
-		for (int j = 0; j < 3; j++) // x
+	Show_Extra_Lifes(hdc);
+	//for (int i = 0; i < 4; i++) // y
+	//	for (int j = 0; j < 3; j++) // x
+	//		Draw_Extra_Life(hdc, 33 + j * 16, 57 + i * 7);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Show_Extra_Lifes(HDC hdc)
+{
+	int lifes_to_draw = AsConfig::Extra_Lives_Count;
+
+	for (int j = 0; j < 3; j++) // x
+		for (int i = 0; i < 4; i++) // y
+		{
+			if (lifes_to_draw <= 0)
+				break;
+
 			Draw_Extra_Life(hdc, 33 + j * 16, 57 + i * 7);
+			--lifes_to_draw;
+		}
 }
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Draw_Extra_Life(HDC hdc, int x_pos, int y_pos)
@@ -163,7 +197,7 @@ void AsInfo_Panel::Draw_Extra_Life(HDC hdc, int x_pos, int y_pos)
 	AsTools::Round_Rect(hdc, rect);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str, bool draw_name)
+void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw_name)
 {
 	int str_left_offset, str_top_offset;
 	const int scale = AsConfig::Global_Scale;
@@ -180,14 +214,14 @@ void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str, boo
 
 	SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
 
-	GetTextExtentPoint32(hdc, name_str, wcslen(name_str), &str_size);
+	GetTextExtentPoint32(hdc, name_str.Get_Content(), name_str.Get_Length(), &str_size);
 
 	str_left_offset = rect.left + (rect.right - rect.left) / 2 - str_size.cx / 2;
 	str_top_offset = rect.top + (rect.bottom - rect.top) / 2 - str_size.cy / 2 - scale;
 
 	// 2.1. Вывод тени
 	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
-	TextOut(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, name_str, wcslen(name_str));
+	TextOut(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, name_str.Get_Content(), name_str.Get_Length() );
 
 	// 2.2. Вывод строки
 	if (draw_name)
@@ -195,12 +229,7 @@ void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, const wchar_t *name_str, boo
 	else
 		SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
 
-	TextOut(hdc, str_left_offset, str_top_offset, name_str, wcslen(name_str));
-}
-//------------------------------------------------------------------------------------------------------------
-bool AsInfo_Panel::Is_Finished()
-{
-	return false;
+	TextOut(hdc, str_left_offset, str_top_offset, name_str.Get_Content(), name_str.Get_Length() );
 }
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Init()

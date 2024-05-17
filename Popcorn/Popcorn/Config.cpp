@@ -2,6 +2,8 @@
 
 bool AsConfig::Level_Has_Floor = false; // включение - отключение пол в игре
 int AsConfig::Current_Timer_Tick = 0;
+int AsConfig::Current_Score = 0;
+int AsConfig::Extra_Lives_Count = 5;
 
 const AColor AsConfig::BG_Color(6, 30, 82);
 const AColor AsConfig::Red_Color(230, 25, 229);
