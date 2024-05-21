@@ -13,7 +13,6 @@ public:
 	virtual void Advance(double max_speed);
 	virtual double Get_Speed();
 
-
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT& paint_area);
 	virtual void Draw(HDC hdc, RECT& paint_area);

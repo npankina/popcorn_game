@@ -57,6 +57,5 @@ private:
 	AsMonster_Set Monster_Set;
 	AsInfo_Panel Info_Panel;
 
-	//AGame_Object* Modules[AsConfig::Max_Modules_Count]; // UNO Главные графические объекты игры
-	std::vector<AGame_Object *> Modules;
+	std::vector<AGame_Object *> Modules; // UNO; Главные графические объекты игры
 };
