@@ -99,6 +99,6 @@ public:
 
 private:
 	int Hit_Checkers_Count;
-	AHit_Checker *Hit_Checkers[4];
+	AHit_Checker *Hit_Checkers[4]; // !!! Заменить на вектор
 };
 //------------------------------------------------------------------------------------------------------------

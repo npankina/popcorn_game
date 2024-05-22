@@ -32,5 +32,5 @@ private:
 	void Draw_Floor(HDC hdc, RECT &paint_area);
 
 	RECT Floor_Rect;
-	AGate *Gates[AsConfig::Gates_Count];
+	AGate *Gates[AsConfig::Gates_Count]; // !!! Заменить на вектор
 };

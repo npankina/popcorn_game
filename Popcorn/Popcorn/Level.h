@@ -74,8 +74,6 @@ private:
 
 	static AsLevel *Level;
 
-	//int Active_Bricks_Count;
-		//AActive_Brick *Active_Bricks[AsConfig::Max_Active_Bricks_Count];
 	std::vector<AGraphics_Object *> Active_Bricks;
 	std::vector<AGraphics_Object *> Falling_Letters;
 };

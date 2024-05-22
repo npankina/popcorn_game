@@ -5,7 +5,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <string>
-
+#include <vector>
 
 //------------------------------------------------------------------------------------------------------------
 enum class EBall_State : unsigned char

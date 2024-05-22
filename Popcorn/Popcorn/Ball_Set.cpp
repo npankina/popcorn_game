@@ -1,41 +1,33 @@
 #include "Ball_Set.h"
 
+//------------------------------------------------------------------------------------------------------------
+AsBall_Set::AsBall_Set() : Balls(AsConfig::Max_Balls_Count)
+{}
+//------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Act()
 {
-	int i;
-	ABall *curr_ball;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+	for (auto &ball : Balls)
 	{
-		curr_ball = &Balls[i];
-
-		if (curr_ball->Get_State() == EBall_State::On_Platform)
-			if (curr_ball->Release_Timer_Tick != 0 and AsConfig::Current_Timer_Tick >= curr_ball->Release_Timer_Tick)
-				curr_ball->Release();
+		if (ball.Get_State() == EBall_State::On_Platform)
+			if (ball.Release_Timer_Tick != 0 and AsConfig::Current_Timer_Tick >= ball.Release_Timer_Tick)
+				ball.Release();
 	}
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Release_From_Platform(double platform_x_pos)
 {
-	int i;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-		if (Balls[i].Get_State() == EBall_State::On_Platform)
-			Balls[i].Set_State(EBall_State::Normal, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
+	for (auto &ball : Balls)
+		if (ball.Get_State() == EBall_State::On_Platform)
+			ball.Set_State(EBall_State::Normal, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsBall_Set::Release_Next_Ball()
 {
-	int i;
-	ABall *curr_ball;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+	for (auto &ball : Balls)
 	{
-		curr_ball = &Balls[i];
-
-		if (curr_ball->Get_State() == EBall_State::On_Platform)
+		if (ball.Get_State() == EBall_State::On_Platform)
 		{
-			curr_ball->Release();
+			ball.Release();
 			return true;
 		}
 	}
@@ -47,14 +39,14 @@ void AsBall_Set::Set_On_Platform(double platform_x_pos)
 {
 	int i;
 
-	for (i = 0; i < 1; i++)
+	for ( i = 0; i < 1; i++)
 	{
 		Balls[i].Set_State(EBall_State::Normal);
 		Balls[i].Set_State(EBall_State::On_Platform, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
 		//Balls[i].Release_Timer_Tick = 0; // чтобы мячик не стартовал сам
 	}
 
-	for (; i < AsConfig::Max_Balls_Count; i++)
+	for (; i < Balls.size(); i++)
 		Balls[i].Set_State(EBall_State::Disabled);
 }
 //------------------------------------------------------------------------------------------------------------
