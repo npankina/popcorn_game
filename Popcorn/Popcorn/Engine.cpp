@@ -12,7 +12,6 @@ AsEngine::AsEngine()
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Init_Engine(HWND hwnd)
 {// Настройка игры при старте
-	int index;
 
 	SYSTEMTIME sys_time;
 	FILETIME file_time;
@@ -68,8 +67,6 @@ void AsEngine::Init_Engine(HWND hwnd)
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 {// Отрисовка экрана игры
-
-	int i;
 
 	SetGraphicsMode(hdc, GM_ADVANCED);
 
@@ -168,7 +165,7 @@ void AsEngine::Play_Level()
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Advance_Movers()
 {// смещает в течение текущего кадра все двигающиеся объекты на несколько элементарных шагов
-	int i;
+	
 	double curr_speed, max_speed = 0.0;
 
 	// 1. Получаем максимальную скорость движущихся объектов

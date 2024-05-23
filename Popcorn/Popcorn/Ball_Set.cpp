@@ -52,19 +52,18 @@ void AsBall_Set::Set_On_Platform(double platform_x_pos)
 //------------------------------------------------------------------------------------------------------------
 bool AsBall_Set::All_Balls_Are_Lost()
 {
-	int i;
 	int active_balls_count = 0;
 	int lost_balls_count = 0;
 
 	// Смещаем мячики
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+	for (auto &ball : Balls)
 	{
-		if (Balls[i].Get_State() == EBall_State::Disabled)
+		if (ball.Get_State() == EBall_State::Disabled)
 			continue;
 
 		++active_balls_count;
 
-		if (Balls[i].Get_State() == EBall_State::Lost)
+		if (ball.Get_State() == EBall_State::Lost)
 		{
 			++lost_balls_count;
 			continue;
@@ -90,8 +89,6 @@ bool AsBall_Set::Is_Test_Finished()
 void AsBall_Set::Triple_Balls()
 {// "Растроить" самый дальний летящий от платформы мячик
 
-	int i;
-	ABall *curr_ball;
 	ABall *further_ball = 0;
 	ABall *left_candidate = 0, *right_candidate = 0;
 	double curr_ball_x, curr_ball_y;
@@ -99,24 +96,20 @@ void AsBall_Set::Triple_Balls()
 
 
 	// 1. Выбираем самый дальний по Y мячик
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+	for (auto &ball : Balls)
 	{
-		curr_ball = &Balls[i];
-
-		if (curr_ball->Get_State() != EBall_State::Normal)
+		if (ball.Get_State() != EBall_State::Normal)
 			continue;
 
-
-
 		if (further_ball == 0)
-			further_ball = curr_ball;
+			further_ball = &ball;
 		else
 		{
-			curr_ball->Get_Center(curr_ball_x, curr_ball_y);
+			ball.Get_Center(curr_ball_x, curr_ball_y);
 			further_ball->Get_Center(further_ball_x, further_ball_y);
 
 			if (curr_ball_y < further_ball_y)
-				further_ball = curr_ball;
+				further_ball = &ball;
 		}
 	}
 
@@ -124,20 +117,18 @@ void AsBall_Set::Triple_Balls()
 	if (further_ball == 0)
 		return;
 
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
+	for (auto &ball : Balls)
 	{
-		curr_ball = &Balls[i];
-
-		switch (curr_ball->Get_State() )
+		switch (ball.Get_State() )
 		{
 		case EBall_State::Disabled:
 		case EBall_State::Lost:
 			if (left_candidate == 0)
-				left_candidate = curr_ball;
+				left_candidate = &ball;
 			else
 				if (right_candidate == 0)
 				{
-					right_candidate = curr_ball;
+					right_candidate = &ball;
 					break;  // Оба кандидата найдены
 				}
 
@@ -161,65 +152,38 @@ void AsBall_Set::Triple_Balls()
 void AsBall_Set::Inverse_Balls()
 {// Меняем направление на обратное у всех мячиков
 
-	int i;
-	ABall *curr_ball;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-	{
-		curr_ball = &Balls[i];
-
-		if (curr_ball->Get_State() == EBall_State::Normal)
-			curr_ball->Set_Direction(curr_ball->Get_Direction() + M_PI);
-	}
+	for (auto &ball : Balls)
+		if (ball.Get_State() == EBall_State::Normal)
+			ball.Set_Direction(ball.Get_Direction() + M_PI);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Accelerate()
 {
-	int i;
-	ABall *curr_ball;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-	{
-		curr_ball = &Balls[i];
-
-		if (curr_ball->Get_State() == EBall_State::Normal)
-			curr_ball->Set_Speed(curr_ball->Get_Speed() * AsConfig::Ball_Acceleration);
-	}
+	for (auto &ball : Balls)
+		if (ball.Get_State() == EBall_State::Normal)
+			ball.Set_Speed(ball.Get_Speed() * AsConfig::Ball_Acceleration);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Reset_Speed()
 {
-	int i;
-	ABall *curr_ball;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-	{
-		curr_ball = &Balls[i];
-
-		if (curr_ball->Get_State() == EBall_State::Normal)
-			curr_ball->Set_Speed(AsConfig::Normal_Ball_Speed);
-	}
+	for (auto &ball : Balls)
+		if (ball.Get_State() == EBall_State::Normal)
+			ball.Set_Speed(AsConfig::Normal_Ball_Speed);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::On_Platform_Advance(double direction, double platform_speed, double max_speed)
 {
-	int i;
-	ABall *curr_ball;
-
-	for (i = 0; i < AsConfig::Max_Balls_Count; i++)
-	{
-		curr_ball = &Balls[i];
-
-		if (curr_ball->Get_State() == EBall_State::On_Platform)
-			curr_ball->Forced_Advance(direction, platform_speed, max_speed);
-	}
+	for (auto &ball : Balls)
+		if (ball.Get_State() == EBall_State::On_Platform)
+			ball.Forced_Advance(direction, platform_speed, max_speed);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsBall_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
 {
-	if (index < 0 or index >= AsConfig::Max_Balls_Count)
+	if (index < 0 or index >= Balls.size() )
 		return false;
 
 	*game_obj = &Balls[index++]; //  в указатель помещается адрес объекта, index по ссылке инкрементируется
 	return true;
 }
+//------------------------------------------------------------------------------------------------------------

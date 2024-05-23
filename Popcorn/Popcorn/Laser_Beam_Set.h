@@ -12,5 +12,5 @@ private:
 	virtual bool Get_Next_Game_Object(int &index, AGame_Object **game_obj); // iterator
 
 	static const int Max_Laser_Beams_Count = 10;
-	ALaser_Beam Laser_Beams[Max_Laser_Beams_Count]; // !!! Заменить на вектор
+	std::vector<ALaser_Beam> Laser_Beams;
 };

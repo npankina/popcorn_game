@@ -2,20 +2,19 @@
 
 void AsLaser_Beam_Set::Fire(double left_x_pos, double right_x_pos)
 {
-	int i;
 	ALaser_Beam *left = 0, *right = 0;
 
-	for (i = 0; i < Max_Laser_Beams_Count; i++)
+	for (auto &item : Laser_Beams)
 	{
-		if (Laser_Beams[i].Is_Active() )
+		if (item.Is_Active() )
 			continue; // луч летит дальше
 
 		if (left == 0)
-			left = &Laser_Beams[i];
+			left = &item;
 		else
 			if (right == 0)
 			{
-				right = &Laser_Beams[i];
+				right = &item;
 				break;
 			}
 	}
@@ -29,8 +28,8 @@ void AsLaser_Beam_Set::Fire(double left_x_pos, double right_x_pos)
 //------------------------------------------------------------------------------------------------------------
 void AsLaser_Beam_Set::Disable_All()
 {
-	for (int i = 0; i < Max_Laser_Beams_Count; i++)
-		Laser_Beams[i].Disable();
+	for (auto &item : Laser_Beams)
+		item.Disable();
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLaser_Beam_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
