@@ -237,7 +237,7 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 					Draw_Brick(hdc, brick_rect, j, i);
 			}
 
-		Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Active_Bricks, AsConfig::Max_Active_Bricks_Count);
+		Draw_Objects(hdc, paint_area, Active_Bricks, AsConfig::Max_Active_Bricks_Count);
 	}
 
 	for (auto &item : Active_Bricks)
@@ -779,28 +779,27 @@ void AsLevel::Delete_Objects(std::vector<AGraphics_Object *> &obj)
 	obj.erase(obj.begin(), obj.end() ); // очищен вектор от инвалидированных указателей
 }
 //------------------------------------------------------------------------------------------------------------
-void AsLevel::Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count)
+void AsLevel::Draw_Objects(HDC hdc, RECT &paint_area, std::vector<AGraphics_Object *> &obj, int objects_max_count)
 {
-	int i;
-
-	for (i = 0; i < objects_max_count; i++)
-	{
-		if (objects_array[i] != 0)
-			objects_array[i]->Draw(hdc, paint_area);
-	}
+	for (auto *obj : obj)
+		obj->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Act_Objects(std::vector<AGraphics_Object *> &obj)
 {
-	for (auto it = obj.begin(), end = obj.end(); it != end; it++)
+	auto it = obj.begin();
+
+	while (it != obj.end())
 	{
 		(*it)->Act();
 
 		if ((*it)->Is_Finished())
 		{
-			delete *it; // удаление объекта в куче
-			it = obj.erase(it); // иначе будет ошибка - инвалидирован итератор; erase возвращает итератор
+			delete *it;
+			it = obj.erase(it);
 		}
+		else
+			it++;
 	}
 }
 //------------------------------------------------------------------------------------------------------------

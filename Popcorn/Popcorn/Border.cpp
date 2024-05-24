@@ -39,7 +39,7 @@ void AsBorder::Redraw_Floor()
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Open_Gate(int gate_index, bool short_open)
 {
-	if (gate_index != Gates.size() and short_open)
+	if (gate_index != Gates.size() - 1 and short_open)
 		AsConfig::Throw(); // самый последний гейт может открываться только short_open, т.е. мячик может выкатываться только из правого нижнего гейта
 	
 	if (gate_index >= 0 and gate_index < Gates.size() )

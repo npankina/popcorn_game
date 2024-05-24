@@ -2,32 +2,39 @@
 
 
 // class AsMonster_Set
+//------------------------------------------------------------------------------------------------------------
+AsMonster_Set::~AsMonster_Set()
+{
+	for (auto *monster : Monsters)
+		delete monster;
+
+	Monsters.erase(Monsters.begin(), Monsters.end());
+}
+//------------------------------------------------------------------------------------------------------------
 AsMonster_Set::AsMonster_Set()
 : Border(0), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0), Max_Alive_Monsters_Count(0)
-{
-	memset(Monsters, 0, sizeof(AMonster*) * Max_Monsters_Count); // обнуляем указатели в массиве
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 {
-	for (int i = 0; i < Max_Monsters_Count; i++)
-		if (Monsters[i] != 0 and Monsters[i]->Check_Hit(next_x_pos, next_y_pos, ball) )
+	for (auto *monster : Monsters)
+		if (monster->Check_Hit(next_x_pos, next_y_pos, ball) )
 			return true;
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos)
 {
-	for (int i = 0; i < Max_Monsters_Count; i++)
-		if (Monsters[i] != 0 and Monsters[i]->Check_Hit(next_x_pos, next_y_pos))
+	for (auto *monster : Monsters)
+		if (monster->Check_Hit(next_x_pos, next_y_pos))
 			return true;
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Check_Hit(RECT &rect)
 {
-	for (int i = 0; i < Max_Monsters_Count; i++)
-		if (Monsters[i] != 0 and Monsters[i]->Check_Hit(rect) )
+	for (auto *monster : Monsters)
+		if (monster->Check_Hit(rect) )
 			return true;
 	return false;
 }
@@ -43,8 +50,9 @@ void AsMonster_Set::Act()
 
 	case EMonster_Set_State::Selecting_Next_Gate:
 	    current_alive_count = 0;
-		for (int i = 0; i < Max_Monsters_Count; i++)
-			if (Monsters[i] != 0 and ! Monsters[i]->Is_Finished())
+
+		for (auto *monster : Monsters)
+			if (monster->Is_Finished())
 				++current_alive_count;
 
 		// добавляем нового монстра, если можно
@@ -77,12 +85,16 @@ void AsMonster_Set::Act()
 
 	if (Monster_Set_State != EMonster_Set_State::Idle)
 	{
-		for (int i = 0; i < Max_Monsters_Count; i++)
-			if (Monsters[i] != 0 and Monsters[i]->Is_Finished())
+		auto it = Monsters.begin();
+
+		while (it != Monsters.end())
+			if ((*it)->Is_Finished())
 			{
-				delete Monsters[i];
-				Monsters[i] = 0;
+				delete *it;
+				it = Monsters.erase(Monsters.begin(), Monsters.end());
 			}
+			else
+				++it;
 	}
 
 	AGame_Objects_Set::Act(); // выполняется вызов метода базового класса
@@ -103,25 +115,22 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 	if (gate_index < 0 or gate_index >= AsConfig::Gates_Count)
 		AsConfig::Throw();
 
-	for (int i = 0; i < Max_Monsters_Count; i++)
-	{
-		if (Monsters[i] == 0)
-		{
-			monster_type = AsTools::Rand(2);
 
-			if (monster_type == 0)
-				monster = new AMonster_Eye();
-			else 
-				monster = new AMonster_Comet();
+	// Все монстры уже в игре
+	if (Monsters.size() >= Max_Monsters_Count)
+		return;
 
-			Monsters[i] = monster;
-			break;
-		}
-	}
 
-	if (monster == 0)
-		return; // Все монстры уже в игре
+	// Выбираем тип монстра и добавляем в коллекцию
+	monster_type = AsTools::Rand(2);
 
+	if (monster_type == 0)
+		monster = new AMonster_Eye();
+	else 
+		monster = new AMonster_Comet();
+	Monsters.push_back(monster);
+
+	// 
 	Border->Get_Gate_Pos(gate_index, gate_x_pos, gate_y_pos);
 
 	if (gate_index % 2 == 0)
@@ -143,29 +152,18 @@ void AsMonster_Set::Activate(int max_alive_monsters_count)
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Destroy_All()
 {
-	for (int i = 0; i < Max_Monsters_Count; i++)
-		if (Monsters[i] != 0)
-			Monsters[i]->Destroy();
+	for (auto &item : Monsters)
+		item->Destroy();
 
 	Monster_Set_State = EMonster_Set_State::Idle;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
 {
-	AMonster *monster;
-
-	if (index < 0 or index >= Max_Monsters_Count)
+	if (index < 0 or index >= Monsters.size() )
 		return false;
 
-	while (index < Max_Monsters_Count)
-	{
-		monster = Monsters[index++];
-		if (monster != 0)
-		{
-			*game_obj = monster; //  в указатель помещается адрес объекта, index по ссылке инкрементируется
-			return true;
-		}
-	}
 
-	return false;
+	*game_obj = Monsters[index++]; //  в указатель помещается адрес объекта, index по ссылке инкрементируется
+	return true;
 }

@@ -6,7 +6,7 @@ AMonster::~AMonster()
 {}
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Monster_State(EMonster_State::Missing), 
+: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Monster_State(EMonster_State::Missing), Explosive_Balls(Explosive_Balls_Count),
   Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0), Monster_Rect{}, Prev_Monster_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
@@ -232,7 +232,6 @@ void AMonster::Destroy()
 	if (!(Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive))
 		return;
 
-	int i;
 	int half_width = Width * AsConfig::Global_Scale / 2;
 	int half_height = Height * AsConfig::Global_Scale / 2;
 	int x_pos = (int)(X_Pos * AsConfig::D_Global_Scale) + half_width;
@@ -247,7 +246,7 @@ void AMonster::Destroy()
 	if (half_height < half_size)
 		half_size = half_height;
 
-	for (i = 0; i < Explosive_Balls_Count; i++)
+	for (auto &item : Explosive_Balls)
 	{
 		x_offset = AsTools::Rand(half_width) - half_width / 2;
 		y_offset = AsTools::Rand(half_height) - half_height / 2;
@@ -266,7 +265,7 @@ void AMonster::Destroy()
 		else
 			is_red = false;
 
-		Explosive_Balls[i].Explode(x_pos + x_offset, y_pos + y_offset, size * 2, is_red, time_offset, 10);
+		item.Explode(x_pos + x_offset, y_pos + y_offset, size * 2, is_red, time_offset, 10);
 	}
 
 
@@ -280,20 +279,18 @@ void AMonster::Destroy()
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Draw_Destroing(HDC hdc, RECT &paint_area)
 {
-	int i;
-
-	for (i = 0; i < Explosive_Balls_Count; i++)
-		Explosive_Balls[i].Draw(hdc, paint_area);
+	for (auto &item : Explosive_Balls)
+		item.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Act_Destroing()
 {
 	bool destroing_is_finished = true;
 
-	for (int i = 0; i < Explosive_Balls_Count; i++)
+	for (auto &item : Explosive_Balls)
 	{
-		Explosive_Balls[i].Act();
-		destroing_is_finished &= Explosive_Balls[i].Is_Finished(); // накапливаем результат
+		item.Act();
+		destroing_is_finished &= item.Is_Finished(); // накапливаем результат
 	}
 
 	if (destroing_is_finished)
@@ -345,7 +342,7 @@ const EEye_State AMonster_Eye::Blink_States[Blink_Stages_Count] = {
 						EEye_State::Opening, EEye_State::Staring, EEye_State::Closing };
 //------------------------------------------------------------------------------------------------------------
 AMonster_Eye::AMonster_Eye()
-: Eye_State(EEye_State::Closed), Start_Blink_Timeout(0), Cornea_Height(Max_Cornea_Height), Total_Animation_Timeout(0), Blink_Ticks{}
+: Eye_State(EEye_State::Closed), Start_Blink_Timeout(0), Cornea_Height(Max_Cornea_Height), Total_Animation_Timeout(0), Blink_Ticks(Blink_Stages_Count)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMonster_Eye::Draw_Alive(HDC hdc)
@@ -445,7 +442,7 @@ void AMonster_Eye::Act_Alive()
 
 	curr_tick_offset = (AsConfig::Current_Timer_Tick - Start_Blink_Timeout) % Total_Animation_Timeout;
 
-	for (i = 0; i < Blink_Stages_Count; i++)
+	for (i = 0; i < Blink_Ticks.size(); i++)
 	{
 		if (curr_tick_offset < Blink_Ticks[i])
 		{
