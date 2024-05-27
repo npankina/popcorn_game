@@ -59,6 +59,22 @@ AColor::AColor(const AColor &pen_color, const AColor &brush_color, int pen_size)
 	Brush = CreateSolidBrush(brush_color.Get_RGB() );
 }
 //------------------------------------------------------------------------------------------------------------
+void AColor::operator=(const AColor &another)
+{
+	R = another.R;
+	G = another.G;
+	B = another.B;
+
+	if (Pen != 0)
+		DeleteObject(Pen);
+
+	if (Brush != 0)
+		DeleteObject(Brush);
+
+	Pen = CreatePen(PS_SOLID, 0, RGB(R, G, B));
+	Brush = CreateSolidBrush(RGB(R, G, B));
+}
+//------------------------------------------------------------------------------------------------------------
 int AColor::Get_RGB() const
 {
 	return RGB(R, G, B);
