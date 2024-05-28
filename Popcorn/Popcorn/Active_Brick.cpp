@@ -94,7 +94,7 @@ void AActive_Brick_Red_Blue::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AActive_Brick_Red_Blue::Is_Finished()
 {
-	if (Fade_Step >= Max_Fade_Step - 1)
+	if (Fade_Step >= Max_Fade_Step)
 		return true;
 	else
 		return false;
@@ -102,9 +102,7 @@ bool AActive_Brick_Red_Blue::Is_Finished()
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Red_Blue::Setup_Colors()
 {
-	int i;
-
-	for (i = 0; i < Max_Fade_Step; i++)
+	for (int i = 0; i < Max_Fade_Step; i++)
 	{
 		AsTools::Get_Fading_Color(AsConfig::Red_Color, i, Fading_Red_Brick_Colors[i], Max_Fade_Step);
 		AsTools::Get_Fading_Color(AsConfig::Blue_Color, i, Fading_Blue_Brick_Colors[i], Max_Fade_Step);
@@ -113,6 +111,7 @@ void AActive_Brick_Red_Blue::Setup_Colors()
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Red_Blue::Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 {// Вывод неактивного кирпича на уровне
+
 	const AColor *color = 0;
 
 	switch (brick_type)

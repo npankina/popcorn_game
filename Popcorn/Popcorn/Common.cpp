@@ -19,6 +19,7 @@ AGraphics_Object::~AGraphics_Object()
 
 
 // AGame_Objects_Set
+//------------------------------------------------------------------------------------------------------------
 void AGame_Objects_Set::Begin_Movement()
 {
 	int index = 0;
