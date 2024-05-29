@@ -22,6 +22,8 @@ public:
 
 private:
 	virtual bool Get_Next_Game_Object(int &index, AGame_Object **game_obj); // iterator
+	void Rotate_Triple_Ball(ABall *ball, bool is_add_angle);
+
 
 	//ABall Balls[AsConfig::Max_Balls_Count];  // !!! Заменить на вектор
 	std::vector<ABall> Balls;

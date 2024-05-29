@@ -93,6 +93,8 @@ void AsBall_Set::Triple_Balls()
 	ABall *left_candidate = 0, *right_candidate = 0;
 	double curr_ball_x, curr_ball_y;
 	double further_ball_x, further_ball_y;
+	/*double prev_direction, direction_delta;
+	const double min_angle = AsConfig::Min_Ball_Angle / 2.0;*/
 
 
 	// 1. Выбираем самый дальний по Y мячик
@@ -139,13 +141,13 @@ void AsBall_Set::Triple_Balls()
 	if (left_candidate != 0)
 	{
 		*left_candidate = *further_ball;
-		left_candidate->Set_Direction(left_candidate->Get_Direction() + AsConfig::Min_Ball_Angle);
+		Rotate_Triple_Ball(left_candidate, true);
 	}
 
 	if (right_candidate != 0)
 	{
 		*right_candidate = *further_ball;
-		right_candidate->Set_Direction(right_candidate->Get_Direction() - AsConfig::Min_Ball_Angle);
+		Rotate_Triple_Ball(right_candidate, false);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -185,5 +187,27 @@ bool AsBall_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **
 
 	*game_obj = &Balls[index++]; //  в указатель помещается адрес объекта, index по ссылке инкрементируется
 	return true;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBall_Set::Rotate_Triple_Ball(ABall *ball, bool is_add_angle)
+{
+	double prev_direction, direction_delta;
+	const double min_angle = AsConfig::Min_Ball_Angle / 2.0;
+	double correction_angle;
+
+	prev_direction = ball->Get_Direction();
+
+	if (is_add_angle)
+		correction_angle = AsConfig::Min_Ball_Angle;
+	else
+		correction_angle = -AsConfig::Min_Ball_Angle;
+
+	ball->Set_Direction(prev_direction + correction_angle);
+
+	// проверка диапазона значений
+	direction_delta = fabs(ball->Get_Direction() - prev_direction);
+
+	if (direction_delta < min_angle)
+		ball->Set_Direction(prev_direction - min_angle);
 }
 //------------------------------------------------------------------------------------------------------------
