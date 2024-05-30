@@ -2,6 +2,8 @@
 
 
 // class AsInfo_Panel
+int AsInfo_Panel::Current_Score = 0;
+int AsInfo_Panel::Extra_Lives_Count = 5;
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::~AsInfo_Panel()
 {
@@ -23,10 +25,11 @@ AsInfo_Panel::~AsInfo_Panel()
 }
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::AsInfo_Panel()
-: Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Score_Font{}, Shadow_Color(nullptr), Highlight_Color(nullptr), Dark_Blue(nullptr),
-	Letter_P(EBrick_Type::Blue, ELetter_Type::P, 214 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale),
-	Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 153 * AsConfig::Global_Scale),
-	Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale)
+: Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Score_Font{}, Shadow_Color(nullptr),  
+  Highlight_Color(nullptr), Dark_Blue(nullptr),
+  Letter_P(EBrick_Type::Blue, ELetter_Type::P, 214 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale),
+  Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 153 * AsConfig::Global_Scale),
+  Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale)
 {
 	Letter_P.Show_Full_Size();
 	Letter_G.Show_Full_Size();
@@ -136,7 +139,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 	rect.top += Score_Value_Offset * scale;
 	rect.bottom += Score_Value_Offset * scale;
 
-	score_str.Append(AsConfig::Current_Score);
+	score_str.Append(Current_Score);
 	Draw_String(hdc, rect, score_str, false);
 
 	// 4. Буквы индикаторы
@@ -158,7 +161,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Show_Extra_Lifes(HDC hdc)
 {
-	int lifes_to_draw = AsConfig::Extra_Lives_Count;
+	int lifes_to_draw = Extra_Lives_Count;
 
 	for (int j = 0; j < 3; j++) // x
 		for (int i = 0; i < 4; i++) // y
@@ -285,5 +288,37 @@ void AsInfo_Panel::Choose_Font()
 	cf.nFontType = SCREEN_FONTTYPE;
 
 	ChooseFont(&cf);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Update_Score(EScore_Event_Type event_type)
+{
+	const int scale = AsConfig::Global_Scale;
+	RECT rect;
+
+	switch (event_type)
+	{
+	case EScore_Event_Type::Hit_Brick:
+		Current_Score += 20;
+		break;
+
+	case EScore_Event_Type::Hit_Monster:
+		Current_Score += 37;
+		break;
+
+	case EScore_Event_Type::Catch_Letter:
+		Current_Score += 23;
+		break;
+
+	default:
+		AsConfig::Throw();
+	}
+
+	rect.left = 211 * scale;
+	rect.top = 5 * scale;
+	rect.right = rect.left + 104 * scale;
+	rect.bottom = AsConfig::Max_Y_Pos * scale;
+
+	AsTools::Invalidate_Rect(rect);
+
 }
 //------------------------------------------------------------------------------------------------------------

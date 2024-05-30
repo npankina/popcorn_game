@@ -1,5 +1,6 @@
 ﻿#include "Level.h"
 
+
 char AsLevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -398,6 +399,7 @@ bool AsLevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool vertical
 		can_reflect = Create_Active_Brick(brick_x, brick_y, brick_type, ball, vertical_hit);
 
 	Redraw_Brick(brick_x, brick_y);
+	AsInfo_Panel::Update_Score(EScore_Event_Type::Hit_Brick);
 
 	return can_reflect;
 }

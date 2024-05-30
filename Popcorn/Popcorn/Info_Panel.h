@@ -1,7 +1,14 @@
 ﻿#pragma once
 #include "Falling_Letter.h"
 
-
+//------------------------------------------------------------------------------------------------------------
+enum class EScore_Event_Type : unsigned char
+{
+	Hit_Brick,
+	Hit_Monster,
+	Catch_Letter
+};
+//------------------------------------------------------------------------------------------------------------
 class AsInfo_Panel : public AGame_Object
 {
 public:
@@ -20,6 +27,8 @@ public:
 
 	void Init();
 
+	static void Update_Score(EScore_Event_Type event_type);
+
 private:
 	void Choose_Font();
 	void Draw_Extra_Life(HDC hdc, int x_pos, int y_pos);
@@ -31,6 +40,9 @@ private:
 
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
 	AString Player_Name;
+
+	static int Current_Score;
+	static int Extra_Lives_Count;
 
 	static const int Score_X = 208;
 	static const int Score_Y = 108;

@@ -1,6 +1,5 @@
 ﻿#include "Engine.h"
 
-
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
@@ -276,5 +275,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	}
 
 	falling_letter->Finalize();
+
+	AsInfo_Panel::Update_Score(EScore_Event_Type::Catch_Letter);
 }
 //------------------------------------------------------------------------------------------------------------
