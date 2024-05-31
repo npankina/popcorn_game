@@ -4,6 +4,8 @@
 // class AsInfo_Panel
 int AsInfo_Panel::Current_Score = 0;
 int AsInfo_Panel::Extra_Lives_Count = 5;
+RECT AsInfo_Panel::Logo_Rect;
+RECT AsInfo_Panel::Data_Rect;
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::~AsInfo_Panel()
 {
@@ -26,11 +28,24 @@ AsInfo_Panel::~AsInfo_Panel()
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::AsInfo_Panel()
 : Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Score_Font{}, Shadow_Color(nullptr),  
-  Highlight_Color(nullptr), Dark_Blue(nullptr),
+  Highlight_Color(nullptr), Dark_Blue(nullptr), 
   Letter_P(EBrick_Type::Blue, ELetter_Type::P, 214 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale),
   Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 153 * AsConfig::Global_Scale),
   Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale)
 {
+	const int scale = AsConfig::Global_Scale;
+
+	Logo_Rect.left = 211 * scale;
+	Logo_Rect.top = 5 * scale;
+	Logo_Rect.right = Logo_Rect.left + 104 * scale;
+	Logo_Rect.bottom = Logo_Rect.top + 100 * scale;
+
+
+	Data_Rect.left = Score_X * scale;
+	Data_Rect.top = Score_Y * scale;
+	Data_Rect.right = Data_Rect.left + Score_Width * scale;
+	Data_Rect.bottom = Data_Rect.top + Score_Height * scale;
+
 	Letter_P.Show_Full_Size();
 	Letter_G.Show_Full_Size();
 	Letter_M.Show_Full_Size();
@@ -292,9 +307,6 @@ void AsInfo_Panel::Choose_Font()
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Update_Score(EScore_Event_Type event_type)
 {
-	const int scale = AsConfig::Global_Scale;
-	RECT rect;
-
 	switch (event_type)
 	{
 	case EScore_Event_Type::Hit_Brick:
@@ -313,12 +325,6 @@ void AsInfo_Panel::Update_Score(EScore_Event_Type event_type)
 		AsConfig::Throw();
 	}
 
-	rect.left = 211 * scale;
-	rect.top = 5 * scale;
-	rect.right = rect.left + 104 * scale;
-	rect.bottom = AsConfig::Max_Y_Pos * scale;
-
-	AsTools::Invalidate_Rect(rect);
-
+	AsTools::Invalidate_Rect(Data_Rect);
 }
 //------------------------------------------------------------------------------------------------------------

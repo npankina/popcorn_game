@@ -40,6 +40,7 @@ private:
 
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
 	AString Player_Name;
+	static RECT Logo_Rect, Data_Rect; // Область данных на инфо панелипод логотипом, необходимы для перерисовки экрана
 
 	static int Current_Score;
 	static int Extra_Lives_Count;
