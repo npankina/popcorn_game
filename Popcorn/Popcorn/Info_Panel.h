@@ -9,6 +9,24 @@ enum class EScore_Event_Type : unsigned char
 	Catch_Letter
 };
 //------------------------------------------------------------------------------------------------------------
+class AIndicator : public AGraphics_Object
+{
+public:
+	AIndicator(int x_pos, int y_pos);
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+private:
+	int X_Pos, Y_Pos;
+	static const int Width = 12;
+	static const int Hight = 30;
+	static const int Inner_Width = Width - 2;
+	static const int Inner_Hight = Hight - 2;
+};
+//------------------------------------------------------------------------------------------------------------
 class AsInfo_Panel : public AGame_Object
 {
 public:
@@ -39,8 +57,11 @@ private:
 	AColor *Shadow_Color, *Highlight_Color, *Dark_Blue;
 
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
+	AIndicator Floor_Indicator, Monster_Indicator;
+
 	AString Player_Name;
-	static RECT Logo_Rect, Data_Rect; // Область данных на инфо панелипод логотипом, необходимы для перерисовки экрана
+
+	static RECT Logo_Rect, Data_Rect; // Область данных на инфо панели под логотипом, необходимы для перерисовки экрана
 
 	static int Current_Score;
 	static int Extra_Lives_Count;
@@ -50,4 +71,9 @@ private:
 	static const int Score_Width = 110;
 	static const int Score_Height = 90;
 	static const int Score_Value_Offset = 20;
+	static const int Logo_X_Pos = 212;
+	static const int Logo_Y_Pos = 0;
+	static const int Shadow_X_Offset = 5;
+	static const int Shadow_Y_Offset = 5;
+	static const int Indicator_Y_Offset = 55;
 };
