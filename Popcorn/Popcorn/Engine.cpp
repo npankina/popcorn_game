@@ -126,7 +126,8 @@ int AsEngine::On_Timer()
 		{
 			Game_State = EGame_State::Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos() );
-			Monster_Set.Activate(5); 
+			Monster_Set.Activate(5);
+			Info_Panel.Floor_Indicator.Restart();
 		}
 		break;
 	}
@@ -265,7 +266,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	case ELetter_Type::P:  // "Пол"
 		AsConfig::Level_Has_Floor = true;
 		Border.Redraw_Floor();
-		//!!! Отобразить на индикаторе!
+		Info_Panel.Floor_Indicator.Restart();
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 

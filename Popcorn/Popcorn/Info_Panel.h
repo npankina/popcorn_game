@@ -19,12 +19,18 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
+	void Restart();
+
 private:
 	int X_Pos, Y_Pos;
+	int End_Tick;
+	RECT Indicator_Rect;
+
 	static const int Width = 12;
-	static const int Hight = 30;
+	static const int Height = 30;
 	static const int Inner_Width = Width - 2;
-	static const int Inner_Hight = Hight - 2;
+	static const int Inner_Height = Height - 2;
+	static const int Indicator_Timeout = 50;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsInfo_Panel : public AGame_Object
@@ -47,6 +53,8 @@ public:
 
 	static void Update_Score(EScore_Event_Type event_type);
 
+	AIndicator Floor_Indicator, Monster_Indicator;
+
 private:
 	void Choose_Font();
 	void Draw_Extra_Life(HDC hdc, int x_pos, int y_pos);
@@ -57,7 +65,6 @@ private:
 	AColor *Shadow_Color, *Highlight_Color, *Dark_Blue;
 
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
-	AIndicator Floor_Indicator, Monster_Indicator;
 
 	AString Player_Name;
 

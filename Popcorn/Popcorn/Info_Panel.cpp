@@ -3,27 +3,65 @@
 // class 
 //------------------------------------------------------------------------------------------------------------
 AIndicator::AIndicator(int x_pos, int y_pos) 
-: X_Pos(x_pos), Y_Pos(y_pos)
-{}
-//------------------------------------------------------------------------------------------------------------
-void AIndicator::Act() // !!! Надо сделать
-{}
-//------------------------------------------------------------------------------------------------------------
-void AIndicator::Clear(HDC hdc, RECT &paint_area) // !!! Надо сделать
-{}
-//------------------------------------------------------------------------------------------------------------
-void AIndicator::Draw(HDC hdc, RECT &paint_area) // !!! Надо сделать
+: X_Pos(x_pos), Y_Pos(y_pos), End_Tick(0)
 {
-	int inner_x_offset = (Width - Inner_Width) / 2;
-	int inner_y_offset = (Hight - Inner_Hight) / 2;
+	const int scale = AsConfig::Global_Scale;
 
-	AsTools::Rect(hdc, X_Pos, Y_Pos, Width, Hight, AsConfig::Teleport_Portal_Color);
-	AsTools::Rect(hdc, X_Pos + inner_x_offset, Y_Pos + inner_y_offset, Inner_Width, Inner_Hight, AsConfig::Red_Color);
+	Indicator_Rect.left = X_Pos * scale;
+	Indicator_Rect.top = Y_Pos * scale;
+	Indicator_Rect.right = Indicator_Rect.left + Width * scale;
+	Indicator_Rect.bottom = Indicator_Rect.top + Height * scale;
+}
+//------------------------------------------------------------------------------------------------------------
+void AIndicator::Act()
+{
+	if (!Is_Finished())
+		AsTools::Invalidate_Rect(Indicator_Rect);
+}
+//------------------------------------------------------------------------------------------------------------
+void AIndicator::Clear(HDC hdc, RECT &paint_area)
+{
+	// Заглушка, т.к. очистка не нуэна, индикатор при рисовании посностью себя перерисовывает
+}
+//------------------------------------------------------------------------------------------------------------
+void AIndicator::Draw(HDC hdc, RECT &paint_area)
+{
+	const int scale = AsConfig::Global_Scale;
+	int inner_x_offset = (Width - Inner_Width) / 2;
+	int inner_y_offset = (Height - Inner_Height) / 2;
+	int current_height;
+	double ratio;
+	RECT rect{};
+
+	AsTools::Rect(hdc, X_Pos, Y_Pos, Width, Height, AsConfig::Teleport_Portal_Color);
+
+	if (End_Tick == 0 or Is_Finished() )
+		return;
+
+	ratio = (double)(End_Tick - AsConfig::Current_Timer_Tick) / (double)Indicator_Timeout;
+	current_height = (int)((double)(Inner_Height * scale) * ratio);
+
+	if (current_height == 0)
+		return;
+
+	rect.left = (X_Pos + inner_x_offset) * scale;
+	rect.top = (Y_Pos + inner_y_offset) * scale + (Inner_Height * scale - current_height);
+	rect.right = rect.left + Inner_Width * scale;
+	rect.bottom = (Y_Pos + inner_y_offset + Inner_Height) * scale;
+
+	AsTools::Rect(hdc, rect, AsConfig::Red_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AIndicator::Is_Finished()
 {
-	return false; // !!! Надо сделать
+	if (AsConfig::Current_Timer_Tick > End_Tick)
+		return true;
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void AIndicator::Restart()
+{
+	End_Tick = AsConfig::Current_Timer_Tick + Indicator_Timeout;
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -103,15 +141,8 @@ double AsInfo_Panel::Get_Speed() // Заглушка, не использует�
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Act()
 {
-	//const int scale = AsConfig::Global_Scale;
-	//RECT rect{};
-
-	//rect.left = 211 * scale;
-	//rect.top = 5 * scale;
-	//rect.right = rect.left + 104 * scale;
-	//rect.bottom = 199 * scale;
-
-	//AsTools::Invalidate_Rect(rect);
+	Floor_Indicator.Act();
+	Monster_Indicator.Act();
 }
 
 //------------------------------------------------------------------------------------------------------------
@@ -194,9 +225,6 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		Letter_M.Draw(hdc, paint_area);
 
 		// 5. Индикаторы
-
-		AsTools::Rect(hdc, Score_X + 27, Score_Y + Indicator_Y_Offset, 56, 30, AsConfig::Teleport_Portal_Color); // middle
-
 		Floor_Indicator.Draw(hdc, paint_area); // left
 		Monster_Indicator.Draw(hdc, paint_area); // right
 
@@ -209,6 +237,8 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 void AsInfo_Panel::Show_Extra_Lifes(HDC hdc)
 {
 	int lifes_to_draw = Extra_Lives_Count;
+
+	AsTools::Rect(hdc, Score_X + 27, Score_Y + Indicator_Y_Offset, 56, 30, AsConfig::Teleport_Portal_Color); // middle индикатор
 
 	for (int j = 0; j < 3; j++) // x
 		for (int i = 0; i < 4; i++) // y
