@@ -202,6 +202,7 @@ void AsEngine::Act()
 {
 	int index = 0;
 	AFalling_Letter *falling_letter;
+	AMessage *message;
 
 	// 1. Выолняем все действия для модулей игры
 	for (auto *item : Modules)
@@ -218,6 +219,18 @@ void AsEngine::Act()
 	if (Game_State == EGame_State::Restart_Level)
 		if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) ) // 
 			Platform.Set_State(EPlatform_State::Rolling);
+
+	if (AsMessage_Manager::Get_Message(&message))
+	{
+		if (message->Message_Type == EMessage_Type::Floor_Is_Over)
+		{
+			AsConfig::Level_Has_Floor = false;
+			Border.Redraw_Floor();
+			delete message;
+		}
+		else
+			AsConfig::Throw(); // неизвестное сообщение
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
@@ -238,7 +251,8 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
-	//case ELetter_Type::M:  // "Монстры"
+	case ELetter_Type::M:  // "Монстры"
+		break;
 
 	case ELetter_Type::G:  // "Жизнь"
 		if (Life_Count < AsConfig::Max_Life_Count)

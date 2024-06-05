@@ -25,6 +25,7 @@ private:
 	int X_Pos, Y_Pos;
 	int End_Tick;
 	RECT Indicator_Rect;
+	bool Message_Was_Sent;
 
 	static const int Width = 12;
 	static const int Height = 30;

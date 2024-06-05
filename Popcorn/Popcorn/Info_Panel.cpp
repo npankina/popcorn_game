@@ -3,7 +3,7 @@
 // class 
 //------------------------------------------------------------------------------------------------------------
 AIndicator::AIndicator(int x_pos, int y_pos) 
-: X_Pos(x_pos), Y_Pos(y_pos), End_Tick(0)
+: X_Pos(x_pos), Y_Pos(y_pos), End_Tick(0), Message_Was_Sent(true)
 {
 	const int scale = AsConfig::Global_Scale;
 
@@ -54,14 +54,26 @@ void AIndicator::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AIndicator::Is_Finished()
 {
+	AMessage *message;
+
 	if (AsConfig::Current_Timer_Tick > End_Tick)
+	{
+		if (! Message_Was_Sent)
+		{
+			message = new AMessage(EMessage_Type::Floor_Is_Over);
+			AsMessage_Manager::Add_Message(message);
+
+			Message_Was_Sent = true;
+		}
 		return true;
+	}
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AIndicator::Restart()
 {
 	End_Tick = AsConfig::Current_Timer_Tick + Indicator_Timeout;
+	Message_Was_Sent = false;
 }
 //------------------------------------------------------------------------------------------------------------
 
