@@ -236,7 +236,7 @@ void AsEngine::Handle_Message()
 			break;
 
 		case EMessage_Type::Unfreeze_Monsters:
-			Monster_Set.Unfreeze();
+			Monster_Set.Set_Freeze_State(false);
 			break;
 
 		default:
@@ -264,9 +264,8 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 		break;
 
 	case ELetter_Type::M:  // "Монстры"
-		Monster_Set.Freeze();
+		Monster_Set.Set_Freeze_State(true);
 		Info_Panel.Monster_Indicator.Restart();
-
 		break;
 
 	case ELetter_Type::G:  // "Жизнь"

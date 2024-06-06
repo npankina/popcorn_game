@@ -44,8 +44,7 @@ public:
 
 	void Activate(int x_pos, int y_pos, bool moving_right);
 	void Destroy();
-	void Freeze();
-	void Unfreeze();
+	void Set_Freeze_State(bool freeze);
 
 	static const int Width = 16;
 	static const int Height = 16;

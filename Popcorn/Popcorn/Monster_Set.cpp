@@ -12,7 +12,7 @@ AsMonster_Set::~AsMonster_Set()
 }
 //------------------------------------------------------------------------------------------------------------
 AsMonster_Set::AsMonster_Set()
-: Border(0), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0), Max_Alive_Monsters_Count(0)
+: Border(0), Is_Frozen(false), Monster_Set_State(EMonster_Set_State::Idle), Current_Gate_Index(0), Max_Alive_Monsters_Count(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
@@ -112,6 +112,9 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 	int gate_x_pos, gate_y_pos;
 	int monster_type;
 
+	if (Is_Frozen)
+		return;
+
 	if (gate_index < 0 or gate_index >= AsConfig::Gates_Count)
 		AsConfig::Throw();
 
@@ -158,16 +161,12 @@ void AsMonster_Set::Destroy_All()
 	Monster_Set_State = EMonster_Set_State::Idle;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsMonster_Set::Freeze()
+void AsMonster_Set::Set_Freeze_State(bool freeze)
 {
+	Is_Frozen = freeze;
+
 	for (auto &item : Monsters)
-		item->Freeze();
-}
-//------------------------------------------------------------------------------------------------------------
-void AsMonster_Set::Unfreeze()
-{
-	for (auto &item : Monsters)
-		item->Unfreeze();
+		item->Set_Freeze_State(freeze);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель

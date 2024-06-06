@@ -78,7 +78,7 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 	bool got_new_direction = false;
 	RECT monster_rect{};
 
-	if (!(Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive))
+	if (!(Monster_State == EMonster_State::Emitting or Monster_State == EMonster_State::Alive) or Speed == 0.0)
 		return;
 
 
@@ -275,15 +275,15 @@ void AMonster::Destroy()
 	AsInfo_Panel::Update_Score(EScore_Event_Type::Hit_Monster);
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Freeze()
+void AMonster::Set_Freeze_State(bool freeze)
 {
-	Prev_Speed = Speed;
-	Speed = 0.0;
-}
-//------------------------------------------------------------------------------------------------------------
-void AMonster::Unfreeze()
-{
-	Speed = Prev_Speed;
+	if (freeze)
+	{
+		Prev_Speed = Speed;
+		Speed = 0.0;
+	}
+	else
+		Speed = Prev_Speed;
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Draw_Destroing(HDC hdc, RECT &paint_area)
