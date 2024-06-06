@@ -7,7 +7,7 @@ AMonster::~AMonster()
 {}
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
-: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Direction(0.0), Monster_State(EMonster_State::Missing), Explosive_Balls(Explosive_Balls_Count),
+: X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Prev_Speed(0.0), Direction(0.0), Monster_State(EMonster_State::Missing), Explosive_Balls(Explosive_Balls_Count),
   Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0), Monster_Rect{}, Prev_Monster_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
@@ -273,6 +273,17 @@ void AMonster::Destroy()
 	Monster_State = EMonster_State::Destroing;
 
 	AsInfo_Panel::Update_Score(EScore_Event_Type::Hit_Monster);
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Freeze()
+{
+	Prev_Speed = Speed;
+	Speed = 0.0;
+}
+//------------------------------------------------------------------------------------------------------------
+void AMonster::Unfreeze()
+{
+	Speed = Prev_Speed;
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Draw_Destroing(HDC hdc, RECT &paint_area)

@@ -12,7 +12,7 @@ enum class EScore_Event_Type : unsigned char
 class AIndicator : public AGraphics_Object
 {
 public:
-	AIndicator(int x_pos, int y_pos);
+	AIndicator(EMessage_Type type, int x_pos, int y_pos);
 
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT &paint_area);
@@ -25,6 +25,7 @@ private:
 	int X_Pos, Y_Pos;
 	int End_Tick;
 	RECT Indicator_Rect;
+	EMessage_Type Message_Type;
 	bool Message_Was_Sent;
 
 	static const int Width = 12;

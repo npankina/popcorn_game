@@ -44,6 +44,8 @@ public:
 
 	void Activate(int x_pos, int y_pos, bool moving_right);
 	void Destroy();
+	void Freeze();
+	void Unfreeze();
 
 	static const int Width = 16;
 	static const int Height = 16;
@@ -68,7 +70,7 @@ private:
 	void Redraw_Monster();
 	void Change_Direction();
 
-	double Speed;
+	double Speed, Prev_Speed;
 
 	std::vector<AExplosive_Ball> Explosive_Balls;
 	static const int Explosive_Balls_Count = 20;

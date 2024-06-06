@@ -44,6 +44,7 @@ private:
 	void Advance_Movers();
 	void Act();
 	void On_Falling_Letter(AFalling_Letter* falling_letter);
+	void Handle_Message();
 
 	EGame_State Game_State;
 	double Rest_Distance;

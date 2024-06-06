@@ -127,7 +127,6 @@ int AsEngine::On_Timer()
 			Game_State = EGame_State::Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos() );
 			Monster_Set.Activate(5);
-			Info_Panel.Floor_Indicator.Restart();
 		}
 		break;
 	}
@@ -202,7 +201,6 @@ void AsEngine::Act()
 {
 	int index = 0;
 	AFalling_Letter *falling_letter;
-	AMessage *message;
 
 	// 1. Выолняем все действия для модулей игры
 	for (auto *item : Modules)
@@ -220,16 +218,30 @@ void AsEngine::Act()
 		if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) ) // 
 			Platform.Set_State(EPlatform_State::Rolling);
 
+	Handle_Message();
+}
+//------------------------------------------------------------------------------------------------------------
+void AsEngine::Handle_Message()
+{
+	AMessage *message;
+
 	if (AsMessage_Manager::Get_Message(&message))
 	{
-		if (message->Message_Type == EMessage_Type::Floor_Is_Over)
+		switch (message->Message_Type)
 		{
+		case EMessage_Type::Floor_Is_Over:
 			AsConfig::Level_Has_Floor = false;
 			Border.Redraw_Floor();
 			delete message;
-		}
-		else
+			break;
+
+		case EMessage_Type::Unfreeze_Monsters:
+			Monster_Set.Unfreeze();
+			break;
+
+		default:
 			AsConfig::Throw(); // неизвестное сообщение
+		}
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -252,6 +264,9 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 		break;
 
 	case ELetter_Type::M:  // "Монстры"
+		Monster_Set.Freeze();
+		Info_Panel.Monster_Indicator.Restart();
+
 		break;
 
 	case ELetter_Type::G:  // "Жизнь"
