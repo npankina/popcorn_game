@@ -141,6 +141,7 @@
     <ClInclude Include="Falling_Letter.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Gate.h" />
+    <ClInclude Include="Indicator.h" />
     <ClInclude Include="Info_Panel.h" />
     <ClInclude Include="Laser_Beam.h" />
     <ClInclude Include="Laser_Beam_Set.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="Explosive_Ball.cpp" />
     <ClCompile Include="Falling_Letter.cpp" />
     <ClCompile Include="Gate.cpp" />
+    <ClCompile Include="Indicator.cpp" />
     <ClCompile Include="Info_Panel.cpp" />
     <ClCompile Include="Laser_Beam.cpp" />
     <ClCompile Include="Laser_Beam_Set.cpp" />

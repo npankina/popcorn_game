@@ -49,6 +49,9 @@ void AsMonster_Set::Act()
 		break;
 
 	case EMonster_Set_State::Selecting_Next_Gate:
+		if (Is_Frozen)
+			break;
+
 	    current_alive_count = 0;
 
 		for (auto *monster : Monsters)

@@ -70,6 +70,7 @@ private:
 	void Change_Direction();
 
 	double Speed, Prev_Speed;
+	bool Need_To_Freeze;
 
 	std::vector<AExplosive_Ball> Explosive_Balls;
 	static const int Explosive_Balls_Count = 20;

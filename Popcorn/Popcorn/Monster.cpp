@@ -8,7 +8,7 @@ AMonster::~AMonster()
 //------------------------------------------------------------------------------------------------------------
 AMonster::AMonster()
 : X_Pos(0.0), Y_Pos(0.0), Speed(0.0), Prev_Speed(0.0), Direction(0.0), Monster_State(EMonster_State::Missing), Explosive_Balls(Explosive_Balls_Count),
-  Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0), Monster_Rect{}, Prev_Monster_Rect{}
+  Next_Direction_Switch_Tick(0), Alive_Timer_Tick(0), Monster_Rect{}, Prev_Monster_Rect{}, Need_To_Freeze(false)
 {}
 //------------------------------------------------------------------------------------------------------------
 bool AMonster::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
@@ -148,6 +148,13 @@ void AMonster::Act()
 
 
 	case EMonster_State::Alive:
+		if (Need_To_Freeze) // отложенная заморозка монстра
+		{
+			Prev_Speed = Speed;
+			Speed = 0.0;
+			Need_To_Freeze = false;
+		}
+
 		Act_Alive();
 		Change_Direction();
 		break;
@@ -277,13 +284,10 @@ void AMonster::Destroy()
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Set_Freeze_State(bool freeze)
 {
-	if (freeze)
-	{
-		Prev_Speed = Speed;
-		Speed = 0.0;
-	}
-	else
+	if (! freeze)
 		Speed = Prev_Speed;
+
+	Need_To_Freeze = freeze;
 }
 //------------------------------------------------------------------------------------------------------------
 void AMonster::Draw_Destroing(HDC hdc, RECT &paint_area)

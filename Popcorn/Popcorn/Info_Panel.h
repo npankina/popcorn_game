@@ -1,39 +1,6 @@
 ﻿#pragma once
-#include "Falling_Letter.h"
+#include "Indicator.h"
 
-//------------------------------------------------------------------------------------------------------------
-enum class EScore_Event_Type : unsigned char
-{
-	Hit_Brick,
-	Hit_Monster,
-	Catch_Letter
-};
-//------------------------------------------------------------------------------------------------------------
-class AIndicator : public AGraphics_Object
-{
-public:
-	AIndicator(EMessage_Type type, int x_pos, int y_pos);
-
-	virtual void Act();
-	virtual void Clear(HDC hdc, RECT &paint_area);
-	virtual void Draw(HDC hdc, RECT &paint_area);
-	virtual bool Is_Finished();
-
-	void Restart();
-
-private:
-	int X_Pos, Y_Pos;
-	int End_Tick;
-	RECT Indicator_Rect;
-	EMessage_Type Message_Type;
-	bool Message_Was_Sent;
-
-	static const int Width = 12;
-	static const int Height = 30;
-	static const int Inner_Width = Width - 2;
-	static const int Inner_Height = Height - 2;
-	static const int Indicator_Timeout = 50;
-};
 //------------------------------------------------------------------------------------------------------------
 class AsInfo_Panel : public AGame_Object
 {
@@ -86,3 +53,4 @@ private:
 	static const int Shadow_Y_Offset = 5;
 	static const int Indicator_Y_Offset = 55;
 };
+//------------------------------------------------------------------------------------------------------------
