@@ -436,9 +436,9 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 	letter_x = (brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset) * AsConfig::Global_Scale;
 	letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
 
-	letter_type = ELetter_Type::L;
+	letter_type = ELetter_Type::G;
 
-	switch(AsTools::Rand(3))
+	/*switch(AsTools::Rand(3))
 	{
 	case 0:
 		letter_type = ELetter_Type::L;
@@ -451,7 +451,7 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 	case 2:
 		letter_type = ELetter_Type::W;
 		break;
-	}
+	}*/
 
 	falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);
 	Falling_Letters.push_back(falling_letter);

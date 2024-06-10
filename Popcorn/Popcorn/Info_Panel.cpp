@@ -3,7 +3,6 @@
 //------------------------------------------------------------------------------------------------------------
 // class AsInfo_Panel
 int AsInfo_Panel::Current_Score = 0;
-int AsInfo_Panel::Extra_Lives_Count = 5;
 RECT AsInfo_Panel::Logo_Rect;
 RECT AsInfo_Panel::Data_Rect;
 //------------------------------------------------------------------------------------------------------------
@@ -28,7 +27,7 @@ AsInfo_Panel::~AsInfo_Panel()
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::AsInfo_Panel()
 : Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Score_Font{}, Shadow_Color(nullptr),  
-  Highlight_Color(nullptr), Dark_Blue(nullptr),
+  Highlight_Color(nullptr), Dark_Blue(nullptr), Extra_Lives_Count(AsConfig::Initial_Life_Count),
   Letter_P(EBrick_Type::Blue, ELetter_Type::P, 214 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale),
   Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 153 * AsConfig::Global_Scale),
   Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale), 
@@ -187,7 +186,7 @@ void AsInfo_Panel::Show_Extra_Lifes(HDC hdc)
 void AsInfo_Panel::Draw_Extra_Life(HDC hdc, int x_pos, int y_pos)
 {
 	const int scale = AsConfig::Global_Scale;
-	RECT rect;
+	RECT rect{};
 
 	rect.left = (Score_X + x_pos) * scale;
 	rect.top = (Score_Y + y_pos) * scale;
@@ -321,5 +320,25 @@ void AsInfo_Panel::Update_Score(EScore_Event_Type event_type)
 	}
 
 	AsTools::Invalidate_Rect(Data_Rect);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsInfo_Panel::Increase_Life_Count()
+{
+	if (Extra_Lives_Count < AsConfig::Max_Life_Count)
+	{
+		++Extra_Lives_Count;
+		AsTools::Invalidate_Rect(Data_Rect);
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsInfo_Panel::Decrease_Life_Count()
+{
+	if (Extra_Lives_Count == 0)
+		return false;
+
+	--Extra_Lives_Count;
+	AsTools::Invalidate_Rect(Data_Rect);
+
+	return true;
 }
 //------------------------------------------------------------------------------------------------------------

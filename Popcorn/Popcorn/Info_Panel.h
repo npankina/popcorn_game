@@ -21,6 +21,8 @@ public:
 	void Init();
 
 	static void Update_Score(EScore_Event_Type event_type);
+	void Increase_Life_Count();
+	bool Decrease_Life_Count();
 
 	AIndicator Floor_Indicator, Monster_Indicator;
 
@@ -32,16 +34,12 @@ private:
 
 	HFONT Logo_Pop_Font, Logo_Corn_Font, Player_Name_Font, Score_Font;
 	AColor *Shadow_Color, *Highlight_Color, *Dark_Blue;
-
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
-
 	AString Player_Name;
+	int Extra_Lives_Count;
 
 	static RECT Logo_Rect, Data_Rect; // Область данных на инфо панели под логотипом, необходимы для перерисовки экрана
-
 	static int Current_Score;
-	static int Extra_Lives_Count;
-
 	static const int Score_X = 208;
 	static const int Score_Y = 108;
 	static const int Score_Width = 110;

@@ -3,7 +3,7 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-: Timer_ID(WM_USER + 1), Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(AsConfig::Initial_Life_Count), Modules{}
+: Timer_ID(WM_USER + 1), Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Modules{}
 {
 	//memset(Movers, 0, sizeof(Movers) );
 	//memset(Modules, 0, sizeof(Modules) );
@@ -116,8 +116,9 @@ int AsEngine::On_Timer()
 
 
 	case EGame_State::Lost_Ball:
-		if (Platform.Has_State(EPlatform_Substate_Regular::Missing) )
-			Restart_Level();
+		if (Platform.Has_State(EPlatform_Substate_Regular::Missing))
+			if (! Restart_Level())
+				Game_Over();
 		break;
 
 
@@ -136,10 +137,21 @@ int AsEngine::On_Timer()
 	return 0;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsEngine::Restart_Level()
+bool AsEngine::Restart_Level()
 {
+	if (!Info_Panel.Decrease_Life_Count()) // false - no restart
+		return false;
+
 	Game_State = EGame_State::Restart_Level;
 	Border.Open_Gate(7, true);
+
+	return true;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsEngine::Game_Over()
+{
+	// !!! Надо сделать
+	AsConfig::Throw();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Play_Level()
@@ -154,7 +166,7 @@ void AsEngine::Play_Level()
 		Monster_Set.Destroy_All();
 		Laser_Beam_Set.Disable_All();
 		Platform.Set_State(EPlatform_State::Meltdown);
-		Info_Panel.
+		Info_Panel.Init();
 	}
 	else
 		Ball_Set.Accelerate();
@@ -252,7 +264,8 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	{
 	case ELetter_Type::O:  // "Отмена"
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
-		break;  //!!! Пока отменяется только клей!
+
+		break;
 
 	case ELetter_Type::I:  // "Инверсия"
 		Ball_Set.Inverse_Balls();
@@ -270,8 +283,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 		break;
 
 	case ELetter_Type::G:  // "Жизнь"
-		if (Life_Count < AsConfig::Max_Life_Count)
-			++Life_Count;  //!!! Отобразить на индикаторе!
+		Info_Panel.Increase_Life_Count();
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
