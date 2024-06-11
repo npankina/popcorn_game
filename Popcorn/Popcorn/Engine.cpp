@@ -263,8 +263,9 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	switch (falling_letter->Letter_Type)
 	{
 	case ELetter_Type::O:  // "Отмена"
+		Info_Panel.Floor_Indicator.Cancel();
+		Info_Panel.Monster_Indicator.Cancel();
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
-
 		break;
 
 	case ELetter_Type::I:  // "Инверсия"

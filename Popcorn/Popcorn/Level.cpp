@@ -436,22 +436,42 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 	letter_x = (brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset) * AsConfig::Global_Scale;
 	letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
 
-	letter_type = ELetter_Type::G;
+	//letter_type = ELetter_Type::G;
 
-	/*switch(AsTools::Rand(3))
+	switch(AsTools::Rand(8))
 	{
 	case 0:
-		letter_type = ELetter_Type::L;
+		letter_type = ELetter_Type::O; // отмена
 		break;
 
 	case 1:
-		letter_type = ELetter_Type::K;
+		letter_type = ELetter_Type::K; // клей
 		break;
 
 	case 2:
-		letter_type = ELetter_Type::W;
+		letter_type = ELetter_Type::W; // широкая платформа
 		break;
-	}*/
+
+	case 3:
+		letter_type = ELetter_Type::G; // жизнь
+		break;
+
+	case 4:
+		letter_type = ELetter_Type::L; // лазер
+		break;
+
+	case 5:
+		letter_type = ELetter_Type::P; // пол
+		break;
+
+	case 6:
+		letter_type = ELetter_Type::T; // три мячика
+		break;
+
+	case 7:
+		letter_type = ELetter_Type::M; // монстры
+		break;
+	}
 
 	falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);
 	Falling_Letters.push_back(falling_letter);

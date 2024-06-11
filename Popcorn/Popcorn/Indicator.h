@@ -22,6 +22,7 @@ public:
 
 	void Restart();
 	void Reset();
+	void Cancel();
 
 private:
 	int X_Pos, Y_Pos;

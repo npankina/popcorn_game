@@ -57,13 +57,7 @@ bool AIndicator::Is_Finished()
 
 	if (AsConfig::Current_Timer_Tick > End_Tick)
 	{
-		if (!Need_To_Notify)
-		{
-			message = new AMessage(Message_Type);
-			AsMessage_Manager::Add_Message(message);
-
-			Need_To_Notify = false;
-		}
+		Cancel();
 		return true;
 	}
 	return false;
@@ -79,5 +73,19 @@ void AIndicator::Reset()
 { // Обнуление индикаторов и перерисовка области
 	End_Tick = 0;
 	AsTools::Invalidate_Rect(Indicator_Rect);
+}
+//------------------------------------------------------------------------------------------------------------
+void AIndicator::Cancel()
+{
+	AMessage *message;
+
+	if (!Need_To_Notify)
+	{
+		message = new AMessage(Message_Type);
+		AsMessage_Manager::Add_Message(message);
+
+		Need_To_Notify = false;
+	}
+	Reset();
 }
 //------------------------------------------------------------------------------------------------------------
