@@ -223,7 +223,7 @@ void AsLevel::Init()
 
 	memset(Current_Level, 0, sizeof(Current_Level) );
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < ALevel_Data::Max_Level_Number; i++)
 	{
 		level_data = new ALevel_Data(i + 1);
 		Levels_Data.push_back(level_data);
@@ -234,9 +234,9 @@ void AsLevel::Set_Current_Level(int level_number)
 {
 	int i, j;
 	EBrick_Type brick_type;
-	ALevel_Data *level_data = nullptr;
+	ALevel_Data *level_data;
 
-	if (level_number < 1 or level_number > Levels_Data.size() ) 
+	if (level_number < 1 or level_number >(int)Levels_Data.size() )
 		AsConfig::Throw();
 
 	level_data = Levels_Data[level_number - 1];
@@ -365,8 +365,8 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 {// Создаём падающую букву, если можем
 	
 	int letter_x, letter_y;
-	ELetter_Type letter_type;
-	AFalling_Letter *falling_letter;
+	ELetter_Type letter_type{};
+	AFalling_Letter *falling_letter = nullptr;
 
 
 	if (! (brick_type == EBrick_Type::Red or brick_type == EBrick_Type::Blue) )
