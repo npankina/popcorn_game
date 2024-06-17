@@ -211,7 +211,7 @@ bool AMonster::Is_Finished()
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void AMonster::Activate(int x_pos, int y_pos, bool moving_right)
+void AMonster::Activate(double x_pos, double y_pos, bool moving_right)
 { // активация монстров
 	int emitting_time_offset;
 	int rand_speed;

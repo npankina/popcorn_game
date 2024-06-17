@@ -114,6 +114,7 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 	bool gate_is_left = false; // задаем движение монстра (все четные гейты находятся справа, а нечетные слева)
 	int gate_x_pos, gate_y_pos;
 	int monster_type;
+	double x_pos, y_pos;
 
 	if (Is_Frozen)
 		return;
@@ -136,16 +137,21 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 		monster = new AMonster_Comet();
 	Monsters.push_back(monster);
 
-	// 
+	if (monster == 0)
+		return; // все монстры заняты - уе на поле
+
 	Border->Get_Gate_Pos(gate_index, gate_x_pos, gate_y_pos);
+
+	x_pos = (double)gate_x_pos;
+	y_pos = (double)gate_y_pos;
 
 	if (gate_index % 2 == 0)
 		gate_is_left = true; // гейт левый, иначе правый
 
 	if (!gate_is_left)
-		gate_x_pos -= monster->Width - AGate::Width; // вычисление положения монстра справа
+		x_pos -= (double)monster->Width - AGate::Width; // вычисление положения монстра справа
 
-	monster->Activate(gate_x_pos, gate_y_pos + 1, gate_is_left);
+	monster->Activate(x_pos, y_pos + 1.5, gate_is_left);
 
 	//monster->Destroy();
 }

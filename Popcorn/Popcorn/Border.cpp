@@ -11,8 +11,8 @@ AsBorder::AsBorder()
 	Gates.push_back(new AGate(1, 29, 0, 3) );
 	Gates.push_back(new AGate(AsConfig::Max_X_Pos, 29, AsConfig::Level_Width - 1, 3) );
 
-	Gates.push_back(new AGate(1, 77, 0, 9) );
-	Gates.push_back(new AGate(AsConfig::Max_X_Pos, 77, AsConfig::Level_Width - 1, 9) );
+	Gates.push_back(new AGate(1, 76, 0, 9) );
+	Gates.push_back(new AGate(AsConfig::Max_X_Pos, 76, AsConfig::Level_Width - 1, 9) );
 
 	Gates.push_back(new AGate(1, 129) );
 	Gates.push_back(new AGate(AsConfig::Max_X_Pos, 129) );

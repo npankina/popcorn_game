@@ -8,7 +8,7 @@ public:
 
 	char *Level;
 
-	static const int Max_Level_Number = 3;
+	static const int Max_Level_Number = 4;
 
 private:
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];

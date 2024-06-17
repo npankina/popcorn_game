@@ -42,7 +42,7 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
-	void Activate(int x_pos, int y_pos, bool moving_right);
+	void Activate(double x_pos, double y_pos, bool moving_right);
 	void Destroy();
 	void Set_Freeze_State(bool freeze);
 
