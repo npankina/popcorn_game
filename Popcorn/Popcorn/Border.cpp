@@ -8,8 +8,8 @@ AsBorder::AsBorder()
 	Floor_Rect.right = (AsConfig::Max_X_Pos - 1) * AsConfig::Global_Scale;
 	Floor_Rect.bottom = AsConfig::Max_Y_Pos * AsConfig::Global_Scale;
 
-	Gates.push_back(new AGate(1, 29, 0, 3) );
-	Gates.push_back(new AGate(AsConfig::Max_X_Pos, 29, AsConfig::Level_Width - 1, 3) );
+	Gates.push_back(new AGate(1, 28, 0, 3) );
+	Gates.push_back(new AGate(AsConfig::Max_X_Pos, 28, AsConfig::Level_Width - 1, 3) );
 
 	Gates.push_back(new AGate(1, 76, 0, 9) );
 	Gates.push_back(new AGate(AsConfig::Max_X_Pos, 76, AsConfig::Level_Width - 1, 9) );
