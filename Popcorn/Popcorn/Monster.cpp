@@ -85,7 +85,7 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 	next_step = Speed / max_speed * AsConfig::Moving_Step_Size;
 	origin_direction = Direction;
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		next_x_pos = X_Pos + next_step * cos(Direction); // приращение х
 		next_y_pos = Y_Pos - next_step * sin(Direction); // приращение у
@@ -93,7 +93,7 @@ void AMonster::Advance(double max_speed) // смещает монстра на 1
 		Get_Monster_Rect(next_x_pos, next_y_pos, monster_rect);
 
 		if (AsLevel::Has_Brick_At(monster_rect))
-			Direction += M_PI / 8.0;
+			Direction += M_PI / 32.0;
 		else
 		{
 			got_new_direction = true;
