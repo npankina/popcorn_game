@@ -315,17 +315,34 @@ bool AsLevel::Has_Brick_At(RECT &monster_rect)
 	min_level_y = (monster_rect.top - level_y_offset) / y_step;
 	max_level_y = (monster_rect.bottom - level_y_offset) / y_step;
 
+
 	// Так как ячейка уровня больше кирпича, хотя и начинается в одинаковых координатах,
 	// то она имеет пустую полосу правую и нижнюю, в которой может находиться монстр
 	// Игнорируем ряд (или столбец) кирпичей, если монстр попал в ячейку, но не попал в кирпич.
 	min_cell_y = min_level_y * y_step + level_y_offset;
 	min_cell_x = min_level_x - x_step + level_x_offset;
 
+
 	if (monster_rect.top - min_cell_x > brick_size_width)
 		++min_level_x;
 
 	if (monster_rect.left - min_cell_y > brick_size_height)
 		++min_level_y;
+
+
+	if (min_level_x >= AsConfig::Level_Width)
+		min_level_x = AsConfig::Level_Width - 1;
+
+	if (max_level_x >= AsConfig::Level_Width)
+		max_level_x = AsConfig::Level_Width - 1;
+
+
+	if (min_level_y >= AsConfig::Level_Height)
+		min_level_y = AsConfig::Level_Height - 1;
+
+	if (max_level_y >= AsConfig::Level_Height)
+		max_level_y = AsConfig::Level_Height - 1;
+
 
 	for (int i = min_level_y; i <= max_level_y; i++)
 		for (int j = min_level_x; j <= max_level_x; j++)
