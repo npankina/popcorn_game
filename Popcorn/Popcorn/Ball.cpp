@@ -15,7 +15,7 @@ void ABall::Begin_Movement()
 //------------------------------------------------------------------------------------------------------------
 void ABall::Finish_Movement()
 {
-	if (Ball_State == EBall_State::Disabled or Ball_State == EBall_State::Lost or Ball_State == EBall_State::On_Platform)
+	if (Ball_State == EBall_State::Disabled or Ball_State == EBall_State::Lost)
 		return;
 
 	Redraw_Ball();
@@ -382,7 +382,6 @@ void ABall::Forced_Advance(double direction, double speed, double max_speed)
 	Ball_State = EBall_State::Normal;
 	Ball_Direction = direction;
 	Ball_Speed = speed;
-
 
 	Advance(max_speed);
 

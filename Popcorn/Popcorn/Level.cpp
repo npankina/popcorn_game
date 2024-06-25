@@ -29,7 +29,7 @@ bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball
 	bool got_horizontal_hit, got_vertical_hit;
 	double horizontal_reflection_pos, vertical_reflection_pos;
 
-	if (next_y_pos + AsConfig::Ball_Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
+	if (next_y_pos - AsConfig::Ball_Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
 		return false;
 
 	direction = ball->Get_Direction();
@@ -305,30 +305,22 @@ bool AsLevel::Has_Brick_At(RECT &monster_rect)
 	int level_x_offset = AsConfig::Level_X_Offset * scale;
 	int min_level_x, max_level_x;
 	int min_level_y, max_level_y;
-	int min_cell_y, min_cell_x;
+	int max_cell_y, max_cell_x;
 	int brick_size_height = AsConfig::Cell_Height * scale;
 	int brick_size_width = AsConfig::Cell_Width * scale;
+	int max_y_all_bricks_in_level = level_y_offset + ((AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height) * AsConfig::Global_Scale;
+	int max_brick_width;
+	int max_brick_height;
+
+
+	if (monster_rect.top > max_y_all_bricks_in_level)
+		return false;
 
 	min_level_x = (monster_rect.left - level_x_offset) / x_step;
 	max_level_x = (monster_rect.right - level_x_offset) / x_step;
 
 	min_level_y = (monster_rect.top - level_y_offset) / y_step;
 	max_level_y = (monster_rect.bottom - level_y_offset) / y_step;
-
-
-	// Так как ячейка уровня больше кирпича, хотя и начинается в одинаковых координатах,
-	// то она имеет пустую полосу правую и нижнюю, в которой может находиться монстр
-	// Игнорируем ряд (или столбец) кирпичей, если монстр попал в ячейку, но не попал в кирпич.
-	min_cell_y = min_level_y * y_step + level_y_offset;
-	min_cell_x = min_level_x - x_step + level_x_offset;
-
-
-	if (monster_rect.top - min_cell_x > brick_size_width)
-		++min_level_x;
-
-	if (monster_rect.left - min_cell_y > brick_size_height)
-		++min_level_y;
-
 
 	if (min_level_x >= AsConfig::Level_Width)
 		min_level_x = AsConfig::Level_Width - 1;
@@ -343,6 +335,21 @@ bool AsLevel::Has_Brick_At(RECT &monster_rect)
 	if (max_level_y >= AsConfig::Level_Height)
 		max_level_y = AsConfig::Level_Height - 1;
 
+	// Так как ячейка уровня больше кирпича, хотя и начинается в одинаковых координатах,
+	// то она имеет пустую полосу правую и нижнюю, в которой может находиться монстр
+	// Игнорируем ряд (или столбец) кирпичей, если монстр попал в ячейку, но не попал в кирпич.
+
+	max_cell_y = min_level_y * y_step + level_y_offset;
+	max_cell_x = min_level_x * y_step + level_x_offset;
+
+	max_brick_width = max_cell_x + AsConfig::Brick_Width * scale;
+	max_brick_height = max_cell_y + AsConfig::Brick_Height * scale;
+
+	if (monster_rect.left > max_brick_width and monster_rect.left < max_cell_x + x_step)
+		--max_level_x; // исключить из проверки ряд кирпичей
+
+	if (monster_rect.top > max_brick_height and monster_rect.top < max_cell_y + y_step)
+		--min_level_y;
 
 	for (int i = min_level_y; i <= max_level_y; i++)
 		for (int j = min_level_x; j <= max_level_x; j++)
@@ -651,7 +658,7 @@ bool AsLevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level
 		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Top_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вверх
-			if (level_y > 0 and Current_Level[level_y - 1][level_x] == 0)
+			if (level_y == AsConfig::Level_Height -1 or (level_y > 0 and Current_Level[level_y - 1][level_x] == 0) )
 				return true;
 			else
 				return false;
