@@ -101,6 +101,9 @@ void ABall::Clear(HDC hdc, RECT &paint_area)
 		return;
 
 	// 1. Очищаем фон
+	if (Ball_State == EBall_State::On_Parachute)
+		 Clear_Parachute(hdc);
+
 	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) ) 
 	// AsTools::Ellipse(hdc, Prev_Ball_Rect, AsConfig::BG_Color);
 	{
@@ -160,6 +163,8 @@ double ABall::Get_Direction()
 void ABall::Set_Direction(double new_direction)
 {
 	const double pi_2 = 2.0 * M_PI;
+	const double min_angle = AsConfig::Min_Ball_Angle;
+	double pi_angle;
 
 	// 1. Переводим угол в диапазон [0 .. pi_2]
 	while (new_direction > pi_2)
@@ -171,21 +176,52 @@ void ABall::Set_Direction(double new_direction)
 	// 2. Не позволим приближаться к горизонтальной оси ближе, чем на угол AsConfig::Min_Ball_Angle
 	// 2.1. Слева
 	// 2.1.1. Сверху
-	if (new_direction < AsConfig::Min_Ball_Angle)
-		new_direction = AsConfig::Min_Ball_Angle;
+	if (new_direction < min_angle)
+		new_direction = min_angle;
 
 	// 2.1.1. Снизу
-	if (new_direction > pi_2 - AsConfig::Min_Ball_Angle)
-		new_direction = pi_2 - AsConfig::Min_Ball_Angle;
+	if (new_direction > pi_2 - min_angle)
+		new_direction = pi_2 - min_angle;
 
 	// 2.2. Справа
 	// 2.2.1. Сверху
-	if (new_direction > M_PI - AsConfig::Min_Ball_Angle and new_direction < M_PI)
-		new_direction = M_PI - AsConfig::Min_Ball_Angle;
+	pi_angle = M_PI - min_angle;
+
+	if (new_direction > pi_angle and new_direction < M_PI)
+		new_direction = pi_angle;
 
 	// 2.2.1. Снизу
-	if (new_direction >= M_PI and new_direction < M_PI + AsConfig::Min_Ball_Angle)
-		new_direction = M_PI + AsConfig::Min_Ball_Angle;
+	pi_angle = M_PI + min_angle;
+
+	if (new_direction >= M_PI and new_direction < pi_angle)
+		new_direction = pi_angle;
+
+	// 3. Не позволим приближаться к горизонтальной оси ближе, чем на угол AsConfig::Min_Ball_Angle
+	// 3.1. Сверху 
+	// 3.1.1. Справа
+	pi_angle = M_PI_2 - min_angle;
+
+	if (new_direction > pi_angle and new_direction < M_PI_2)
+		new_direction = pi_angle;
+
+	// 3.1.1. Слева
+	pi_angle = pi_2 + min_angle;
+
+	if (new_direction > M_PI_2 and new_direction < pi_angle)
+		new_direction = pi_angle;
+
+	// 3.2. Снизу
+	// 3.2.1. Слева
+	pi_angle = M_PI + M_PI_2 - min_angle;
+
+	if (new_direction > pi_angle and new_direction < M_PI + M_PI_2)
+		new_direction = pi_angle;
+
+	// 3.2.1. Справа
+	pi_angle = M_PI + M_PI_2 + min_angle;
+
+	if (new_direction >= M_PI + M_PI_2 and new_direction < pi_angle)
+		new_direction = pi_angle;
 
 	Ball_Direction = new_direction;
 }
@@ -432,8 +468,6 @@ void ABall::Draw_Parachute(HDC hdc, RECT &paint_area)
 
 	if (! IntersectRect(&intersection_rect, &paint_area, &Parachute_Rect) )
 		return;
-
-	Clear_Parachute(hdc);
 
 	// 1. Купол
 	AsConfig::Blue_Color.Select(hdc);

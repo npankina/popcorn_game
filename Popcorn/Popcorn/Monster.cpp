@@ -334,7 +334,7 @@ void AMonster::Change_Direction()
 
 	if (AsConfig::Current_Timer_Tick > Next_Direction_Switch_Tick)
 	{
-		Next_Direction_Switch_Tick += AsTools::Rand(AsConfig::FPS); // увеличить счетчик на случайное число [0, 1]
+		Next_Direction_Switch_Tick += AsConfig::FPS;
 
 		// выбираем случайное направление монстру -45 / 45 градусов
 		direction_delta = (double)(AsTools::Rand(90) - 45) * M_PI / 180.0; // выбранное случайным образом направление приводим к значиению в радианах
