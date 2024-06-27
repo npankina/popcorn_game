@@ -1,62 +1,17 @@
 ﻿#include "Level_Data.h"
 
-//------------------------------------------------------------------------------------------------------------
-ALevel_Data::ALevel_Data(int level_number) : Level(0)
+
+char *ALevel_Data::Levels_Array[Max_Level_Number] =
 {
-
-
+	*Level_01, *Level_02, *Level_03, *Level_04, *Level_05, *Level_06, *Level_07, *Level_08/*, *Level_09, *Level_10*/
+};
+//------------------------------------------------------------------------------------------------------------
+ALevel_Data::ALevel_Data(int level_number) : Level(0), Advertisement(0)
+{
 	if (level_number < 1 or level_number > Max_Level_Number)
 		AsConfig::Throw();
 
-	switch (level_number)
-	{
-	case 0:
-		Level = (char *)Test_Level;
-		break;
-
-	case 1:
-		Level = (char *)Level_01;
-		break;
-
-	case 2:
-		Level = (char *)Level_02;
-		break;
-
-	case 3:
-		Level = (char *)Level_03;
-		break;
-
-	case 4:
-		Level = (char *)Level_04;
-		break;
-
-	case 5:
-		Level = (char *)Level_05;
-		break;
-
-	case 6:
-		Level = (char *)Level_06;
-		break;
-
-	case 7:
-		Level = (char *)Level_07;
-		break;
-
-	case 8:
-		Level = (char *)Level_08;
-		break;
-
-	case 9:
-		Level = (char *)Level_09;
-		break;
-
-	case 10:
-		Level = (char *)Level_10;
-		break;
-
-	default:
-		AsConfig::Throw();
-	}
+	Level = Levels_Array[level_number - 1];
 }
 //------------------------------------------------------------------------------------------------------------
 char ALevel_Data::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
@@ -187,20 +142,20 @@ char ALevel_Data::Level_07[AsConfig::Level_Height][AsConfig::Level_Width] =
 //------------------------------------------------------------------------------------------------------------
 char ALevel_Data::Level_08[AsConfig::Level_Height][AsConfig::Level_Width] =
 {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+	0, 3, 7, 7, 7, 7, 7, 7, 3, 0, 1, 2,
+	0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 1, 2,
+	0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 1, 2,
+	0, 3, 0, 0, 10, 10, 0, 0, 0, 0, 1, 2,
+	0, 3, 0, 0, 10, 10, 0, 0, 0, 0, 1, 2,
+	0, 3, 0, 0, 10, 10, 0, 0, 0, 0, 1, 2,
+	0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 1, 2,
+	0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 1, 2,
+	0, 3, 3, 3, 3, 3, 3, 3, 3, 0, 1, 2,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2
 };
 //------------------------------------------------------------------------------------------------------------
 char ALevel_Data::Level_09[AsConfig::Level_Height][AsConfig::Level_Width] =

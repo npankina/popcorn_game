@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Config.h"
+#include "Active_Brick.h"
 //------------------------------------------------------------------------------------------------------------
 class ALevel_Data
 {
@@ -7,8 +7,9 @@ public:
 	ALevel_Data(int level_number);
 
 	char *Level;
+	AAdvertisement *Advertisement;
 
-	static const int Max_Level_Number = 7;
+	static const int Max_Level_Number = 8;
 
 private:
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
@@ -24,5 +25,6 @@ private:
 
 
 	static char Test_Level[AsConfig::Level_Height][AsConfig::Level_Width];
+	static char *Levels_Array[Max_Level_Number];
 };
 //------------------------------------------------------------------------------------------------------------
