@@ -140,7 +140,7 @@ HBRUSH AColor::Get_Brush() const
 int AsTools::Rand(int range)
 {// Вычисляет псевдослучайное число в диапазоне [0, .. range - 1]
 
-	return rand() * range / RAND_MAX;
+	return rand() * range / (RAND_MAX + 1);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsTools::Round_Rect(HDC hdc, RECT &rect, int corner_radius)
