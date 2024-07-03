@@ -853,8 +853,14 @@ void AsMop::Clear(HDC hdc, RECT &paint_area)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Draw(HDC hdc, RECT &paint_area)
-{}
+{
+	int width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
+
+	AsTools::Rect(hdc, AsConfig::Level_X_Offset, AsConfig::Level_Y_Offset, width, AsConfig::Cell_Height, AsConfig::Red_Color);
+}
 //------------------------------------------------------------------------------------------------------------
 bool AsMop::Is_Finished()
-{}
+{
+	return false;
+}
 //------------------------------------------------------------------------------------------------------------
