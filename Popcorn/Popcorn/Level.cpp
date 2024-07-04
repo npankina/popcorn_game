@@ -857,6 +857,17 @@ void AsMop::Draw(HDC hdc, RECT &paint_area)
 	int width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
 
 	AsTools::Rect(hdc, AsConfig::Level_X_Offset, AsConfig::Level_Y_Offset, width, AsConfig::Cell_Height, AsConfig::Red_Color);
+
+	Highlight_Color->Select_Pen(hdc);
+	MoveToEx(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale, 0);
+	LineTo(hdc, (Score_X + 2) * scale, (Score_Y + 2) * scale);
+	LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale);
+
+	Shadow_Color->Select_Pen(hdc);
+	MoveToEx(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale, 0);
+	LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + Score_Height - 2) * scale);
+	LineTo(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale);
+
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMop::Is_Finished()

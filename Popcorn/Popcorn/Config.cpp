@@ -24,9 +24,11 @@ const AColor AsConfig::Monster_Dark_Red_Color(153, 17, 153);
 const AColor AsConfig::Monster_Cornea_Color(BG_Color, White_Color, 2);
 const AColor AsConfig::Monster_Iris_Color(BG_Color, Blue_Color, 2);
 const AColor AsConfig::BG_Outcome_Color(BG_Color, 2);
-const AColor AsConfig::Explosion_Red_Color(AsConfig::White_Color, AsConfig::Red_Color, 0);
-const AColor AsConfig::Explosion_Blue_Color(AsConfig::White_Color, AsConfig::Blue_Color, 0);
+const AColor AsConfig::Explosion_Red_Color(White_Color, Red_Color, 0);
+const AColor AsConfig::Explosion_Blue_Color(White_Color, Blue_Color, 0);
 const AColor AsConfig::Monster_Comet_Tail(230, 25, 229, Global_Scale);
+const AColor AsConfig::Shadow_Color(BG_Color, Global_Scale);
+const AColor AsConfig::Highlight_Panel_Color(White_Color, Global_Scale);
 
 
 HWND AsConfig::Hwnd;
