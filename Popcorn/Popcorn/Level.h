@@ -79,6 +79,8 @@ private:
 class AsMop : public AGame_Object
 {
 public:
+	AsMop();
+
 	virtual void Begin_Movement();
 	virtual void Finish_Movement();
 	virtual void Advance(double max_speed);
@@ -91,6 +93,20 @@ public:
 	virtual bool Is_Finished();
 
 private:
-	
+	AMop_Indicator Mop_Indicator;
+};
+//------------------------------------------------------------------------------------------------------------
+class AMop_Indicator : public AGraphics_Object
+{
+public:
+	AMop_Indicator(int x, int y);
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+private:
+	int X_Pos, Y_Pos;
 };
 //------------------------------------------------------------------------------------------------------------

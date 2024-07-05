@@ -33,7 +33,7 @@ private:
 	void Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw_name);
 
 	HFONT Logo_Pop_Font, Logo_Corn_Font, Player_Name_Font, Score_Font;
-	AColor *Shadow_Color, *Highlight_Color, *Dark_Blue;
+	AColor *Dark_Blue;
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
 	AString Player_Name;
 	int Extra_Lives_Count;

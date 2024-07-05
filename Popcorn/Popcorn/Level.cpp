@@ -834,6 +834,9 @@ void AsLevel::Cancel_All_Activity()
 
 // class AsMop
 //------------------------------------------------------------------------------------------------------------
+AsMop::AsMop() : Mop_Indicator(AsConfig::Level_X_Offset + 97, AsConfig::Level_Y_Offset + 1)
+{}
+//------------------------------------------------------------------------------------------------------------
 void AsMop::Begin_Movement()
 {}
 //------------------------------------------------------------------------------------------------------------
@@ -844,7 +847,9 @@ void AsMop::Advance(double max_speed)
 {}
 //------------------------------------------------------------------------------------------------------------
 double AsMop::Get_Speed()
-{}
+{
+	return 0.0;
+}
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Act()
 {}
@@ -854,23 +859,62 @@ void AsMop::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Draw(HDC hdc, RECT &paint_area)
 {
+	const int scale = AsConfig::Global_Scale;
+	int x_pos = AsConfig::Level_X_Offset;
+	int y_pos = AsConfig::Level_Y_Offset;
 	int width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
+	int height = AsConfig::Brick_Height;
 
-	AsTools::Rect(hdc, AsConfig::Level_X_Offset, AsConfig::Level_Y_Offset, width, AsConfig::Cell_Height, AsConfig::Red_Color);
+	AsTools::Rect(hdc, AsConfig::Level_X_Offset, AsConfig::Level_Y_Offset, width, height, AsConfig::Red_Color);
 
-	Highlight_Color->Select_Pen(hdc);
-	MoveToEx(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale, 0);
-	LineTo(hdc, (Score_X + 2) * scale, (Score_Y + 2) * scale);
-	LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale);
-
-	Shadow_Color->Select_Pen(hdc);
-	MoveToEx(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale, 0);
-	LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + Score_Height - 2) * scale);
-	LineTo(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale);
-
+	Mop_Indicator.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMop::Is_Finished()
+{
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
+// class AMop_Indicator
+//------------------------------------------------------------------------------------------------------------
+AMop_Indicator::AMop_Indicator(int x, int y) : X_Pos(x), Y_Pos(y)
+{}
+//------------------------------------------------------------------------------------------------------------
+void AMop_Indicator::Act()
+{}
+//------------------------------------------------------------------------------------------------------------
+void AMop_Indicator::Clear(HDC hdc, RECT &paint_area)
+{}
+//------------------------------------------------------------------------------------------------------------
+void AMop_Indicator::Draw(HDC hdc, RECT &paint_area)
+{
+	const int scale = AsConfig::Global_Scale;
+	int x_pos = X_Pos * scale;
+	int y_pos = Y_Pos * scale;
+	int y_pos_with_shift = (Y_Pos + 5) * scale;
+	int x_pos_with_shift = x_pos + 18 * scale;
+
+	AsTools::Rect(hdc, X_Pos, Y_Pos, 18, 5, AsConfig::Blue_Color);
+
+
+	// Рамка идикатора
+	AsConfig::Highlight_Color.Select_Pen(hdc);
+	MoveToEx(hdc, x_pos, y_pos_with_shift, 0);
+	LineTo(hdc, x_pos, y_pos);
+	LineTo(hdc, x_pos_with_shift, y_pos);
+
+	AsConfig::Shadow_Color.Select_Pen(hdc);
+	MoveToEx(hdc, x_pos_with_shift, y_pos, 0);
+	LineTo(hdc, x_pos_with_shift, y_pos_with_shift);
+	LineTo(hdc, x_pos, y_pos_with_shift);
+
+}
+//------------------------------------------------------------------------------------------------------------
+bool AMop_Indicator::Is_Finished()
 {
 	return false;
 }
