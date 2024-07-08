@@ -895,10 +895,10 @@ void AMop_Indicator::Draw(HDC hdc, RECT &paint_area)
 	const int scale = AsConfig::Global_Scale;
 	int x_pos = X_Pos * scale;
 	int y_pos = Y_Pos * scale;
-	int y_pos_with_shift = (Y_Pos + 5) * scale;
-	int x_pos_with_shift = x_pos + 18 * scale;
+	int y_pos_with_shift = (Y_Pos + Height) * scale;
+	int x_pos_with_shift = x_pos + Width * scale;
 
-	AsTools::Rect(hdc, X_Pos, Y_Pos, 18, 5, AsConfig::Blue_Color);
+	AsTools::Rect(hdc, X_Pos, Y_Pos, Width, Height, AsConfig::Blue_Color);
 
 
 	// Рамка идикатора
