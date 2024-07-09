@@ -109,7 +109,7 @@ public:
 private:
 	int X_Pos, Y_Pos;
 
-	static const int Width = 18;
-	static const int Height = 5;
+	//static const int Width = 18;
+	//static const int Height = 5;
 };
 //------------------------------------------------------------------------------------------------------------

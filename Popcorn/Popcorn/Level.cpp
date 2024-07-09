@@ -892,24 +892,24 @@ void AMop_Indicator::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AMop_Indicator::Draw(HDC hdc, RECT &paint_area)
 {
-	const int scale = AsConfig::Global_Scale;
-	int x_pos = X_Pos * scale;
-	int y_pos = Y_Pos * scale;
-	int y_pos_with_shift = (Y_Pos + Height) * scale;
-	int x_pos_with_shift = x_pos + Width * scale;
+	//const int scale = AsConfig::Global_Scale;
+	//int x_pos = X_Pos * scale;
+	//int y_pos = Y_Pos * scale;
+	//int y_pos_with_shift = (Y_Pos + Height) * scale;
+	//int x_pos_with_shift = x_pos + Width * scale;
 
-	AsTools::Rect(hdc, X_Pos, Y_Pos, Width, Height, AsConfig::Blue_Color);
+	//AsTools::Rect(hdc, X_Pos, Y_Pos, Width, Height, AsConfig::Blue_Color);
 
 
-	// Рамка идикатора
-	AsConfig::Highlight_Color.Select_Pen(hdc);
-	MoveToEx(hdc, x_pos, y_pos_with_shift, 0);
-	LineTo(hdc, x_pos, y_pos);
-	LineTo(hdc, x_pos_with_shift, y_pos);
+	//// Рамка идикатора
+	//AsConfig::Highlight_Color.Select_Pen(hdc);
+	//MoveToEx(hdc, x_pos, y_pos_with_shift, 0);
+	//LineTo(hdc, x_pos, y_pos);
+	//LineTo(hdc, x_pos_with_shift, y_pos);
 
-	AsConfig::Shadow_Color.Select_Pen(hdc);
-	MoveToEx(hdc, x_pos_with_shift, y_pos, 0);
-	LineTo(hdc, x_pos_with_shift, y_pos_with_shift);
+	//AsConfig::Shadow_Color.Select_Pen(hdc);
+	//MoveToEx(hdc, x_pos_with_shift, y_pos, 0);
+	//LineTo(hdc, x_pos_with_shift, y_pos_with_shift);
 	LineTo(hdc, x_pos, y_pos_with_shift);
 
 }
