@@ -910,7 +910,7 @@ void AMop_Indicator::Draw(HDC hdc, RECT &paint_area)
 	//AsConfig::Shadow_Color.Select_Pen(hdc);
 	//MoveToEx(hdc, x_pos_with_shift, y_pos, 0);
 	//LineTo(hdc, x_pos_with_shift, y_pos_with_shift);
-	LineTo(hdc, x_pos, y_pos_with_shift);
+	//LineTo(hdc, x_pos, y_pos_with_shift);
 
 }
 //------------------------------------------------------------------------------------------------------------
