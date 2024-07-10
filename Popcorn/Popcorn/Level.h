@@ -15,6 +15,26 @@ public:
 	int X, Y;
 };
 //------------------------------------------------------------------------------------------------------------
+class AsMop : public AGame_Object
+{
+public:
+	AsMop();
+
+	virtual void Begin_Movement();
+	virtual void Finish_Movement();
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+private:
+	AMop_Indicator Mop_Indicator;
+};
+//------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object
 {
 public:
@@ -67,33 +87,13 @@ private:
 	AColor Parachute_Color;
 	char Current_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 	AAdvertisement *Advertisement;
-
 	std::vector<APoint> Teleport_Bricks_Pos;
 	std::vector<AGraphics_Object *> Active_Bricks;
 	std::vector<AGraphics_Object *> Falling_Letters;
 	std::vector<ALevel_Data *> Levels_Data;
+	AsMop Mop; // Швабра для очистки уровня
 
 	static AsLevel *Level;
-};
-//------------------------------------------------------------------------------------------------------------
-class AsMop : public AGame_Object
-{
-public:
-	AsMop();
-
-	virtual void Begin_Movement();
-	virtual void Finish_Movement();
-	virtual void Advance(double max_speed);
-	virtual double Get_Speed();
-
-
-	virtual void Act();
-	virtual void Clear(HDC hdc, RECT &paint_area);
-	virtual void Draw(HDC hdc, RECT &paint_area);
-	virtual bool Is_Finished();
-
-private:
-	AMop_Indicator Mop_Indicator;
 };
 //------------------------------------------------------------------------------------------------------------
 class AMop_Indicator : public AGraphics_Object
@@ -109,7 +109,7 @@ public:
 private:
 	int X_Pos, Y_Pos;
 
-	//static const int Width = 18;
-	//static const int Height = 5;
+	static const int Width = 18;
+	static const int Height = 5;
 };
 //------------------------------------------------------------------------------------------------------------
