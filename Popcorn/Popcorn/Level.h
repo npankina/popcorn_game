@@ -15,6 +15,23 @@ public:
 	int X, Y;
 };
 //------------------------------------------------------------------------------------------------------------
+class AMop_Indicator : public AGraphics_Object
+{
+public:
+	AMop_Indicator(int x, int y);
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+private:
+	int X_Pos, Y_Pos;
+
+	static const int Width = 18;
+	static const int Height = 5;
+};
+//------------------------------------------------------------------------------------------------------------
 class AsMop : public AGame_Object
 {
 public:
@@ -94,22 +111,5 @@ private:
 	AsMop Mop; // Швабра для очистки уровня
 
 	static AsLevel *Level;
-};
-//------------------------------------------------------------------------------------------------------------
-class AMop_Indicator : public AGraphics_Object
-{
-public:
-	AMop_Indicator(int x, int y);
-
-	virtual void Act();
-	virtual void Clear(HDC hdc, RECT &paint_area);
-	virtual void Draw(HDC hdc, RECT &paint_area);
-	virtual bool Is_Finished();
-
-private:
-	int X_Pos, Y_Pos;
-
-	static const int Width = 18;
-	static const int Height = 5;
 };
 //------------------------------------------------------------------------------------------------------------
