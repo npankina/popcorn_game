@@ -27,14 +27,17 @@ public:
 
 private:
 	int X_Pos, Y_Pos;
+	RECT Indicator_Rect;
 
-	static const int Width = 18;
+	static const int scale_ = AsConfig::Global_Scale;
+	static const int Width = 17;
 	static const int Height = 5;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsMop : public AGame_Object
 {
 public:
+	~AsMop();
 	AsMop();
 
 	virtual void Begin_Movement();
@@ -49,7 +52,10 @@ public:
 	virtual bool Is_Finished();
 
 private:
-	AMop_Indicator Mop_Indicator;
+	std::vector<AMop_Indicator *> Mop_Indicator;
+
+	static const int Indicator_Count = 10;
+	//static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object

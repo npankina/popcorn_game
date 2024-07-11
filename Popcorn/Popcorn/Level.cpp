@@ -836,11 +836,30 @@ void AsLevel::Cancel_All_Activity()
 
 // class AsMop
 //------------------------------------------------------------------------------------------------------------
-AsMop::AsMop() : Mop_Indicator(AsConfig::Level_X_Offset + 97, AsConfig::Level_Y_Offset + 1)
-{}
+AsMop::~AsMop()
+{
+	for (auto *indicator : Mop_Indicator)
+		delete indicator;
+
+	Mop_Indicator.erase(Mop_Indicator.begin(), Mop_Indicator.end());
+}
+//------------------------------------------------------------------------------------------------------------
+AsMop::AsMop()
+{
+	AMop_Indicator *indicator = nullptr;
+	int x_pos = AsConfig::Level_X_Offset + 1;
+
+	for (int i = 0; i < Indicator_Count; i++)
+	{
+		indicator = new AMop_Indicator(x_pos + i * 19, AsConfig::Level_Y_Offset + 1);
+		Mop_Indicator.push_back(indicator);
+	}
+}
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Begin_Movement()
-{}
+{
+
+}
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Finish_Movement()
 {}
@@ -861,7 +880,6 @@ void AsMop::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Draw(HDC hdc, RECT &paint_area)
 {
-	const int scale = AsConfig::Global_Scale;
 	int x_pos = AsConfig::Level_X_Offset;
 	int y_pos = AsConfig::Level_Y_Offset;
 	int width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
@@ -869,7 +887,8 @@ void AsMop::Draw(HDC hdc, RECT &paint_area)
 
 	AsTools::Rect(hdc, AsConfig::Level_X_Offset, AsConfig::Level_Y_Offset, width, height, AsConfig::Red_Color);
 
-	Mop_Indicator.Draw(hdc, paint_area);
+	for (auto *indicator : Mop_Indicator)
+		indicator->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMop::Is_Finished()
@@ -883,8 +902,14 @@ bool AsMop::Is_Finished()
 
 // class AMop_Indicator
 //------------------------------------------------------------------------------------------------------------
-AMop_Indicator::AMop_Indicator(int x, int y) : X_Pos(x), Y_Pos(y)
-{}
+AMop_Indicator::AMop_Indicator(int x, int y) 
+: X_Pos(x), Y_Pos(y), Indicator_Rect{}
+{
+	Indicator_Rect.left = X_Pos * scale_;
+	Indicator_Rect.top = Y_Pos * scale_;
+	Indicator_Rect.right = Indicator_Rect.left + Width * scale_;
+	Indicator_Rect.bottom = Indicator_Rect.top + Height * scale_;
+}
 //------------------------------------------------------------------------------------------------------------
 void AMop_Indicator::Act()
 {}
@@ -894,14 +919,16 @@ void AMop_Indicator::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AMop_Indicator::Draw(HDC hdc, RECT &paint_area)
 {
-	const int scale = AsConfig::Global_Scale;
-	int x_pos = X_Pos * scale;
-	int y_pos = Y_Pos * scale;
-	int y_pos_with_shift = (Y_Pos + Height) * scale;
-	int x_pos_with_shift = x_pos + Width * scale;
+	RECT intersection_rect{};
+	int x_pos = X_Pos * scale_;
+	int y_pos = Y_Pos * scale_;
+	int y_pos_with_shift = (Y_Pos + Height) * scale_;
+	int x_pos_with_shift = x_pos + Width * scale_;
+
+	if (! IntersectRect(&intersection_rect, &paint_area, &Indicator_Rect))
+		return;
 
 	AsTools::Rect(hdc, X_Pos, Y_Pos, Width, Height, AsConfig::Blue_Color);
-
 
 	// Рамка идикатора
 	AsConfig::Highlight_Color.Select_Pen(hdc);
@@ -913,7 +940,6 @@ void AMop_Indicator::Draw(HDC hdc, RECT &paint_area)
 	MoveToEx(hdc, x_pos_with_shift, y_pos, 0);
 	LineTo(hdc, x_pos_with_shift, y_pos_with_shift);
 	LineTo(hdc, x_pos, y_pos_with_shift);
-
 }
 //------------------------------------------------------------------------------------------------------------
 bool AMop_Indicator::Is_Finished()
