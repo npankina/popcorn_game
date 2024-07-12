@@ -25,6 +25,8 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
+	static void Setup_Colors();
+
 private:
 	int X_Pos, Y_Pos;
 	RECT Indicator_Rect;
@@ -32,6 +34,8 @@ private:
 	static const int scale_ = AsConfig::Global_Scale;
 	static const int Width = 17;
 	static const int Height = 5;
+	static const int Max_Fade_Step = AsConfig::FPS;
+	static AColor Fading_Colors[Max_Fade_Step];
 };
 //------------------------------------------------------------------------------------------------------------
 class AsMop : public AGame_Object
@@ -55,7 +59,6 @@ private:
 	std::vector<AMop_Indicator *> Mop_Indicator;
 
 	static const int Indicator_Count = 10;
-	//static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object
