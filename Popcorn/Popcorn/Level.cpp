@@ -901,7 +901,7 @@ bool AsMop::Is_Finished()
 
 
 // class AMop_Indicator
-AColor AMop_Indicator::Fading_Colors[Max_Fade_Step];
+AColor_Fade AMop_Indicator::Fading_Colors;
 //------------------------------------------------------------------------------------------------------------
 AMop_Indicator::AMop_Indicator(int x, int y) 
 : X_Pos(x), Y_Pos(y), Indicator_Rect{}
@@ -951,6 +951,6 @@ bool AMop_Indicator::Is_Finished()
 void AMop_Indicator::Setup_Colors()
 {
 	for (int i = 0; i < Max_Fade_Step; i++)
-		AsTools::Get_Fading_Color(AsConfig::Blue_Color, i, Fading_Colors[i], Max_Fade_Step);
+		AsTools::Get_Fading_Color(AsConfig::Blue_Color, i, Max_Fade_Step);
 }
 //------------------------------------------------------------------------------------------------------------

@@ -35,7 +35,7 @@ private:
 	static const int Width = 17;
 	static const int Height = 5;
 	static const int Max_Fade_Step = AsConfig::FPS;
-	static AColor Fading_Colors[Max_Fade_Step];
+	static AColor_Fade Fading_Colors;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsMop : public AGame_Object

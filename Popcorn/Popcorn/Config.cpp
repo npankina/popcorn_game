@@ -137,6 +137,38 @@ HBRUSH AColor::Get_Brush() const
 
 
 
+// class AColor_Fade
+//------------------------------------------------------------------------------------------------------------
+AColor_Fade::~AColor_Fade()
+{
+	for (auto *item : Fading_Colors)
+		delete item;
+
+	Fading_Colors.erase(Fading_Colors.begin(), Fading_Colors.end());
+}
+//------------------------------------------------------------------------------------------------------------
+AColor_Fade::AColor_Fade(const AColor &color, int max_fade_step)
+{
+	AColor *current_color;
+
+	for (int i = 0; i < max_fade_step; i++)
+	{
+		current_color = AsTools::Get_Fading_Color(color, i, max_fade_step);
+		Fading_Colors.push_back(std::move(current_color));
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+AColor* AColor_Fade::Get_Color(int fade_step)
+{
+	if (fade_step < 0 or fade_step >= (int)Fading_Colors.size())
+		AsConfig::Throw();
+	return Fading_Colors[fade_step];
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
 // AsTools
 //------------------------------------------------------------------------------------------------------------
 int AsTools::Rand(int range)

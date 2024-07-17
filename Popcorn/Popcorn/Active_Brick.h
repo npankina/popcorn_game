@@ -58,7 +58,6 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
-	static void Setup_Colors();
 	static void Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Type brick_type);
 
 private:
@@ -66,9 +65,8 @@ private:
 
 	static const int Max_Fade_Step = AsConfig::FPS;
 
-	static AColor Fading_Red_Brick_Colors[Max_Fade_Step];
-	static AColor Fading_Blue_Brick_Colors[Max_Fade_Step];
-
+	static AColor_Fade Fading_Red_Brick_Colors;
+	static AColor_Fade Fading_Blue_Brick_Colors;
 };
 //------------------------------------------------------------------------------------------------------------
 class AActive_Brick_Unbreakable: public AActive_Brick
