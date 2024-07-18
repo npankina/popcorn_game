@@ -103,7 +103,7 @@ bool AActive_Brick_Red_Blue::Is_Finished()
 void AActive_Brick_Red_Blue::Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 {// Вывод неактивного кирпича на уровне
 
-	const AColor_Fade *color = 0;
+	const AColor *color = 0;
 
 	switch (brick_type)
 	{

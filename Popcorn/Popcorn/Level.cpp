@@ -901,7 +901,7 @@ bool AsMop::Is_Finished()
 
 
 // class AMop_Indicator
-AColor_Fade AMop_Indicator::Fading_Colors;
+AColor_Fade AMop_Indicator::Fading_Colors(AsConfig::Blue_Color, Max_Fade_Step);
 //------------------------------------------------------------------------------------------------------------
 AMop_Indicator::AMop_Indicator(int x, int y) 
 : X_Pos(x), Y_Pos(y), Indicator_Rect{}

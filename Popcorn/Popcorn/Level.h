@@ -34,7 +34,7 @@ private:
 	static const int scale_ = AsConfig::Global_Scale;
 	static const int Width = 17;
 	static const int Height = 5;
-	static const int Max_Fade_Step = AsConfig::FPS;
+	static const int Max_Fade_Step = AsConfig::FPS * 4 / 10; // 0.4 s
 	static AColor_Fade Fading_Colors;
 };
 //------------------------------------------------------------------------------------------------------------
