@@ -29,12 +29,14 @@ public:
 
 private:
 	int X_Pos, Y_Pos;
+	const AColor *Current_Color;
 	RECT Indicator_Rect;
 
 	static const int scale_ = AsConfig::Global_Scale;
 	static const int Width = 17;
 	static const int Height = 5;
 	static const int Max_Fade_Step = AsConfig::FPS * 4 / 10; // 0.4 s
+	static const int Normal_Timeout = AsConfig::FPS / 2;
 	static AColor_Fade Fading_Colors;
 };
 //------------------------------------------------------------------------------------------------------------

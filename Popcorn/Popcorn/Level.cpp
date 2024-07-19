@@ -904,7 +904,7 @@ bool AsMop::Is_Finished()
 AColor_Fade AMop_Indicator::Fading_Colors(AsConfig::Blue_Color, Max_Fade_Step);
 //------------------------------------------------------------------------------------------------------------
 AMop_Indicator::AMop_Indicator(int x, int y) 
-: X_Pos(x), Y_Pos(y), Indicator_Rect{}
+: X_Pos(x), Y_Pos(y), Current_Color(nullptr), Indicator_Rect{}
 {
 	Indicator_Rect.left = X_Pos * scale_;
 	Indicator_Rect.top = Y_Pos * scale_;
@@ -913,7 +913,25 @@ AMop_Indicator::AMop_Indicator(int x, int y)
 }
 //------------------------------------------------------------------------------------------------------------
 void AMop_Indicator::Act()
-{}
+{
+	int total_timeout = Max_Fade_Step + Normal_Timeout;
+	int current_tick = AsConfig::Current_Timer_Tick % total_timeout;
+	int current_offset;
+
+	if (current_tick < Normal_Timeout)
+		Current_Color = &AsConfig::Red_Color;
+	else
+	{
+		current_offset = current_tick - Normal_Timeout;
+
+		if (current_offset < 0 or current_offset >= Max_Fade_Step)
+			AsConfig::Throw();
+
+		Current_Color = Fading_Colors.Get_Color(current_offset);
+	}
+
+	AsTools::Invalidate_Rect(Indicator_Rect);
+}
 //------------------------------------------------------------------------------------------------------------
 void AMop_Indicator::Clear(HDC hdc, RECT &paint_area)
 {}
