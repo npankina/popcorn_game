@@ -31,6 +31,7 @@ class AColor_Fade
 public:
 	~AColor_Fade();
 	AColor_Fade(const AColor &color, int max_fade_step);
+	AColor_Fade(const AColor &color, const AColor &base_color, int max_fade_step);
 	AColor* Get_Color(int fade_step);
 
 private:
@@ -108,6 +109,7 @@ public:
 	static void Ellipse(HDC hdc, RECT &rect, const AColor &color);
 	static unsigned char Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step, int max_step);
 	static AColor* Get_Fading_Color(const AColor &origin_color, int step, int max_step);
+	static AColor* Get_Fading_Color(const AColor &origin_color, const AColor &base_color, int step, int max_step);
 	static bool Reflect_On_Circle(double next_x_pos, double next_y_pos, double circle_x, double circle_y, double circle_radius, ABall_Object *ball);
 };
 //------------------------------------------------------------------------------------------------------------

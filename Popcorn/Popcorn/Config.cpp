@@ -158,6 +158,17 @@ AColor_Fade::AColor_Fade(const AColor &color, int max_fade_step)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
+AColor_Fade::AColor_Fade(const AColor &color, const AColor &base_color, int max_fade_step)
+{
+	AColor *current_color;
+
+	for (int i = 0; i < max_fade_step; i++)
+	{
+		current_color = AsTools::Get_Fading_Color(color, base_color, i, max_fade_step);
+		Fading_Colors.push_back(std::move(current_color));
+	}
+}
+//------------------------------------------------------------------------------------------------------------
 AColor* AColor_Fade::Get_Color(int fade_step)
 {
 	if (fade_step < 0 or fade_step >= (int)Fading_Colors.size())
@@ -223,12 +234,17 @@ unsigned char AsTools::Get_Fading_Channel(unsigned char color, unsigned char bg_
 //------------------------------------------------------------------------------------------------------------
 AColor* AsTools::Get_Fading_Color(const AColor &origin_color, int step, int max_step)
 {
+	return Get_Fading_Color(origin_color, AsConfig::BG_Color, step, max_step);
+}
+//------------------------------------------------------------------------------------------------------------
+AColor* AsTools::Get_Fading_Color(const AColor &origin_color, const AColor &base_color, int step, int max_step)
+{
 	unsigned char r, g, b;
 	AColor *result_color;
 
-	r = Get_Fading_Channel(origin_color.R, AsConfig::BG_Color.R, step, max_step);
-	g = Get_Fading_Channel(origin_color.G, AsConfig::BG_Color.G, step, max_step);
-	b = Get_Fading_Channel(origin_color.B, AsConfig::BG_Color.B, step, max_step);
+	r = Get_Fading_Channel(origin_color.R, base_color.R, step, max_step);
+	g = Get_Fading_Channel(origin_color.G, base_color.G, step, max_step);
+	b = Get_Fading_Channel(origin_color.B, base_color.B, step, max_step);
 
 	result_color = new AColor(r, g, b);
 

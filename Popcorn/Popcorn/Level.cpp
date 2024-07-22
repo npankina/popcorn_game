@@ -160,6 +160,8 @@ void AsLevel::Act()
 
 	if (Advertisement != 0)
 		Advertisement->Act();
+
+	Mop.Act();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Clear(HDC hdc, RECT &paint_area)
@@ -851,7 +853,7 @@ AsMop::AsMop()
 
 	for (int i = 0; i < Indicator_Count; i++)
 	{
-		indicator = new AMop_Indicator(x_pos + i * 19, AsConfig::Level_Y_Offset + 1);
+		indicator = new AMop_Indicator(x_pos + i * 19, AsConfig::Level_Y_Offset + 1, i * 80);
 		Mop_Indicator.push_back(indicator);
 	}
 }
@@ -873,7 +875,10 @@ double AsMop::Get_Speed()
 }
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Act()
-{}
+{
+	for (auto *indicator : Mop_Indicator)
+		indicator->Act();
+}
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Clear(HDC hdc, RECT &paint_area)
 {}
@@ -901,10 +906,10 @@ bool AsMop::Is_Finished()
 
 
 // class AMop_Indicator
-AColor_Fade AMop_Indicator::Fading_Colors(AsConfig::Blue_Color, Max_Fade_Step);
+AColor_Fade AMop_Indicator::Fading_Colors(AsConfig::Blue_Color, AsConfig::Red_Color, Max_Fade_Step);
 //------------------------------------------------------------------------------------------------------------
-AMop_Indicator::AMop_Indicator(int x, int y) 
-: X_Pos(x), Y_Pos(y), Current_Color(nullptr), Indicator_Rect{}
+AMop_Indicator::AMop_Indicator(int x, int y, int time_offset) 
+: X_Pos(x), Y_Pos(y), Current_Color(&AsConfig::Blue_Color), Time_Offset(time_offset), Indicator_Rect{}
 {
 	Indicator_Rect.left = X_Pos * scale_;
 	Indicator_Rect.top = Y_Pos * scale_;
@@ -915,7 +920,7 @@ AMop_Indicator::AMop_Indicator(int x, int y)
 void AMop_Indicator::Act()
 {
 	int total_timeout = Max_Fade_Step + Normal_Timeout;
-	int current_tick = AsConfig::Current_Timer_Tick % total_timeout;
+	int current_tick = (AsConfig::Current_Timer_Tick + Time_Offset) % total_timeout;
 	int current_offset;
 
 	if (current_tick < Normal_Timeout)
@@ -947,7 +952,7 @@ void AMop_Indicator::Draw(HDC hdc, RECT &paint_area)
 	if (! IntersectRect(&intersection_rect, &paint_area, &Indicator_Rect))
 		return;
 
-	AsTools::Rect(hdc, X_Pos, Y_Pos, Width, Height, AsConfig::Blue_Color);
+	AsTools::Rect(hdc, Indicator_Rect, *Current_Color);
 
 	// Рамка идикатора
 	AsConfig::Highlight_Color.Select_Pen(hdc);
