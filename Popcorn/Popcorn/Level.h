@@ -15,6 +15,21 @@ public:
 	int X, Y;
 };
 //------------------------------------------------------------------------------------------------------------
+class AMop_Cylinder : public AGraphics_Object
+{
+public:
+	AMop_Cylinder(int x, int y, int width, int height);
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+private:
+	int X_Pos, Y_Pos;
+	int Width, Height;
+};
+//------------------------------------------------------------------------------------------------------------
 class AMop_Indicator : public AGraphics_Object
 {
 public:
