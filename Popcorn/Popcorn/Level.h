@@ -75,7 +75,10 @@ public:
 
 private:
 	std::vector<AMop_Indicator *> Mop_Indicator;
+	AMop_Cylinder Mop_Cylinder;
 
+	static const int Width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
+	static const int Height = AsConfig::Brick_Height;
 	static const int Indicator_Count = 10;
 };
 //------------------------------------------------------------------------------------------------------------

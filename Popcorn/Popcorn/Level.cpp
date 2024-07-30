@@ -852,7 +852,9 @@ void AMop_Cylinder::Draw(HDC hdc, RECT &paint_area)
 {}
 //------------------------------------------------------------------------------------------------------------
 bool AMop_Cylinder::Is_Finished()
-{}
+{
+	return false;
+}
 //------------------------------------------------------------------------------------------------------------
 
 
@@ -869,6 +871,7 @@ AsMop::~AsMop()
 }
 //------------------------------------------------------------------------------------------------------------
 AsMop::AsMop()
+: Mop_Cylinder(AsConfig::Level_X_Offset + Width / 2 - 6, AsConfig::Level_Y_Offset+ 7, 13, 5)
 {
 	AMop_Indicator *indicator = nullptr;
 	int x_pos = AsConfig::Level_X_Offset + 1;
@@ -909,13 +912,13 @@ void AsMop::Draw(HDC hdc, RECT &paint_area)
 {
 	int x_pos = AsConfig::Level_X_Offset;
 	int y_pos = AsConfig::Level_Y_Offset;
-	int width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
-	int height = AsConfig::Brick_Height;
-
-	AsTools::Rect(hdc, AsConfig::Level_X_Offset, AsConfig::Level_Y_Offset, width, height, AsConfig::Red_Color);
+	
+	AsTools::Rect(hdc, AsConfig::Level_X_Offset, AsConfig::Level_Y_Offset, Width, Height, AsConfig::Red_Color);
 
 	for (auto *indicator : Mop_Indicator)
 		indicator->Draw(hdc, paint_area);
+
+	Mop_Cylinder.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMop::Is_Finished()
