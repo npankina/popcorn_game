@@ -849,7 +849,15 @@ void AMop_Cylinder::Clear(HDC hdc, RECT &paint_area)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMop_Cylinder::Draw(HDC hdc, RECT &paint_area)
-{}
+{
+	// 1. Крепление цилиндра
+	
+	// 2. Цилиндр
+	AsTools::Rect(hdc, X_Pos + 2, Y_Pos + 4, 2, Height * 10, AsConfig::White_Color);
+	AsTools::Rect(hdc, X_Pos + 4, Y_Pos + 4, 1, Height * 10, AsConfig::Blue_Color);
+	AsTools::Rect(hdc, X_Pos + 5, Y_Pos + 4, 1, Height * 10, AsConfig::White_Color);
+	AsTools::Rect(hdc, X_Pos + 6, Y_Pos + 4, 4, Height * 10, AsConfig::Blue_Color);
+}
 //------------------------------------------------------------------------------------------------------------
 bool AMop_Cylinder::Is_Finished()
 {
