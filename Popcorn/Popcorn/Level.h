@@ -28,6 +28,7 @@ public:
 private:
 	int X_Pos, Y_Pos;
 	int Width, Height;
+	static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------
 class AMop_Indicator : public AGraphics_Object
@@ -74,8 +75,8 @@ public:
 	virtual bool Is_Finished();
 
 private:
-	std::vector<AMop_Indicator *> Mop_Indicator;
-	AMop_Cylinder Mop_Cylinder;
+	std::vector<AMop_Indicator *> Mop_Indicators;
+	std::vector < AMop_Cylinder *> Mop_Cylinders;
 
 	static const int Width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
 	static const int Height = AsConfig::Brick_Height;
