@@ -243,7 +243,7 @@ void AsLevel::Init()
 			level_data->Advertisement = new AAdvertisement(1, 9, 2, 3);
 	}
 
-
+	Mop.Erase_Level();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Set_Current_Level(int level_number)
@@ -871,12 +871,17 @@ void AMop_Cylinder::Draw(HDC hdc, RECT &paint_area)
 	AsTools::Rect(hdc, X_Pos + 2, Y_Pos + 4, 2, Height * 10, AsConfig::White_Color);
 	AsTools::Rect(hdc, X_Pos + 4, Y_Pos + 4, 1, Height * 10, AsConfig::Blue_Color);
 	AsTools::Rect(hdc, X_Pos + 5, Y_Pos + 4, 1, Height * 10, AsConfig::White_Color);
-	AsTools::Rect(hdc, X_Pos + 6, Y_Pos + 4, 5, Height * 10, AsConfig::Blue_Color);
+	AsTools::Rect(hdc, X_Pos + 6, Y_Pos + 4, Width - 8, Height * 10, AsConfig::Blue_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AMop_Cylinder::Is_Finished()
 {
 	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void AMop_Cylinder::Set_Y_Pos(int y)
+{
+	Y_Pos = y;
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -897,7 +902,7 @@ AsMop::~AsMop()
 	Mop_Cylinders.erase(Mop_Cylinders.begin(), Mop_Cylinders.end());
 }
 //------------------------------------------------------------------------------------------------------------
-AsMop::AsMop()
+AsMop::AsMop() : Y_Pos(0), Start_Tick(0)
 {
 	AMop_Indicator *indicator = nullptr;
 	AMop_Cylinder *cylinder = nullptr;
@@ -912,7 +917,7 @@ AsMop::AsMop()
 
 	for (int i = 0; i < 4; i++) 
 	{
-		cylinder = new AMop_Cylinder(AsConfig::Level_X_Offset + Width / 2 - 6 - i, AsConfig::Level_Y_Offset + 7, 13 + 2, 5);
+		cylinder = new AMop_Cylinder(AsConfig::Level_X_Offset + Width / 2 - 6 - i, AsConfig::Level_Y_Offset + 7 + i * 5, 13 + i * 2, 1);
 		Mop_Cylinders.push_back(cylinder);
 	}
 }
@@ -944,10 +949,7 @@ void AsMop::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Draw(HDC hdc, RECT &paint_area)
 {
-	int x_pos = AsConfig::Level_X_Offset;
-	int y_pos = AsConfig::Level_Y_Offset;
-	
-	AsTools::Rect(hdc, AsConfig::Level_X_Offset, AsConfig::Level_Y_Offset, Width, Height, AsConfig::Red_Color);
+	AsTools::Rect(hdc, AsConfig::Level_X_Offset, Y_Pos, Width, Height, AsConfig::Red_Color);
 
 	for (auto *indicator : Mop_Indicators)
 		indicator->Draw(hdc, paint_area);
@@ -961,6 +963,18 @@ bool AsMop::Is_Finished()
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
+void AsMop::Erase_Level()
+{
+	Start_Tick = AsConfig::Current_Timer_Tick;
+	Y_Pos = 172;
+
+	for (auto *indicator : Mop_Indicators)
+		indicator->Set_Y_Pos(Y_Pos + 1);
+
+	for (int i = 0; i < Mop_Cylinders.size(); i++)
+		Mop_Cylinders[i]->Set_Y_Pos(Y_Pos + Height + i * 5);
+}
+//------------------------------------------------------------------------------------------------------------
 
 
 
@@ -971,10 +985,7 @@ AColor_Fade AMop_Indicator::Fading_Colors(AsConfig::Blue_Color, AsConfig::Red_Co
 AMop_Indicator::AMop_Indicator(int x, int y, int time_offset) 
 : X_Pos(x), Y_Pos(y), Current_Color(&AsConfig::Blue_Color), Time_Offset(time_offset), Indicator_Rect{}
 {
-	Indicator_Rect.left = X_Pos * scale_;
-	Indicator_Rect.top = Y_Pos * scale_;
-	Indicator_Rect.right = Indicator_Rect.left + Width * scale_;
-	Indicator_Rect.bottom = Indicator_Rect.top + Height * scale_;
+	Set_Y_Pos(y);
 }
 //------------------------------------------------------------------------------------------------------------
 void AMop_Indicator::Act()
@@ -1035,5 +1046,15 @@ void AMop_Indicator::Setup_Colors()
 {
 	for (int i = 0; i < Max_Fade_Step; i++)
 		AsTools::Get_Fading_Color(AsConfig::Blue_Color, i, Max_Fade_Step);
+}
+//------------------------------------------------------------------------------------------------------------
+void AMop_Indicator::Set_Y_Pos(int y)
+{
+	Y_Pos = y;
+	
+	Indicator_Rect.left = X_Pos * scale_;
+	Indicator_Rect.top = Y_Pos * scale_;
+	Indicator_Rect.right = Indicator_Rect.left + Width * scale_;
+	Indicator_Rect.bottom = Indicator_Rect.top + Height * scale_;
 }
 //------------------------------------------------------------------------------------------------------------

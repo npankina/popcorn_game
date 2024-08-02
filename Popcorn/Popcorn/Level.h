@@ -25,6 +25,8 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
+	void Set_Y_Pos(int y);
+
 private:
 	int X_Pos, Y_Pos;
 	int Width, Height;
@@ -42,6 +44,7 @@ public:
 	virtual bool Is_Finished();
 
 	static void Setup_Colors();
+	void Set_Y_Pos(int y);
 
 private:
 	int X_Pos, Y_Pos;
@@ -74,7 +77,11 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
+	void Erase_Level();
+
 private:
+	int Y_Pos;
+	int Start_Tick;
 	std::vector<AMop_Indicator *> Mop_Indicators;
 	std::vector < AMop_Cylinder *> Mop_Cylinders;
 
