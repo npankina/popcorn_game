@@ -178,6 +178,9 @@ void AsLevel::Clear(HDC hdc, RECT &paint_area)
 		Cancel_All_Activity();
 		Need_To_Cancel_All = false;
 	}
+
+	Mop.Clear(hdc, paint_area);
+
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Draw(HDC hdc, RECT &paint_area)
@@ -837,9 +840,10 @@ void AsLevel::Cancel_All_Activity()
 
 
 // class AMop_Cylinder
+const int AMop_Cylinder::Max_Cylinders_Height[4] = {86, 43, 32, 11};
 //------------------------------------------------------------------------------------------------------------
-AMop_Cylinder::AMop_Cylinder(int x, int y, int width, int height)
-: X_Pos(x), Y_Pos(y), Width(width), Height(height)
+AMop_Cylinder::AMop_Cylinder(int x, int y, int width, int height, int max_heiht)
+: X_Pos(x), Y_Pos(y), Width(width), Height(height), Max_Height(max_heiht)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMop_Cylinder::Act()
@@ -884,6 +888,17 @@ void AMop_Cylinder::Set_Y_Pos(int y)
 	Y_Pos = y;
 }
 //------------------------------------------------------------------------------------------------------------
+void AMop_Cylinder::Set_Height_For(double ratio)
+{
+	Height = (int)((double)Max_Height * ratio);
+
+	if (Height < 1)
+		Height = 1;
+	else
+		if (Height > Max_Height)
+			Height = Max_Height;
+}
+//------------------------------------------------------------------------------------------------------------
 
 
 
@@ -902,22 +917,33 @@ AsMop::~AsMop()
 	Mop_Cylinders.erase(Mop_Cylinders.begin(), Mop_Cylinders.end());
 }
 //------------------------------------------------------------------------------------------------------------
-AsMop::AsMop() : Y_Pos(0), Start_Tick(0)
+AsMop::AsMop() : Y_Pos(0), Start_Tick(0), Acting(false), Mop_Rect{}, Prev_Mop_Rect{}
 {
 	AMop_Indicator *indicator = nullptr;
 	AMop_Cylinder *cylinder = nullptr;
 
-	int x_pos = AsConfig::Level_X_Offset + 1;
+	int x_pos;
+	int y_pos;
+	int height, max_height;
+	const int width = 1;
+
 
 	for (int i = 0; i < Indicator_Count; i++)
 	{
-		indicator = new AMop_Indicator(x_pos + i * 19, AsConfig::Level_Y_Offset + 1, i * 80);
+		x_pos = AsConfig::Level_X_Offset + 1 + i * 19;
+
+		indicator = new AMop_Indicator(x_pos, AsConfig::Level_Y_Offset + 1, i * 80);
 		Mop_Indicators.push_back(indicator);
 	}
 
 	for (int i = 0; i < 4; i++) 
 	{
-		cylinder = new AMop_Cylinder(AsConfig::Level_X_Offset + Width / 2 - 6 - i, AsConfig::Level_Y_Offset + 7 + i * 5, 13 + i * 2, 1);
+		x_pos = AsConfig::Level_X_Offset + Width / 2 - 6 - i;
+		y_pos = AsConfig::Level_Y_Offset + 7 + i * 5;
+		height = 13 + i * 2;
+		max_height = AMop_Cylinder::Max_Cylinders_Height[i];
+
+		cylinder = new AMop_Cylinder(x_pos, y_pos, height, width, max_height);
 		Mop_Cylinders.push_back(cylinder);
 	}
 }
@@ -940,15 +966,51 @@ double AsMop::Get_Speed()
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Act()
 {
+	int time_offset;
+	double ratio;
+	
+	Prev_Mop_Rect = Mop_Rect;
+
+	if (! Acting)
+		return;
+
+	time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
+
+	if (time_offset < Expansion_Timeout)
+	{
+		ratio = (double)time_offset / (double)Expansion_Timeout;
+
+		for (auto *cylinder : Mop_Cylinders)
+			cylinder->Set_Height_For(ratio); // увеличить высоту цилиндра
+		
+		Set_Mop();
+	}
+	
 	for (auto *indicator : Mop_Indicators)
 		indicator->Act();
+
+	AsTools::Invalidate_Rect(Mop_Rect);
+	AsTools::Invalidate_Rect(Prev_Mop_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Clear(HDC hdc, RECT &paint_area)
-{}
+{
+	RECT intersection_rect{};
+
+	if (!Acting)
+		return;
+
+	if (! IntersectRect(&intersection_rect, &paint_area, &Mop_Rect))
+		return;
+
+	AsTools::Rect(hdc, Prev_Mop_Rect, AsConfig::BG_Color);
+}
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Draw(HDC hdc, RECT &paint_area)
 {
+	if (!Acting)
+		return;
+
 	AsTools::Rect(hdc, AsConfig::Level_X_Offset, Y_Pos, Width, Height, AsConfig::Red_Color);
 
 	for (auto *indicator : Mop_Indicators)
@@ -967,12 +1029,30 @@ void AsMop::Erase_Level()
 {
 	Start_Tick = AsConfig::Current_Timer_Tick;
 	Y_Pos = 172;
+	Acting = true;
+
+	Set_Mop();
+}
+//------------------------------------------------------------------------------------------------------------
+void AsMop::Set_Mop()
+{
+	int total_cylinders_height = 0;
+
+	for (auto *cylinder : Mop_Cylinders)
+		total_cylinders_height += cylinder->Get_Height();
+
+	Y_Pos = AsConfig::Max_Y_Pos - total_cylinders_height - Height;
 
 	for (auto *indicator : Mop_Indicators)
 		indicator->Set_Y_Pos(Y_Pos + 1);
 
 	for (int i = 0; i < Mop_Cylinders.size(); i++)
 		Mop_Cylinders[i]->Set_Y_Pos(Y_Pos + Height + i * 5);
+
+	Mop_Rect.left = AsConfig::Level_X_Offset * scale_;
+	Mop_Rect.top = Y_Pos * scale_;
+	Mop_Rect.right = Mop_Rect.left + Width * scale_;
+	Mop_Rect.bottom = Mop_Rect.top + Height * scale_;
 }
 //------------------------------------------------------------------------------------------------------------
 

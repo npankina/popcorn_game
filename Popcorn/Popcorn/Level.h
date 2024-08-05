@@ -18,7 +18,7 @@ public:
 class AMop_Cylinder : public AGraphics_Object
 {
 public:
-	AMop_Cylinder(int x, int y, int width, int height);
+	AMop_Cylinder(int x, int y, int width, int height, int max_heiht);
 
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT &paint_area);
@@ -26,10 +26,15 @@ public:
 	virtual bool Is_Finished();
 
 	void Set_Y_Pos(int y);
+	void Set_Height_For(double ratio);
+	int Get_Height() { return Height; }
+
+	static const int Max_Cylinders_Height[4];
 
 private:
 	int X_Pos, Y_Pos;
-	int Width, Height;
+	int Width, Height, Max_Height;
+	
 	static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------
@@ -78,16 +83,21 @@ public:
 	virtual bool Is_Finished();
 
 	void Erase_Level();
+	void Set_Mop();
 
 private:
 	int Y_Pos;
 	int Start_Tick;
+	bool Acting;
+	RECT Mop_Rect, Prev_Mop_Rect;
 	std::vector<AMop_Indicator *> Mop_Indicators;
 	std::vector < AMop_Cylinder *> Mop_Cylinders;
 
 	static const int Width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
 	static const int Height = AsConfig::Brick_Height;
 	static const int Indicator_Count = 10;
+	static const int Expansion_Timeout = AsConfig::FPS * 5;
+	static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object
