@@ -34,6 +34,7 @@ public:
 private:
 	int X_Pos, Y_Pos;
 	int Width, Height, Max_Height;
+	RECT Cylinder_Rect;
 	
 	static const int scale_ = AsConfig::Global_Scale;
 };

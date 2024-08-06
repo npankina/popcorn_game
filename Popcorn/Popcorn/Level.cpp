@@ -843,7 +843,7 @@ void AsLevel::Cancel_All_Activity()
 const int AMop_Cylinder::Max_Cylinders_Height[4] = {86, 43, 32, 11};
 //------------------------------------------------------------------------------------------------------------
 AMop_Cylinder::AMop_Cylinder(int x, int y, int width, int height, int max_heiht)
-: X_Pos(x), Y_Pos(y), Width(width), Height(height), Max_Height(max_heiht)
+: X_Pos(x), Y_Pos(y), Width(width), Height(height), Max_Height(max_heiht), Cylinder_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void AMop_Cylinder::Act()
@@ -855,6 +855,9 @@ void AMop_Cylinder::Clear(HDC hdc, RECT &paint_area)
 void AMop_Cylinder::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT rect{};
+	RECT intersection_rect{};
+
+	if (!IntersectRect(&intersection_rect, &paint_area, &Cylinder_Rect));
 
 	rect.left = X_Pos * scale_;
 	rect.top = Y_Pos * scale_;
@@ -872,10 +875,10 @@ void AMop_Cylinder::Draw(HDC hdc, RECT &paint_area)
 
 
 	// 2. Цилиндр
-	AsTools::Rect(hdc, X_Pos + 2, Y_Pos + 4, 2, Height * 10, AsConfig::White_Color);
-	AsTools::Rect(hdc, X_Pos + 4, Y_Pos + 4, 1, Height * 10, AsConfig::Blue_Color);
-	AsTools::Rect(hdc, X_Pos + 5, Y_Pos + 4, 1, Height * 10, AsConfig::White_Color);
-	AsTools::Rect(hdc, X_Pos + 6, Y_Pos + 4, Width - 8, Height * 10, AsConfig::Blue_Color);
+	AsTools::Rect(hdc, X_Pos + 2, Y_Pos + 4, 2, Height, AsConfig::White_Color);
+	AsTools::Rect(hdc, X_Pos + 4, Y_Pos + 4, 1, Height, AsConfig::Blue_Color);
+	AsTools::Rect(hdc, X_Pos + 5, Y_Pos + 4, 1, Height, AsConfig::White_Color);
+	AsTools::Rect(hdc, X_Pos + 6, Y_Pos + 4, Width - 8, Height, AsConfig::Blue_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AMop_Cylinder::Is_Finished()
@@ -886,6 +889,13 @@ bool AMop_Cylinder::Is_Finished()
 void AMop_Cylinder::Set_Y_Pos(int y)
 {
 	Y_Pos = y;
+
+	Cylinder_Rect.left = X_Pos * scale_;
+	Cylinder_Rect.top = Y_Pos * scale_;
+	Cylinder_Rect.right = Cylinder_Rect.left + Width * scale_;
+	Cylinder_Rect.bottom = Cylinder_Rect.top + Height * scale_;
+
+	AsTools::Invalidate_Rect(Cylinder_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AMop_Cylinder::Set_Height_For(double ratio)
