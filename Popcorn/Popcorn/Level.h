@@ -3,6 +3,7 @@
 #include "Falling_Letter.h"
 #include "Info_Panel.h"
 #include "Level_Data.h"
+#include "Mop.h"
 #include <vector>
 
 //------------------------------------------------------------------------------------------------------------
@@ -13,92 +14,6 @@ public:
 	APoint(int x, int y) : X(x), Y(y) {};
 
 	int X, Y;
-};
-//------------------------------------------------------------------------------------------------------------
-class AMop_Cylinder : public AGraphics_Object
-{
-public:
-	AMop_Cylinder(int x, int y, int width, int height, int max_heiht);
-
-	virtual void Act();
-	virtual void Clear(HDC hdc, RECT &paint_area);
-	virtual void Draw(HDC hdc, RECT &paint_area);
-	virtual bool Is_Finished();
-
-	void Set_Y_Pos(int y);
-	void Set_Height_For(double ratio);
-	int Get_Height() { return Height; }
-
-	static const int Max_Cylinders_Height[4];
-
-private:
-	int X_Pos, Y_Pos;
-	int Width, Height, Max_Height;
-	RECT Cylinder_Rect;
-	
-	static const int scale_ = AsConfig::Global_Scale;
-};
-//------------------------------------------------------------------------------------------------------------
-class AMop_Indicator : public AGraphics_Object
-{
-public:
-	AMop_Indicator(int x, int y, int time_offset);
-
-	virtual void Act();
-	virtual void Clear(HDC hdc, RECT &paint_area);
-	virtual void Draw(HDC hdc, RECT &paint_area);
-	virtual bool Is_Finished();
-
-	static void Setup_Colors();
-	void Set_Y_Pos(int y);
-
-private:
-	int X_Pos, Y_Pos;
-	int Time_Offset;
-	const AColor *Current_Color;
-	RECT Indicator_Rect;
-
-	static const int scale_ = AsConfig::Global_Scale;
-	static const int Width = 17;
-	static const int Height = 5;
-	static const int Max_Fade_Step = AsConfig::FPS * 4 / 10; // 0.4 second
-	static const int Normal_Timeout = AsConfig::FPS; // 1 second
-	static AColor_Fade Fading_Colors;
-};
-//------------------------------------------------------------------------------------------------------------
-class AsMop : public AGame_Object
-{
-public:
-	~AsMop();
-	AsMop();
-
-	virtual void Begin_Movement();
-	virtual void Finish_Movement();
-	virtual void Advance(double max_speed);
-	virtual double Get_Speed();
-
-
-	virtual void Act();
-	virtual void Clear(HDC hdc, RECT &paint_area);
-	virtual void Draw(HDC hdc, RECT &paint_area);
-	virtual bool Is_Finished();
-
-	void Erase_Level();
-	void Set_Mop();
-
-private:
-	int Y_Pos;
-	int Start_Tick;
-	bool Acting;
-	RECT Mop_Rect, Prev_Mop_Rect;
-	std::vector<AMop_Indicator *> Mop_Indicators;
-	std::vector < AMop_Cylinder *> Mop_Cylinders;
-
-	static const int Width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
-	static const int Height = AsConfig::Brick_Height;
-	static const int Indicator_Count = 10;
-	static const int Expansion_Timeout = AsConfig::FPS * 5;
-	static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object
