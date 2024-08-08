@@ -157,3 +157,14 @@ void AsMop::Set_Mop()
 	Mop_Rect.bottom = Mop_Rect.top + Height * scale_;
 }
 //------------------------------------------------------------------------------------------------------------
+void AsMop::Clear_Area(HDC hdc)
+{
+	RECT rect = Mop_Rect;
+	rect.bottom = AsConfig::Max_Y_Pos * scale_;
+
+	if (!Acting)
+		return;
+
+	AsTools::Rect(hdc, rect, AsConfig::BG_Color);
+}
+//------------------------------------------------------------------------------------------------------------

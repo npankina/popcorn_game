@@ -39,6 +39,7 @@ public:
 	void Set_Current_Level(int level_number);
 	bool Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_letter);
 	void Stop();
+	void Mop_Level(int number);
 
 	static bool Has_Brick_At(int x_pos, int y_pos);
 	static bool Has_Brick_At(RECT &monster_rect);

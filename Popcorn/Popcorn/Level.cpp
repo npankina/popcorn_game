@@ -205,11 +205,13 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 					Draw_Brick(hdc, brick_rect, j, i);
 			}
 
-		Draw_Objects(hdc, paint_area, Active_Bricks, AsConfig::Max_Active_Bricks_Count);
+		for (auto &item : Active_Bricks)
+			item->Draw(hdc, paint_area);
+
+		Mop.Clear_Area(hdc); // очищаем часть стертую шваброй, если надо
 	}
 
-	for (auto &item : Active_Bricks)
-		item->Draw(hdc, paint_area);
+	
 
 	// Рисование падающих букв
 	for (auto &item : Falling_Letters)
@@ -295,6 +297,11 @@ bool AsLevel::Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_lett
 void AsLevel::Stop()
 {
 	Need_To_Cancel_All = true;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsLevel::Mop_Level(int number)
+{
+
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Has_Brick_At(int level_x_pos, int level_y_pos)

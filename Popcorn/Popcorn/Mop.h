@@ -21,6 +21,7 @@ public:
 
 	void Erase_Level();
 	void Set_Mop();
+	void Clear_Area(HDC hdc);
 
 private:
 	int Y_Pos;
