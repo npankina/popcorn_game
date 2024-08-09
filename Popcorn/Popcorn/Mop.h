@@ -2,6 +2,18 @@
 #include "Mop_Indicator.h"
 #include "Mop_Cylinder.h"
 
+
+//------------------------------------------------------------------------------------------------------------
+enum class EMop_State : unsigned char
+{
+	Idle,
+
+	Clearing,
+	Clear_Done,
+	Showing,
+	Show_Done
+};
+//------------------------------------------------------------------------------------------------------------
 class AsMop : public AGame_Object
 {
 public:
@@ -19,15 +31,17 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
-	void Erase_Level();
+	void Activate(bool is_cleaning);
 	void Set_Mop();
 	void Clear_Area(HDC hdc);
+	EMop_State Get_State() { return Mop_State;  }
+	
 
 private:
 	int Y_Pos;
 	int Start_Tick;
-	bool Acting;
 	RECT Mop_Rect, Prev_Mop_Rect;
+	EMop_State Mop_State;
 	std::vector<AMop_Indicator *> Mop_Indicators;
 	std::vector < AMop_Cylinder *> Mop_Cylinders;
 

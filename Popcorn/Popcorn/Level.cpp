@@ -10,7 +10,7 @@ AsLevel::~AsLevel()
 }
 //------------------------------------------------------------------------------------------------------------
 AsLevel::AsLevel()
-: Level_Rect{}, Current_Level{}, Need_To_Cancel_All(false),
+: Next_Level(0), Level_Rect{}, Current_Level{}, Need_To_Cancel_All(false),
   Parachute_Color(AsConfig::Red_Color, AsConfig::Blue_Color, AsConfig::Global_Scale), Advertisement(0),
   Current_Brick_Left_X(0.0), Current_Brick_Right_X(0.0), Current_Brick_Top_Y(0.0), Current_Brick_Low_Y(0.0)
 {
@@ -248,7 +248,7 @@ void AsLevel::Init()
 			level_data->Advertisement = new AAdvertisement(1, 9, 2, 3);
 	}
 
-	Mop.Erase_Level();
+	//Mop.Erase_Level();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Set_Current_Level(int level_number)
@@ -299,9 +299,29 @@ void AsLevel::Stop()
 	Need_To_Cancel_All = true;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsLevel::Mop_Level(int number)
+void AsLevel::Mop_Level(int next_level)
 {
+	if (next_level < 1 or next_level >= ALevel_Data::Max_Level_Number)
+		AsConfig::Throw();
 
+	Next_Level = next_level;
+
+	Mop.Activate(true);
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsLevel::Is_Level_Mopping_Done()
+{// Возврат: true / false - закончилась очистка уровня и вывод нового / еще нет
+
+	if (Mop.Get_State() == EMop_State::Show_Done)
+		return true;
+
+	if (Mop.Get_State() == EMop_State::Clear_Done)
+	{
+		Set_Current_Level(Next_Level);
+		Mop.Activate(false);
+	}
+
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Has_Brick_At(int level_x_pos, int level_y_pos)

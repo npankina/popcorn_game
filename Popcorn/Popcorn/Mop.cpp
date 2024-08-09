@@ -14,7 +14,7 @@ AsMop::~AsMop()
 	Mop_Cylinders.erase(Mop_Cylinders.begin(), Mop_Cylinders.end());
 }
 //------------------------------------------------------------------------------------------------------------
-AsMop::AsMop() : Y_Pos(0), Start_Tick(0), Acting(false), Mop_Rect{}, Prev_Mop_Rect{}
+AsMop::AsMop() : Y_Pos(0), Start_Tick(0), Mop_Rect{}, Prev_Mop_Rect{}, Mop_State(EMop_State::Idle)
 {
 	AMop_Indicator *indicator = nullptr;
 	AMop_Cylinder *cylinder = nullptr;
@@ -66,7 +66,7 @@ void AsMop::Act()
 
 	Prev_Mop_Rect = Mop_Rect;
 
-	if (!Acting)
+	if ( ! (Mop_State == EMop_State::Clearing or Mop_State == EMop_State::Showing) )
 		return;
 
 	time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
@@ -75,10 +75,29 @@ void AsMop::Act()
 	{
 		ratio = (double)time_offset / (double)Expansion_Timeout;
 
+		if (Mop_State == EMop_State::Showing)
+			ratio = 1.0 - ratio;
+
 		for (auto *cylinder : Mop_Cylinders)
 			cylinder->Set_Height_For(ratio); // увеличить высоту цилиндра
 
 		Set_Mop();
+	}
+	else
+	{
+		switch (Mop_State)
+		{
+		case EMop_State::Clearing:
+			Mop_State = EMop_State::Clear_Done;
+			break;
+
+		case EMop_State::Showing:
+			Mop_State = EMop_State::Show_Done;
+			break;
+
+		default:
+			AsConfig::Throw();
+		}
 	}
 
 	for (auto *indicator : Mop_Indicators)
@@ -92,7 +111,7 @@ void AsMop::Clear(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect{};
 
-	if (!Acting)
+	if (Mop_State == EMop_State::Idle)
 		return;
 
 	if (!IntersectRect(&intersection_rect, &paint_area, &Mop_Rect))
@@ -106,7 +125,7 @@ void AsMop::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Draw(HDC hdc, RECT &paint_area)
 {
-	if (!Acting)
+	if (Mop_State == EMop_State::Idle)
 		return;
 
 	AsTools::Rect(hdc, AsConfig::Level_X_Offset, Y_Pos, Width, Height, AsConfig::Red_Color);
@@ -123,11 +142,17 @@ bool AsMop::Is_Finished()
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsMop::Erase_Level()
+void AsMop::Activate(bool is_cleaning)
 {
+	if (is_cleaning)
+	{
+		Y_Pos = 172;
+		Mop_State = EMop_State::Clearing;
+	}
+	else
+		Mop_State = EMop_State::Showing;
+
 	Start_Tick = AsConfig::Current_Timer_Tick;
-	Y_Pos = 172;
-	Acting = true;
 
 	Set_Mop();
 }
@@ -162,7 +187,7 @@ void AsMop::Clear_Area(HDC hdc)
 	RECT rect = Mop_Rect;
 	rect.bottom = AsConfig::Max_Y_Pos * scale_;
 
-	if (!Acting)
+	if (Mop_State == EMop_State::Idle)
 		return;
 
 	AsTools::Rect(hdc, rect, AsConfig::BG_Color);
