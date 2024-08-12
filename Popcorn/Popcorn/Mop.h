@@ -11,7 +11,12 @@ enum class EMop_State : unsigned char
 	Clearing,
 	Clear_Done,
 	Showing,
-	Show_Done
+	Show_Done,
+
+	Ascending,
+	Ascend_Done,
+	Descending,
+	Descend_Done
 };
 //------------------------------------------------------------------------------------------------------------
 class AsMop : public AGame_Object
@@ -38,7 +43,11 @@ public:
 	
 
 private:
-	int Y_Pos;
+	int Get_Cylinders_Height();
+
+
+	int Y_Pos, Max_Y_Pos;
+	int Lifting_Height;
 	int Start_Tick;
 	RECT Mop_Rect, Prev_Mop_Rect;
 	EMop_State Mop_State;

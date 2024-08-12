@@ -14,7 +14,7 @@ AsMop::~AsMop()
 	Mop_Cylinders.erase(Mop_Cylinders.begin(), Mop_Cylinders.end());
 }
 //------------------------------------------------------------------------------------------------------------
-AsMop::AsMop() : Y_Pos(0), Start_Tick(0), Mop_Rect{}, Prev_Mop_Rect{}, Mop_State(EMop_State::Idle)
+AsMop::AsMop() : Y_Pos(0), Max_Y_Pos(0), Lifting_Height(0), Start_Tick(0), Mop_Rect{}, Prev_Mop_Rect{}, Mop_State(EMop_State::Idle)
 {
 	AMop_Indicator *indicator = nullptr;
 	AMop_Cylinder *cylinder = nullptr;
@@ -66,10 +66,15 @@ void AsMop::Act()
 
 	Prev_Mop_Rect = Mop_Rect;
 
-	if ( ! (Mop_State == EMop_State::Clearing or Mop_State == EMop_State::Showing) )
+	if ( Mop_State == EMop_State::Idle or Mop_State == EMop_State::Descend_Done)
 		return;
 
 	time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
+
+	if (Mop_State == EMop_State::Ascending)
+	{
+
+	}
 
 	if (time_offset <= Expansion_Timeout)
 	{
@@ -147,7 +152,10 @@ void AsMop::Activate(bool is_cleaning)
 	if (is_cleaning)
 	{
 		Y_Pos = 172;
-		Mop_State = EMop_State::Clearing;
+		Mop_State = EMop_State::Ascending;
+
+		Lifting_Height = Get_Cylinders_Height() + Height;
+		Max_Y_Pos = AsConfig::Max_Y_Pos + Lifting_Height;
 	}
 	else
 		Mop_State = EMop_State::Showing;
@@ -159,13 +167,9 @@ void AsMop::Activate(bool is_cleaning)
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Set_Mop()
 {
-	int total_cylinders_height = 0;
 	int current_y_pos = 0;
 
-	for (auto *cylinder : Mop_Cylinders)
-		total_cylinders_height += cylinder->Get_Height();
-
-	Y_Pos = AsConfig::Max_Y_Pos - total_cylinders_height - Height + 1;
+	Y_Pos = Max_Y_Pos - Get_Cylinders_Height() - Height + 1;
 
 	for (auto *indicator : Mop_Indicators)
 		indicator->Set_Y_Pos(Y_Pos + 1);
@@ -191,5 +195,16 @@ void AsMop::Clear_Area(HDC hdc)
 		return;
 
 	AsTools::Rect(hdc, rect, AsConfig::BG_Color);
+}
+//------------------------------------------------------------------------------------------------------------
+int AsMop::Get_Cylinders_Height()
+{
+	int total_cylinders_height = 0;
+
+
+	for (auto *cylinder : Mop_Cylinders)
+		total_cylinders_height += cylinder->Get_Height();
+
+	return total_cylinders_height;
 }
 //------------------------------------------------------------------------------------------------------------
