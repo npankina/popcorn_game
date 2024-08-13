@@ -14,7 +14,8 @@ AsMop::~AsMop()
 	Mop_Cylinders.erase(Mop_Cylinders.begin(), Mop_Cylinders.end());
 }
 //------------------------------------------------------------------------------------------------------------
-AsMop::AsMop() : Y_Pos(0), Max_Y_Pos(0), Lifting_Height(0), Start_Tick(0), Mop_Rect{}, Prev_Mop_Rect{}, Mop_State(EMop_State::Idle)
+AsMop::AsMop()
+: Y_Pos(0), Max_Y_Pos(0), Lifting_Height(0), Start_Tick(0), Mop_State(EMop_State::Idle), Mop_Rect{}, Prev_Mop_Rect{}
 {
 	AMop_Indicator *indicator = nullptr;
 	AMop_Cylinder *cylinder = nullptr;
@@ -66,45 +67,79 @@ void AsMop::Act()
 
 	Prev_Mop_Rect = Mop_Rect;
 
-	if ( Mop_State == EMop_State::Idle or Mop_State == EMop_State::Descend_Done)
+	if (Mop_State == EMop_State::Idle or Mop_State == EMop_State::Descend_Done)
 		return;
 
-	time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
 
 	if (Mop_State == EMop_State::Ascending)
 	{
+		time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
 
-	}
-
-	if (time_offset <= Expansion_Timeout)
-	{
-		ratio = (double)time_offset / (double)Expansion_Timeout;
-
-		if (Mop_State == EMop_State::Showing)
-			ratio = 1.0 - ratio;
-
-		for (auto *cylinder : Mop_Cylinders)
-			cylinder->Set_Height_For(ratio); // увеличить высоту цилиндра
-
-		Set_Mop();
-	}
-	else
-	{
-		switch (Mop_State)
+		if (time_offset <= Lifting_Timeout)
 		{
-		case EMop_State::Clearing:
-			Mop_State = EMop_State::Clear_Done;
-			break;
+			ratio = 1.0 - (double)time_offset / (double)Lifting_Timeout;
+			Max_Y_Pos = AsConfig::Max_Y_Pos + (int)((double)Lifting_Height * ratio);
 
-		case EMop_State::Showing:
-			Mop_State = EMop_State::Show_Done;
-			break;
+			Set_Mop();
+		}
+		else
+		{
+			Mop_State = EMop_State::Clearing;
+			Start_Tick = AsConfig::Current_Timer_Tick;
+		}
+	}
+	else if (Mop_State == EMop_State::Descending)
+	{
+		time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
 
-		default:
-			AsConfig::Throw();
+		if (time_offset <= Lifting_Timeout)
+		{
+			ratio = (double)time_offset / (double)Lifting_Timeout;
+			Max_Y_Pos = AsConfig::Max_Y_Pos + (int)((double)Lifting_Height * ratio);
+
+			Set_Mop();
+		}
+		else
+			Mop_State = EMop_State::Descend_Done;
+	}
+
+
+	if (Mop_State == EMop_State::Clearing or Mop_State == EMop_State::Showing)
+	{
+		time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
+
+		if (time_offset <= Expansion_Timeout)
+		{
+			ratio = (double)time_offset / (double)Expansion_Timeout;
+
+			if (Mop_State == EMop_State::Showing)
+				ratio = 1.0 - ratio;
+
+			for (auto *cylinder : Mop_Cylinders)
+				cylinder->Set_Height_For(ratio); // увеличить высоту цилиндра
+
+			Set_Mop();
+		}
+		else
+		{
+			switch (Mop_State)
+			{
+			case EMop_State::Clearing:
+				Mop_State = EMop_State::Clear_Done;
+				break;
+
+			case EMop_State::Showing:
+				Mop_State = EMop_State::Descending;
+				Start_Tick = AsConfig::Current_Timer_Tick;
+				break;
+
+			default:
+				AsConfig::Throw();
+			}
 		}
 	}
 
+	// перемигивание индикаторов
 	for (auto *indicator : Mop_Indicators)
 		indicator->Act();
 

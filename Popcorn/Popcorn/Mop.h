@@ -11,10 +11,8 @@ enum class EMop_State : unsigned char
 	Clearing,
 	Clear_Done,
 	Showing,
-	Show_Done,
-
+	
 	Ascending,
-	Ascend_Done,
 	Descending,
 	Descend_Done
 };
@@ -58,5 +56,6 @@ private:
 	static const int Height = AsConfig::Brick_Height;
 	static const int Indicator_Count = 10;
 	static const int Expansion_Timeout = AsConfig::FPS * 2;
+	static const int Lifting_Timeout = AsConfig::FPS;
 	static const int scale_ = AsConfig::Global_Scale;
 };
