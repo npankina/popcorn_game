@@ -60,52 +60,59 @@ double AsMop::Get_Speed()
 	return 0.0;
 }
 //------------------------------------------------------------------------------------------------------------
+void AsMop::Act_Lifting(bool is_lift_up)
+{
+	double ratio;
+	int time_offset;
+
+	time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
+
+	if (time_offset <= Lifting_Timeout)
+	{
+		ratio = (double)time_offset / (double)Lifting_Timeout;
+
+		if (is_lift_up)
+			ratio = 1.0 - ratio;
+		
+		Max_Y_Pos = AsConfig::Max_Y_Pos + (int)((double)Lifting_Height * ratio);
+		Set_Mop();
+	}
+	else
+	{
+		if (is_lift_up)
+		{
+			Mop_State = EMop_State::Clearing;
+			Start_Tick = AsConfig::Current_Timer_Tick;
+		}
+		else
+			Mop_State = EMop_State::Descend_Done;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
 void AsMop::Act()
 {
 	int time_offset;
 	double ratio;
 
-	Prev_Mop_Rect = Mop_Rect;
-
 	if (Mop_State == EMop_State::Idle or Mop_State == EMop_State::Descend_Done)
 		return;
 
+	Prev_Mop_Rect = Mop_Rect;
 
-	if (Mop_State == EMop_State::Ascending)
+	switch (Mop_State)
 	{
-		time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
-
-		if (time_offset <= Lifting_Timeout)
-		{
-			ratio = 1.0 - (double)time_offset / (double)Lifting_Timeout;
-			Max_Y_Pos = AsConfig::Max_Y_Pos + (int)((double)Lifting_Height * ratio);
-
-			Set_Mop();
-		}
-		else
-		{
-			Mop_State = EMop_State::Clearing;
-			Start_Tick = AsConfig::Current_Timer_Tick;
-		}
-	}
-	else if (Mop_State == EMop_State::Descending)
-	{
-		time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
-
-		if (time_offset <= Lifting_Timeout)
-		{
-			ratio = (double)time_offset / (double)Lifting_Timeout;
-			Max_Y_Pos = AsConfig::Max_Y_Pos + (int)((double)Lifting_Height * ratio);
-
-			Set_Mop();
-		}
-		else
-			Mop_State = EMop_State::Descend_Done;
-	}
+	case EMop_State::Ascending: // Поднимаем сложенную швабру
+		Act_Lifting(true);
+		break;
 
 
-	if (Mop_State == EMop_State::Clearing or Mop_State == EMop_State::Showing)
-	{
+	case EMop_State::Descending: // Опускаем швабру
+		Act_Lifting(false);
+		break;
+
+
+	case EMop_State::Clearing:
+	case EMop_State::Showing:
 		time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
 
 		if (time_offset <= Expansion_Timeout)
@@ -137,8 +144,14 @@ void AsMop::Act()
 				AsConfig::Throw();
 			}
 		}
+		break;
+
+
+	default:
+		AsConfig::Throw();
 	}
 
+	
 	// перемигивание индикаторов
 	for (auto *indicator : Mop_Indicators)
 		indicator->Act();

@@ -42,6 +42,7 @@ public:
 
 private:
 	int Get_Cylinders_Height();
+	void Act_Lifting(bool is_lift_up);
 
 
 	int Y_Pos, Max_Y_Pos;
