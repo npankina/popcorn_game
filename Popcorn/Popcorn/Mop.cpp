@@ -45,9 +45,7 @@ AsMop::AsMop()
 }
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Begin_Movement()
-{
-
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Finish_Movement()
 {}
@@ -94,10 +92,11 @@ void AsMop::Act()
 	int time_offset;
 	double ratio;
 
-	if (Mop_State == EMop_State::Idle or Mop_State == EMop_State::Descend_Done)
+	if (Mop_State == EMop_State::Idle or Mop_State == EMop_State::Descend_Done or Mop_State == EMop_State::Clear_Done)
 		return;
 
 	Prev_Mop_Rect = Mop_Rect;
+	time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
 
 	switch (Mop_State)
 	{
@@ -112,7 +111,26 @@ void AsMop::Act()
 
 
 	case EMop_State::Clearing:
+		if (time_offset > Expansion_Timeout)
+			Mop_State = EMop_State::Clear_Done;
+		break;
+
+
 	case EMop_State::Showing:
+		if (time_offset > Expansion_Timeout)
+		{
+			Mop_State = EMop_State::Descending;
+			Start_Tick = AsConfig::Current_Timer_Tick;
+		}
+		break;
+
+
+	default:
+		AsConfig::Throw();
+	}
+
+	if (Mop_State == EMop_State::Clearing or Mop_State == EMop_State::Showing)
+	{
 		time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
 
 		if (time_offset <= Expansion_Timeout)
@@ -127,30 +145,7 @@ void AsMop::Act()
 
 			Set_Mop();
 		}
-		else
-		{
-			switch (Mop_State)
-			{
-			case EMop_State::Clearing:
-				Mop_State = EMop_State::Clear_Done;
-				break;
-
-			case EMop_State::Showing:
-				Mop_State = EMop_State::Descending;
-				Start_Tick = AsConfig::Current_Timer_Tick;
-				break;
-
-			default:
-				AsConfig::Throw();
-			}
-		}
-		break;
-
-
-	default:
-		AsConfig::Throw();
 	}
-
 	
 	// перемигивание индикаторов
 	for (auto *indicator : Mop_Indicators)
@@ -167,7 +162,7 @@ void AsMop::Clear(HDC hdc, RECT &paint_area)
 	if (Mop_State == EMop_State::Idle)
 		return;
 
-	if (!IntersectRect(&intersection_rect, &paint_area, &Mop_Rect))
+	if (! IntersectRect(&intersection_rect, &paint_area, &Prev_Mop_Rect))
 		return;
 
 	AsTools::Rect(hdc, Prev_Mop_Rect, AsConfig::BG_Color);
@@ -222,7 +217,7 @@ void AsMop::Set_Mop()
 	for (auto *indicator : Mop_Indicators)
 		indicator->Set_Y_Pos(Y_Pos + 1);
 
-	for (int i = 0; i < Mop_Cylinders.size(); i++)
+	for (int i = 0; i < (int)Mop_Cylinders.size(); i++)
 	{
 		Mop_Cylinders[i]->Set_Y_Pos(Y_Pos + Height + current_y_pos);
 		current_y_pos += Mop_Cylinders[i]->Get_Height();
@@ -248,7 +243,6 @@ void AsMop::Clear_Area(HDC hdc)
 int AsMop::Get_Cylinders_Height()
 {
 	int total_cylinders_height = 0;
-
 
 	for (auto *cylinder : Mop_Cylinders)
 		total_cylinders_height += cylinder->Get_Height();

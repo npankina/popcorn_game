@@ -78,5 +78,6 @@ private:
 	AsMop Mop; // Швабра для очистки уровня
 
 	static AsLevel *Level;
+	static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------

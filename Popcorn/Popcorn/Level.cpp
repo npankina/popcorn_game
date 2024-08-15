@@ -229,10 +229,10 @@ void AsLevel::Init()
 {
 	ALevel_Data *level_data = nullptr;
 
-	Level_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
-	Level_Rect.top = AsConfig::Level_Y_Offset * AsConfig::Global_Scale;
-	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width * AsConfig::Global_Scale;
-	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height * AsConfig::Global_Scale;
+	Level_Rect.left = AsConfig::Level_X_Offset * scale_;
+	Level_Rect.top = AsConfig::Level_Y_Offset * scale_;
+	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width * scale_;
+	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height * scale_;
 
 	memset(Current_Level, 0, sizeof(Current_Level) );
 
@@ -247,8 +247,6 @@ void AsLevel::Init()
 		if (i == 9)
 			level_data->Advertisement = new AAdvertisement(1, 9, 2, 3);
 	}
-
-	//Mop.Erase_Level();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Set_Current_Level(int level_number)

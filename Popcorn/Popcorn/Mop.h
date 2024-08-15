@@ -38,7 +38,7 @@ public:
 	void Set_Mop();
 	void Clear_Area(HDC hdc);
 	EMop_State Get_State() { return Mop_State;  }
-	
+
 
 private:
 	int Get_Cylinders_Height();

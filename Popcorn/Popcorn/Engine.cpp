@@ -22,9 +22,9 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Level.Init();
 	Platform.Init(&Ball_Set, &Laser_Beam_Set);
 	Monster_Set.Init(&Border);
-
-	AFalling_Letter::Init();
 	Info_Panel.Init();
+
+	AFalling_Letter::Init();	
 
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Level);
@@ -36,7 +36,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	AsPlatform::Hit_Checker_List.Add_Hit_Checker(&Monster_Set);
 
-	Level.Set_Current_Level(1); // уровень игры
+	//Level.Set_Current_Level(1); // уровень игры
 
 	Platform.Redraw_Platform();
 
