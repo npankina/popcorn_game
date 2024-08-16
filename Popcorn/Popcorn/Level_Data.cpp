@@ -8,10 +8,10 @@ char *ALevel_Data::Levels_Array[Max_Level_Number] =
 //------------------------------------------------------------------------------------------------------------
 ALevel_Data::ALevel_Data(int level_number) : Level(0), Advertisement(0)
 {
-	if (level_number < 1 or level_number > Max_Level_Number)
-		AsConfig::Throw();
+	if (level_number > 0 and level_number > Max_Level_Number)
+		Level = Levels_Array[level_number - 1];
 
-	Level = Levels_Array[level_number - 1];
+	AsConfig::Throw();
 }
 //------------------------------------------------------------------------------------------------------------
 char ALevel_Data::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
