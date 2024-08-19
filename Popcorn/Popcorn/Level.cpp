@@ -10,7 +10,7 @@ AsLevel::~AsLevel()
 }
 //------------------------------------------------------------------------------------------------------------
 AsLevel::AsLevel()
-: Next_Level(0), Level_Rect{}, Current_Level{}, Need_To_Cancel_All(false),
+: Next_Level(0), Available_Bricks_Count(0), Level_Rect{}, Current_Level{}, Need_To_Cancel_All(false),
   Parachute_Color(AsConfig::Red_Color, AsConfig::Blue_Color, AsConfig::Global_Scale), Advertisement(0),
   Current_Brick_Left_X(0.0), Current_Brick_Right_X(0.0), Current_Brick_Top_Y(0.0), Current_Brick_Low_Y(0.0)
 {
@@ -279,6 +279,8 @@ void AsLevel::Set_Current_Level(int level_number)
 
 	if (Teleport_Bricks_Pos.size() == 1)
 		AsConfig::Throw(); // телепорт не может быть один, 0 or > 1
+
+	Available_Bricks_Count = level_data->Get_Available_Bricks_Count();
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_letter)

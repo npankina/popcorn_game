@@ -65,6 +65,7 @@ private:
 
 	RECT Level_Rect;
 	int Next_Level;
+	int Available_Bricks_Count;
 	bool Need_To_Cancel_All;
 	double Current_Brick_Left_X, Current_Brick_Right_X;
 	double Current_Brick_Top_Y, Current_Brick_Low_Y;
