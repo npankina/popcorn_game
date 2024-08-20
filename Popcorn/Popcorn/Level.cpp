@@ -10,7 +10,7 @@ AsLevel::~AsLevel()
 }
 //------------------------------------------------------------------------------------------------------------
 AsLevel::AsLevel()
-: Next_Level(0), Available_Bricks_Count(0), Level_Rect{}, Current_Level{}, Need_To_Cancel_All(false),
+: Next_Level_Number(0), Current_Level_Number(0), Available_Bricks_Count(0), Level_Rect{}, Current_Level{}, Need_To_Cancel_All(false),
   Parachute_Color(AsConfig::Red_Color, AsConfig::Blue_Color, AsConfig::Global_Scale), Advertisement(0),
   Current_Brick_Left_X(0.0), Current_Brick_Right_X(0.0), Current_Brick_Top_Y(0.0), Current_Brick_Low_Y(0.0)
 {
@@ -255,6 +255,8 @@ void AsLevel::Set_Current_Level(int level_number)
 	EBrick_Type brick_type;
 	ALevel_Data *level_data;
 
+	Current_Level_Number = level_number;
+
 	if (level_number < 1 or level_number >(int)Levels_Data.size() )
 		AsConfig::Throw();
 
@@ -304,9 +306,19 @@ void AsLevel::Mop_Level(int next_level)
 	if (next_level < 1 or next_level >= ALevel_Data::Max_Level_Number)
 		AsConfig::Throw();
 
-	Next_Level = next_level;
+	Next_Level_Number = next_level;
 
 	Mop.Activate(true);
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsLevel::Mop_Next_Level()
+{
+	if (Current_Level_Number + 1 > Levels_Data.size())
+		return false;
+
+	Mop_Level(Current_Level_Number);
+
+	return true;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Is_Level_Mopping_Done()
@@ -317,7 +329,7 @@ bool AsLevel::Is_Level_Mopping_Done()
 
 	if (Mop.Get_State() == EMop_State::Clear_Done)
 	{
-		Set_Current_Level(Next_Level);
+		Set_Current_Level(Next_Level_Number);
 		Mop.Activate(false);
 	}
 
@@ -407,7 +419,7 @@ bool AsLevel::Has_Brick_At(RECT &monster_rect)
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool vertical_hit)
 {
-	EBrick_Type brick_type;
+	EBrick_Type brick_type, new_brick;
 	bool can_reflect = true;
 
 	brick_type = (EBrick_Type)Current_Level[brick_y][brick_x];
@@ -431,6 +443,13 @@ bool AsLevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool vertical
 
 	Redraw_Brick(brick_x, brick_y);
 	AsInfo_Panel::Update_Score(EScore_Event_Type::Hit_Brick);
+
+	new_brick = (EBrick_Type)Current_Level[brick_y][brick_x];
+	if (new_brick == EBrick_Type::None)
+		--Available_Bricks_Count;
+
+	if (Available_Bricks_Count <= 0)
+		AsMessage_Manager::Add_Message(new AMessage(EMessage_Type::Level_Finished));
 
 	return can_reflect;
 }

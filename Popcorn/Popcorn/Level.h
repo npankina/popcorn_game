@@ -40,6 +40,7 @@ public:
 	bool Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_letter);
 	void Stop();
 	void Mop_Level(int number);
+	bool Mop_Next_Level();
 	bool Is_Level_Mopping_Done();
 
 	static bool Has_Brick_At(int x_pos, int y_pos);
@@ -61,10 +62,11 @@ private:
 	void Draw_Objects(HDC hdc, RECT &paint_area, std::vector<AGraphics_Object *> &obj, int objects_max_count);
 	void Act_Objects(std::vector<AGraphics_Object *> &obj);
 	void Cancel_All_Activity();
+	
 
 
 	RECT Level_Rect;
-	int Next_Level;
+	int Next_Level_Number, Current_Level_Number;
 	int Available_Bricks_Count;
 	bool Need_To_Cancel_All;
 	double Current_Brick_Left_X, Current_Brick_Right_X;
