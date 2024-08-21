@@ -324,10 +324,10 @@ bool AsLevel::Mop_Next_Level()
 bool AsLevel::Is_Level_Mopping_Done()
 {// Возврат: true / false - закончилась очистка уровня и вывод нового / еще нет
 
-	if (Mop.Get_State() == EMop_State::Descend_Done)
+	if (Mop.Is_Mopping_Done() )
 		return true;
 
-	if (Mop.Get_State() == EMop_State::Clear_Done)
+	if (Mop.Is_Cleaning_Done() )
 	{
 		Set_Current_Level(Next_Level_Number);
 		Mop.Activate(false);

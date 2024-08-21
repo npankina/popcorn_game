@@ -15,7 +15,8 @@ AsMop::~AsMop()
 }
 //------------------------------------------------------------------------------------------------------------
 AsMop::AsMop()
-: Y_Pos(0), Max_Y_Pos(0), Lifting_Height(0), Start_Tick(0), Mop_State(EMop_State::Idle), Mop_Rect{}, Prev_Mop_Rect{}
+: Y_Pos(0), Max_Y_Pos(0), Lifting_Height(0), Start_Tick(0), Mopping_Is_Done(false), 
+  Mop_State(EMop_State::Idle), Mop_Rect{}, Prev_Mop_Rect{}
 {
 	AMop_Indicator *indicator = nullptr;
 	AMop_Cylinder *cylinder = nullptr;
@@ -125,6 +126,12 @@ void AsMop::Act()
 		break;
 
 
+	case EMop_State::Descend_Done:
+		Mop_State = EMop_State::Idle;
+		Mopping_Is_Done = true;
+		break;
+
+
 	default:
 		AsConfig::Throw();
 	}
@@ -196,6 +203,7 @@ void AsMop::Activate(bool is_cleaning)
 	{
 		Y_Pos = 172;
 		Mop_State = EMop_State::Ascending;
+		Mopping_Is_Done = false;
 
 		Lifting_Height = Get_Cylinders_Height() + Height;
 		Max_Y_Pos = AsConfig::Max_Y_Pos + Lifting_Height;
@@ -238,6 +246,18 @@ void AsMop::Clear_Area(HDC hdc)
 		return;
 
 	AsTools::Rect(hdc, rect, AsConfig::BG_Color);
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsMop::Is_Mopping_Done()
+{
+	return Mopping_Is_Done;
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsMop::Is_Cleaning_Done()
+{
+	if (Mop_State == EMop_State::Clear_Done)
+		return true;
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 int AsMop::Get_Cylinders_Height()

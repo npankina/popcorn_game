@@ -37,7 +37,8 @@ public:
 	void Activate(bool is_cleaning);
 	void Set_Mop();
 	void Clear_Area(HDC hdc);
-	EMop_State Get_State() { return Mop_State;  }
+	bool Is_Mopping_Done();
+	bool Is_Cleaning_Done();
 
 
 private:
@@ -48,6 +49,7 @@ private:
 	int Y_Pos, Max_Y_Pos;
 	int Lifting_Height;
 	int Start_Tick;
+	bool Mopping_Is_Done;
 	RECT Mop_Rect, Prev_Mop_Rect;
 	EMop_State Mop_State;
 	std::vector<AMop_Indicator *> Mop_Indicators;
