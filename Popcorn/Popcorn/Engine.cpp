@@ -126,9 +126,19 @@ int AsEngine::On_Timer()
 			Monster_Set.Activate(5);
 		}
 		break;
+
+
+	case EGame_State::Finish_Level:
+		if (Monster_Set.Are_All_Destroyed())
+		{
+			Level.Mop_Next_Level();
+			Game_State = EGame_State::Mop_Level;
+		}
+		break;
+
 	}
 
-	Act();
+	Act(); 
 
 	return 0;
 }
@@ -256,15 +266,21 @@ void AsEngine::Handle_Message()
 			delete message;
 			break;
 
+
 		case EMessage_Type::Unfreeze_Monsters:
 			Monster_Set.Set_Freeze_State(false);
 			break;
 
+
 		case EMessage_Type::Level_Finished:
-			if (!Level.Mop_Next_Level())
+			if (!Level.Can_Mop_Next_Level())
 				Game_Won();
 			else
+			{
 				Stop_Play();
+				Ball_Set.Disable_All_Balls();
+				Game_State = EGame_State::Finish_Level;
+			}
 			break;
 
 		default:

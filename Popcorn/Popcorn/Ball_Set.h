@@ -19,6 +19,7 @@ public:
 	void Accelerate();
 	void Reset_Speed();
 	void On_Platform_Advance(double direction, double platform_speed, double max_speed);
+	void Disable_All_Balls();
 
 private:
 	virtual bool Get_Next_Game_Object(int &index, AGame_Object **game_obj); // iterator

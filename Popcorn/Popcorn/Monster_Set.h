@@ -29,6 +29,7 @@ public:
 	void Activate(int max_alive_monsters_count);
 	void Destroy_All();
 	void Set_Freeze_State(bool freeze);
+	bool Are_All_Destroyed();
 
 private:
 	bool Get_Next_Game_Object(int &index, AGame_Object **game_obj); // iterator

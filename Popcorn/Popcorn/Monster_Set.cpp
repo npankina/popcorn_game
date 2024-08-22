@@ -178,6 +178,13 @@ void AsMonster_Set::Set_Freeze_State(bool freeze)
 		item->Set_Freeze_State(freeze);
 }
 //------------------------------------------------------------------------------------------------------------
+bool AsMonster_Set::Are_All_Destroyed()
+{
+	if (Monsters.size() == 0)
+		return true;
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
 {
 	if (index < 0 or index >= Monsters.size() )

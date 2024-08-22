@@ -37,17 +37,15 @@ bool AsBall_Set::Release_Next_Ball()
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Set_On_Platform(double platform_x_pos)
 {
-	int i;
-
-	for ( i = 0; i < 1; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		Balls[i].Set_State(EBall_State::Normal);
 		Balls[i].Set_State(EBall_State::On_Platform, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
 		//Balls[i].Release_Timer_Tick = 0; // чтобы мячик не стартовал сам
 	}
 
-	for (; i < Balls.size(); i++)
-		Balls[i].Set_State(EBall_State::Disabled);
+	for (auto &ball : Balls)
+		ball.Set_State(EBall_State::Disabled);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsBall_Set::All_Balls_Are_Lost()
@@ -84,6 +82,18 @@ void AsBall_Set::Set_For_Test()
 bool AsBall_Set::Is_Test_Finished()
 {
 	return Balls[0].Is_Test_Finished();  // В повторяющихся тестах участвует только 0-й мячик
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBall_Set::Disable_All_Balls()
+{
+	for (auto &ball : Balls)
+	{
+		if (ball.Get_State() != EBall_State::Disabled)
+		{
+			ball.Set_State(EBall_State::Lost);
+			ball.Set_State(EBall_State::Disabled);
+		}
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Triple_Balls()
