@@ -1,10 +1,11 @@
 ﻿#pragma once
+
 #include "Falling_Letter.h"
 #include "Platform_Expanding.h"
 #include "Platform_Glue.h"
 #include "Platform_Laser.h"
 
-class AsPlatform: public AHit_Checker, public AGame_Object
+class AsPlatform : public AHit_Checker, public AGame_Object
 {
 public:
 	~AsPlatform();

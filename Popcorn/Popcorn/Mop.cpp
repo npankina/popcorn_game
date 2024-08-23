@@ -106,10 +106,6 @@ void AsMop::Act()
 		break;
 
 
-	case EMop_State::Descending: // Опускаем швабру
-		Act_Lifting(false);
-		break;
-
 
 	case EMop_State::Clearing:
 		if (time_offset > Expansion_Timeout)
@@ -123,6 +119,11 @@ void AsMop::Act()
 			Mop_State = EMop_State::Descending;
 			Start_Tick = AsConfig::Current_Timer_Tick;
 		}
+		break;
+
+
+	case EMop_State::Descending:
+		Act_Lifting(false);  // Опускаем сложенную швабру
 		break;
 
 

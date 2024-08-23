@@ -94,7 +94,7 @@ void ABall::Clear(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	if (Ball_State == EBall_State::Disabled)
+	if (Ball_State == EBall_State::Disabled and Prev_Ball_State != EBall_State::Lost)
 		return;
 
 	if ( (Ball_State == EBall_State::Teleporting or Ball_State == EBall_State::Lost) and Ball_State == Prev_Ball_State)
@@ -102,14 +102,10 @@ void ABall::Clear(HDC hdc, RECT &paint_area)
 
 	// 1. Очищаем фон
 	if (Ball_State == EBall_State::On_Parachute)
-		 Clear_Parachute(hdc);
+		Clear_Parachute(hdc);
 
-	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) ) 
-	// AsTools::Ellipse(hdc, Prev_Ball_Rect, AsConfig::BG_Color);
-	{
-		AsConfig::BG_Color.Select(hdc);
-		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
-	}
+	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) )
+		AsTools::Ellipse(hdc, Prev_Ball_Rect, AsConfig::BG_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Draw(HDC hdc, RECT &paint_area)
@@ -144,10 +140,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 
 	// 2. Рисуем шарик
 	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect) )
-	{
-		AsConfig::White_Color.Select(hdc);
-		Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right - 1, Ball_Rect.bottom - 1);
-	}
+		AsTools::Ellipse(hdc, Ball_Rect, AsConfig::White_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 bool ABall::Is_Finished()
@@ -441,10 +434,10 @@ void ABall::Release()
 //------------------------------------------------------------------------------------------------------------
 void ABall::Redraw_Ball()
 {
-	Ball_Rect.left = (int)((Center_X_Pos - AsConfig::Ball_Radius) * AsConfig::D_Global_Scale);
-	Ball_Rect.top = (int)((Center_Y_Pos - AsConfig::Ball_Radius) * AsConfig::D_Global_Scale);
-	Ball_Rect.right = (int)((Center_X_Pos + AsConfig::Ball_Radius) * AsConfig::D_Global_Scale);
-	Ball_Rect.bottom = (int)((Center_Y_Pos + AsConfig::Ball_Radius) * AsConfig::D_Global_Scale);
+	Ball_Rect.left = (int)( (Center_X_Pos - AsConfig::Ball_Radius) * AsConfig::D_Global_Scale);
+	Ball_Rect.top = (int)( (Center_Y_Pos - AsConfig::Ball_Radius) * AsConfig::D_Global_Scale);
+	Ball_Rect.right = (int)( (Center_X_Pos + AsConfig::Ball_Radius) * AsConfig::D_Global_Scale);
+	Ball_Rect.bottom = (int)( (Center_Y_Pos + AsConfig::Ball_Radius) * AsConfig::D_Global_Scale);
 
 	AsTools::Invalidate_Rect(Prev_Ball_Rect);
 	AsTools::Invalidate_Rect(Ball_Rect);
@@ -485,7 +478,7 @@ void ABall::Draw_Parachute(HDC hdc, RECT &paint_area)
 	sub_arc.right = sub_arc.left + 3 * scale;
 	sub_arc.bottom = sub_arc.top + 4 * scale;
 
-	Ellipse(hdc, sub_arc.left, sub_arc.top, sub_arc.right - 1, sub_arc.bottom - 1);
+	AsTools::Ellipse(hdc, sub_arc, AsConfig::BG_Color);
 
 	// 2.2. Средняя
 	other_arc = sub_arc;
@@ -493,7 +486,7 @@ void ABall::Draw_Parachute(HDC hdc, RECT &paint_area)
 	other_arc.left = arc_x + 3 * scale + 1;
 	other_arc.right = arc_x + 11 * scale;
 
-	Ellipse(hdc, other_arc.left, other_arc.top, other_arc.right - 1, other_arc.bottom - 1);
+	AsTools::Ellipse(hdc, other_arc, AsConfig::BG_Color);
 
 	// 2.3. Правая
 	other_arc = sub_arc;
@@ -501,7 +494,7 @@ void ABall::Draw_Parachute(HDC hdc, RECT &paint_area)
 	other_arc.left = arc_x + 11 * scale + 1;
 	other_arc.right = arc_x + 14 * scale + 1;
 
-	Ellipse(hdc, other_arc.left, other_arc.top, other_arc.right - 1, other_arc.bottom - 1);
+	AsTools::Ellipse(hdc, other_arc, AsConfig::BG_Color);
 
 	// 3. Стропы
 	line_y = Parachute_Rect.top + dome_height;

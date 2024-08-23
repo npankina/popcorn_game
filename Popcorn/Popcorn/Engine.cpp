@@ -24,7 +24,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Monster_Set.Init(&Border);
 	Info_Panel.Init();
 
-	AFalling_Letter::Init();	
+	AFalling_Letter::Init();
 
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Level);
@@ -51,7 +51,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Modules.push_back(&Monster_Set);
 	Modules.push_back(&Info_Panel);
 
-	Level.Mop_Level(1);
+	Level.Mop_Level(6);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
@@ -59,11 +59,11 @@ void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 
 	SetGraphicsMode(hdc, GM_ADVANCED);
 
-	for (auto *item : Modules)
-		item->Clear(hdc, paint_area);
+	for (auto *curr_module : Modules)
+		curr_module->Clear(hdc, paint_area);
 
-	for (auto *item : Modules)
-		item->Draw(hdc, paint_area);
+	for (auto *curr_module : Modules)
+		curr_module->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key(EKey_Type key_type, bool key_down)
@@ -112,9 +112,13 @@ int AsEngine::On_Timer()
 
 
 	case EGame_State::Lost_Ball:
-		if (Platform.Has_State(EPlatform_Substate_Regular::Missing))
-			if (! Restart_Level())
+		if (Platform.Has_State(EPlatform_Substate_Regular::Missing) )
+		{
+			if (!Info_Panel.Decrease_Life_Count()) // false - no restart
 				Game_Over();
+
+			Restart_Level();
+		}		
 		break;
 
 
@@ -143,15 +147,10 @@ int AsEngine::On_Timer()
 	return 0;
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsEngine::Restart_Level()
+void AsEngine::Restart_Level()
 {
-	if (!Info_Panel.Decrease_Life_Count()) // false - no restart
-		return false;
-
 	Game_State = EGame_State::Restart_Level;
 	Border.Open_Gate(7, true);
-
-	return true;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Game_Over()
@@ -172,8 +171,9 @@ void AsEngine::Play_Level()
 
 	if (Ball_Set.All_Balls_Are_Lost() )
 	{// Потеряли все мячики
-		Game_State = EGame_State::Lost_Ball;
+
 		Stop_Play();
+		Game_State = EGame_State::Lost_Ball;
 	}
 	else
 		Ball_Set.Accelerate();
@@ -188,7 +188,6 @@ void AsEngine::Stop_Play()
 	Monster_Set.Destroy_All();
 	Laser_Beam_Set.Disable_All();
 	Platform.Set_State(EPlatform_State::Meltdown);
-	//Info_Panel.Init();
 	Info_Panel.Floor_Indicator.Reset();
 	Info_Panel.Monster_Indicator.Reset();
 }
@@ -199,11 +198,11 @@ void AsEngine::Advance_Movers()
 	double curr_speed, max_speed = 0.0;
 
 	// 1. Получаем максимальную скорость движущихся объектов
-	for (auto *item : Modules)
+	for (auto *curr_module : Modules)
 	{
-		item->Begin_Movement(); // для всех объектов сначала вызываем начало движения
+		curr_module->Begin_Movement();
 
-		curr_speed = fabs(item->Get_Speed() );
+		curr_speed = fabs(curr_module->Get_Speed() );
 
 		if (curr_speed > max_speed)
 			max_speed = curr_speed;
@@ -215,17 +214,16 @@ void AsEngine::Advance_Movers()
 
 	while (Rest_Distance > 0.0)
 	{
-		for (auto *item : Modules)
-			item->Advance(max_speed); // смещаем все объекты
+		for (auto *curr_module : Modules)
+			curr_module->Advance(max_speed);
 
-		//Platform.Advance(max_speed);
 		Rest_Distance -= AsConfig::Moving_Step_Size;
 	}
 
 
 	// 3. Заканчиваем все движения на этом кадре
-	for (auto *item : Modules)
-		item->Finish_Movement(); // завершаем все движения
+	for (auto *curr_module : Modules)
+		curr_module->Finish_Movement();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Act()
@@ -233,20 +231,20 @@ void AsEngine::Act()
 	int index = 0;
 	AFalling_Letter *falling_letter;
 
-	// 1. Выолняем все действия для модулей игры
-	for (auto *item : Modules)
-			item->Act();
+	// 1. Выполняем все действия
+	for (auto *curr_module : Modules)
+		curr_module->Act();
 
 	// 2. Ловим падающие буквы
-	while (Level.Get_Next_Falling_Letter(index, &falling_letter) ) // обрабатывает перехват падающих букв
+	while (Level.Get_Next_Falling_Letter(index, &falling_letter) )
 	{
 		if (Platform.Hit_By(falling_letter) )
 			On_Falling_Letter(falling_letter);
 	}
 
-	// 3. Перезапуск уровня если надо
+	// 3. Рестарт уровня (если надо)
 	if (Game_State == EGame_State::Restart_Level)
-		if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) ) // 
+		if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) )
 			Platform.Set_State(EPlatform_State::Rolling);
 
 	Handle_Message();
@@ -256,7 +254,7 @@ void AsEngine::Handle_Message()
 {
 	AMessage *message;
 
-	if (AsMessage_Manager::Get_Message(&message))
+	if (AsMessage_Manager::Get_Message(&message) )
 	{
 		switch (message->Message_Type)
 		{
@@ -311,7 +309,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 
 	case ELetter_Type::M:  // "Монстры"
 		Monster_Set.Set_Freeze_State(true);
-		Info_Panel.Monster_Indicator.Restart();
+		Info_Panel.Monster_Indicator.Restart();  // Отобразить на индикаторе
 		break;
 
 	case ELetter_Type::G:  // "Жизнь"
@@ -339,7 +337,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	case ELetter_Type::P:  // "Пол"
 		AsConfig::Level_Has_Floor = true;
 		Border.Redraw_Floor();
-		Info_Panel.Floor_Indicator.Restart();
+		Info_Panel.Floor_Indicator.Restart();  // Отобразить на индикаторе
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 

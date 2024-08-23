@@ -10,13 +10,13 @@ AsPlatform::~AsPlatform()
 }
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-: X_Pos(AsConfig::Border_X_Offset), Left_Key_Down(false),
-  Right_Key_Down(false), Inner_Width(AsConfig::Platform_Normal_Inner_Width), Rolling_Step(0), Last_Redraw_Timer_Tick(0), Speed(0.0),
-  Ball_Set(0), Platform_Glue(Platform_State), Platform_Expanding(Platform_State), Platform_Laser(Platform_State), 
-  Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0), Normal_Platform_Image(0), Platform_Rect{}, 
-  Prev_Platform_Rect{}
+	: X_Pos(AsConfig::Border_X_Offset), Left_Key_Down(false),
+	Right_Key_Down(false), Inner_Width(AsConfig::Platform_Normal_Inner_Width), Rolling_Step(0), Last_Redraw_Timer_Tick(0), Speed(0.0),
+	Ball_Set(0), Platform_Glue(Platform_State), Platform_Expanding(Platform_State), Platform_Laser(Platform_State),
+	Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0), Normal_Platform_Image(0), Platform_Rect{},
+	Prev_Platform_Rect{}
 {
-	X_Pos = (double)(AsConfig::Max_X_Pos - AsConfig::Platform_Normal_Width) / 2.0;
+	X_Pos = (AsConfig::Max_X_Pos - AsConfig::Platform_Normal_Width) / 2;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
@@ -34,7 +34,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *b
 	inner_top_y = (double)(AsConfig::Platform_Y_Pos + 1);
 	inner_low_y = (double)(AsConfig::Platform_Y_Pos + AsConfig::Platform_Height - 1);
 	inner_left_x = (double)(X_Pos + AsConfig::Platform_Circle_Size - 1);
-	inner_right_x = (double)(X_Pos + Get_Current_Platform_Width() - (AsConfig::Platform_Circle_Size - 1) );
+	inner_right_x = (double)(X_Pos + Get_Current_Platform_Width() - (AsConfig::Platform_Circle_Size - 1));
 
 
 	// 1. Проверяем отражение от боковых шариков
@@ -42,23 +42,23 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *b
 	circle_x = (double)X_Pos + circle_radius;
 	circle_y = (double)AsConfig::Platform_Y_Pos + circle_radius;
 
-	if (AsTools::Reflect_On_Circle(next_x_pos, next_y_pos, circle_x, circle_y, circle_radius, ball) )
+	if (AsTools::Reflect_On_Circle(next_x_pos, next_y_pos, circle_x, circle_y, circle_radius, ball))
 		goto _on_hit;  // От левого
 
 
 	circle_x += Get_Current_Platform_Width() - AsConfig::Platform_Circle_Size;
 
 
-	if (AsTools::Reflect_On_Circle(next_x_pos, next_y_pos, circle_x, circle_y, circle_radius, ball) )
+	if (AsTools::Reflect_On_Circle(next_x_pos, next_y_pos, circle_x, circle_y, circle_radius, ball))
 		goto _on_hit;  // От правого
 
 	// 2. Проверяем отражение от центральной части платформы
-	if (ball->Is_Moving_Up() )
+	if (ball->Is_Moving_Up())
 		inner_y = inner_low_y;  // От нижней грани
 	else
 		inner_y = inner_top_y;  // От верхней грани
 
-	if (Hit_Circle_On_Line(next_y_pos - inner_y, next_x_pos, inner_left_x, inner_right_x, AsConfig::Ball_Radius, reflection_pos) )
+	if (Hit_Circle_On_Line(next_y_pos - inner_y, next_x_pos, inner_left_x, inner_right_x, AsConfig::Ball_Radius, reflection_pos))
 	{
 		ball->Reflect(true);
 		goto _on_hit;
@@ -105,15 +105,15 @@ void AsPlatform::Advance(double max_speed)
 	X_Pos += next_step;
 
 	//--- если коррекция произведена остановить платформу и обнулить скорость
-	if (Correct_Platform_Pos() )
+	if (Correct_Platform_Pos())
 	{
 		Speed = 0.0;
 		Platform_State.Moving = EPlatform_Moving_State::Stopping;
 	}
 
 	// Смещаем приклеенные мячики
-	if ( (Platform_State == EPlatform_State::Regular and Platform_State.Regular == EPlatform_Substate_Regular::Ready)
-		or (Platform_State == EPlatform_State::Glue and Platform_State.Glue == EPlatform_Transformation::Active) )
+	if ((Platform_State == EPlatform_State::Regular and Platform_State.Regular == EPlatform_Substate_Regular::Ready)
+		or (Platform_State == EPlatform_State::Glue and Platform_State.Glue == EPlatform_Transformation::Active))
 	{
 		if (Platform_State.Moving == EPlatform_Moving_State::Moving_Left)
 			Ball_Set->On_Platform_Advance(M_PI, fabs(Speed), max_speed);
@@ -149,7 +149,7 @@ void AsPlatform::Act()
 
 
 	case EPlatform_State::Glue:
-		if (Platform_Glue.Act(Ball_Set, next_state) )
+		if (Platform_Glue.Act(Ball_Set, next_state))
 			Redraw_Platform();
 
 		if (next_state != EPlatform_State::Unknown)
@@ -158,7 +158,7 @@ void AsPlatform::Act()
 
 
 	case EPlatform_State::Laser:
-		if (Platform_Laser.Act(next_state, X_Pos) )
+		if (Platform_Laser.Act(next_state, X_Pos))
 			Redraw_Platform();
 
 		if (next_state != EPlatform_State::Unknown)
@@ -167,7 +167,7 @@ void AsPlatform::Act()
 
 
 	case EPlatform_State::Expanding:
-		if (Platform_Expanding.Act(X_Pos, next_state, correct_pos) )
+		if (Platform_Expanding.Act(X_Pos, next_state, correct_pos))
 			Redraw_Platform();
 
 		if (correct_pos)
@@ -183,7 +183,7 @@ void AsPlatform::Clear(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	if (! IntersectRect(&intersection_rect, &paint_area, &Prev_Platform_Rect) )
+	if (!IntersectRect(&intersection_rect, &paint_area, &Prev_Platform_Rect))
 		return;
 
 	switch (Platform_State)
@@ -198,7 +198,7 @@ void AsPlatform::Clear(HDC hdc, RECT &paint_area)
 	case EPlatform_State::Meltdown:
 	case EPlatform_State::Rolling:
 	case EPlatform_State::Glue:
-	case EPlatform_State::Laser:	
+	case EPlatform_State::Laser:
 	case EPlatform_State::Expanding:
 		// Очищаем фоном прежнее место
 		AsConfig::BG_Color.Select(hdc);
@@ -211,7 +211,7 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 
 	RECT intersection_rect;
 
-	if (! IntersectRect(&intersection_rect, &paint_area, &Platform_Rect) )
+	if (!IntersectRect(&intersection_rect, &paint_area, &Platform_Rect))
 		return;
 
 	switch (Platform_State)
@@ -299,7 +299,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 
 
 	case EPlatform_State::Glue:
-		if ( Set_Transformation_State(new_state, Platform_State.Glue) )
+		if (Set_Transformation_State(new_state, Platform_State.Glue))
 			return;
 		else
 		{
@@ -307,10 +307,10 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 			Platform_Glue.Reset();
 		}
 		break;
-		
+
 
 	case EPlatform_State::Laser:
-		if ( Set_Transformation_State(new_state, Platform_State.Laser) )
+		if (Set_Transformation_State(new_state, Platform_State.Laser))
 			return;
 		else
 		{
@@ -320,7 +320,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		break;
 
 	case EPlatform_State::Expanding:
-		if ( Set_Transformation_State(new_state, Platform_State.Expanding) )
+		if (Set_Transformation_State(new_state, Platform_State.Expanding))
 			return;
 		else
 		{
@@ -409,7 +409,7 @@ void AsPlatform::Redraw_Platform()
 
 	Platform_Rect.left = (int)(X_Pos * AsConfig::D_Global_Scale);
 	Platform_Rect.top = AsConfig::Platform_Y_Pos * AsConfig::Global_Scale;
-	Platform_Rect.right = (int)( (X_Pos + Get_Current_Platform_Width() ) * AsConfig::D_Global_Scale);
+	Platform_Rect.right = (int)((X_Pos + Get_Current_Platform_Width()) * AsConfig::D_Global_Scale);
 	Platform_Rect.bottom = Platform_Rect.top + AsConfig::Platform_Height * AsConfig::Global_Scale;
 
 	if (Platform_State == EPlatform_State::Meltdown)
@@ -421,8 +421,8 @@ void AsPlatform::Redraw_Platform()
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Move(bool to_left, bool key_down)
 {
-	if (! (Has_State(EPlatform_Substate_Regular::Normal) or Platform_State == EPlatform_State::Glue 
-		or Platform_State == EPlatform_State::Expanding or Platform_State == EPlatform_State::Laser) )
+	if (!(Has_State(EPlatform_Substate_Regular::Normal) or Platform_State == EPlatform_State::Glue
+		or Platform_State == EPlatform_State::Expanding or Platform_State == EPlatform_State::Laser))
 		return;
 
 	if (to_left)
@@ -433,7 +433,7 @@ void AsPlatform::Move(bool to_left, bool key_down)
 	if (Left_Key_Down and Right_Key_Down)
 		return;  // Игнорируем одновременное нажатие двух клавиш
 
-	if (! Left_Key_Down and ! Right_Key_Down)
+	if (!Left_Key_Down and !Right_Key_Down)
 	{
 		Speed = 0.0;
 		Platform_State.Moving = EPlatform_Moving_State::Stopping;
@@ -455,11 +455,11 @@ void AsPlatform::Move(bool to_left, bool key_down)
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::On_Space_Key(bool key_down)
 {
-	if (Has_State(EPlatform_Substate_Regular::Ready) )
+	if (Has_State(EPlatform_Substate_Regular::Ready))
 	{
-		if (! key_down)
+		if (!key_down)
 		{
-			Ball_Set->Release_From_Platform(Get_Middle_Pos() );
+			Ball_Set->Release_From_Platform(Get_Middle_Pos());
 			Set_State(EPlatform_Substate_Regular::Normal);
 		}
 	}
@@ -467,7 +467,7 @@ void AsPlatform::On_Space_Key(bool key_down)
 	{
 		if (Platform_State == EPlatform_State::Glue)
 		{
-			if (! key_down)
+			if (!key_down)
 				Ball_Set->Release_Next_Ball();
 		}
 
@@ -482,7 +482,7 @@ bool AsPlatform::Hit_By(AFalling_Letter *falling_letter)
 
 	falling_letter->Get_Letter_Cell(falling_letter_rect);
 
-	if (IntersectRect(&intersection_rect, &falling_letter_rect, &Platform_Rect) )
+	if (IntersectRect(&intersection_rect, &falling_letter_rect, &Platform_Rect))
 		return true;
 	else
 		return false;
@@ -496,7 +496,7 @@ double AsPlatform::Get_Middle_Pos()
 bool AsPlatform::Set_Transformation_State(EPlatform_State new_state, EPlatform_Transformation &transformation_state)
 {
 	if (Platform_State != EPlatform_State::Regular)
-	{ 
+	{
 		Platform_State.Set_Next_State(new_state);
 		return true;
 	}
@@ -577,15 +577,13 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 
 	rect.left = (int)(x * d_scale);
 	rect.top = y * scale;
-	rect.right = (int)( (x + (double)AsConfig::Platform_Circle_Size) * d_scale);
+	rect.right = (int)((x + (double)AsConfig::Platform_Circle_Size) * d_scale);
 	rect.bottom = (y + AsConfig::Platform_Circle_Size) * scale;
 
 	Ellipse(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 
 	rect.left = (int)( (x + Inner_Width) * d_scale);
-	rect.top = y * scale;
 	rect.right = (int)( (x + (double)AsConfig::Platform_Circle_Size + Inner_Width) * d_scale);
-	rect.bottom = (y + AsConfig::Platform_Circle_Size) * scale;
 
 	Ellipse(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 
@@ -595,14 +593,14 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	// 3. Рисуем среднюю часть
 	AsConfig::Platform_Inner_Color.Select(hdc);
 
-	inner_rect.left = (int)( (x + 4) * d_scale);
+	inner_rect.left = (int)((x + 4) * d_scale);
 	inner_rect.top = (y + 1) * scale;
-	inner_rect.right = (int)( (x + 4 + Inner_Width - 1) * d_scale);
+	inner_rect.right = (int)((x + 4 + Inner_Width - 1) * d_scale);
 	inner_rect.bottom = (y + 1 + 5) * scale;
 
 	AsTools::Round_Rect(hdc, inner_rect, 3);
 
-	if (Normal_Platform_Image == 0 and Has_State(EPlatform_Substate_Regular::Ready) )
+	if (Normal_Platform_Image == 0 and Has_State(EPlatform_Substate_Regular::Ready))
 		Get_Normal_Platform_Image(hdc);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -655,7 +653,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 		MoveToEx(hdc, x, y, 0);
 
 		// Рисуем последовательность вертикальных штрихов разного цвета (согласно прообразу, сохранённому в Normal_Platform_Image)
-		while (Get_Platform_Image_Stroke_Color(i, j, &color, stroke_len) )
+		while (Get_Platform_Image_Stroke_Color(i, j, &color, stroke_len))
 		{
 			color->Select_Pen(hdc);
 			LineTo(hdc, x, y + stroke_len);
@@ -761,13 +759,13 @@ bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, const AColor **co
 		offset += Normal_Platform_Image_Width;  // Переходим на строку ниже
 	}
 
-	if (color_value == AsConfig::Highlight_Color.Get_RGB() )
+	if (color_value == AsConfig::Highlight_Color.Get_RGB())
 		*color = &AsConfig::Highlight_Color;
-	else if (color_value == AsConfig::Platform_Circle_Color.Get_RGB() )
+	else if (color_value == AsConfig::Platform_Circle_Color.Get_RGB())
 		*color = &AsConfig::Platform_Circle_Color;
-	else if (color_value == AsConfig::Platform_Inner_Color.Get_RGB() )
+	else if (color_value == AsConfig::Platform_Inner_Color.Get_RGB())
 		*color = &AsConfig::Platform_Inner_Color;
-	else if (color_value == AsConfig::BG_Color.Get_RGB() )
+	else if (color_value == AsConfig::BG_Color.Get_RGB())
 		*color = &AsConfig::BG_Color;
 	else
 		AsConfig::Throw();

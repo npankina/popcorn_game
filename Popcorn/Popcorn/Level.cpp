@@ -2,7 +2,7 @@
 
 
 // AsLevel
-AsLevel *AsLevel::Level = nullptr;
+AsLevel *AsLevel::Level = 0;
 //------------------------------------------------------------------------------------------------------------
 AsLevel::~AsLevel()
 {
@@ -11,8 +11,8 @@ AsLevel::~AsLevel()
 //------------------------------------------------------------------------------------------------------------
 AsLevel::AsLevel()
 : Next_Level_Number(0), Current_Level_Number(0), Available_Bricks_Count(0), Level_Rect{}, Current_Level{}, Need_To_Cancel_All(false),
-  Parachute_Color(AsConfig::Red_Color, AsConfig::Blue_Color, AsConfig::Global_Scale), Advertisement(0),
-  Current_Brick_Left_X(0.0), Current_Brick_Right_X(0.0), Current_Brick_Top_Y(0.0), Current_Brick_Low_Y(0.0)
+  Parachute_Color(AsConfig::Red_Color, AsConfig::Blue_Color, AsConfig::Global_Scale), Advertisement(0)
+ // Current_Brick_Left_X(0.0), Current_Brick_Right_X(0.0), Current_Brick_Top_Y(0.0), Current_Brick_Low_Y(0.0)
 {
 	Level = this;
 }
@@ -313,18 +313,18 @@ void AsLevel::Mop_Level(int next_level)
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Mop_Next_Level()
 {
-	if (!Can_Mop_Next_Level())
+	if (! Can_Mop_Next_Level() )
 		AsConfig::Throw();
 
-	Mop_Level(Current_Level_Number);
+	Mop_Level(Current_Level_Number + 1);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Can_Mop_Next_Level()
 {
-	if (Current_Level_Number + 1 <= Levels_Data.size())
+	if (Current_Level_Number + 1 <= (int)Levels_Data.size() )
 		return true;
-
-	return false;
+	else
+		return false;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Is_Level_Mopping_Done()
@@ -362,29 +362,23 @@ bool AsLevel::Has_Brick_At(int level_x_pos, int level_y_pos)
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Has_Brick_At(RECT &monster_rect)
 {
-	const int scale = AsConfig::Global_Scale;
-	int x_step = AsConfig::Cell_Width * scale;
-	int y_step = AsConfig::Cell_Height * scale;
-	int level_y_offset = AsConfig::Level_Y_Offset * scale;
-	int level_x_offset = AsConfig::Level_X_Offset * scale;
+	int i, j;
+	int level_x_offs = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
+	int level_y_offs = AsConfig::Level_Y_Offset * AsConfig::Global_Scale;
+	int x_step = AsConfig::Cell_Width * AsConfig::Global_Scale;
+	int y_step = AsConfig::Cell_Height * AsConfig::Global_Scale;
 	int min_level_x, max_level_x;
 	int min_level_y, max_level_y;
-	int max_cell_y, max_cell_x;
-	int brick_size_height = AsConfig::Cell_Height * scale;
-	int brick_size_width = AsConfig::Cell_Width * scale;
-	int max_y_all_bricks_in_level = level_y_offset + ((AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height) * AsConfig::Global_Scale;
-	int max_brick_width;
-	int max_brick_height;
+	int max_cell_x, max_cell_y;
 
-
-	if (monster_rect.top > max_y_all_bricks_in_level)
+	if (monster_rect.top > level_y_offs + ( (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height) * AsConfig::Global_Scale)
 		return false;
 
-	min_level_x = (monster_rect.left - level_x_offset) / x_step;
-	max_level_x = (monster_rect.right - level_x_offset) / x_step;
+	min_level_x = (monster_rect.left - level_x_offs) / x_step;
+	max_level_x = (monster_rect.right - level_x_offs) / x_step;
 
-	min_level_y = (monster_rect.top - level_y_offset) / y_step;
-	max_level_y = (monster_rect.bottom - level_y_offset) / y_step;
+	min_level_y = (monster_rect.top - level_y_offs) / y_step;
+	max_level_y = (monster_rect.bottom - level_y_offs) / y_step;
 
 	if (min_level_x >= AsConfig::Level_Width)
 		min_level_x = AsConfig::Level_Width - 1;
@@ -399,26 +393,26 @@ bool AsLevel::Has_Brick_At(RECT &monster_rect)
 	if (max_level_y >= AsConfig::Level_Height)
 		max_level_y = AsConfig::Level_Height - 1;
 
-	// Так как ячейка уровня больше кирпича, хотя и начинается в одинаковых координатах,
-	// то она имеет пустую полосу правую и нижнюю, в которой может находиться монстр
-	// Игнорируем ряд (или столбец) кирпичей, если монстр попал в ячейку, но не попал в кирпич.
+	// Т.к. ячейка уровня больше кипича (хотя и начинается в одинаковых с кирпичом координатах),
+	// то она имеет правую и нижнюю пустую полосу, в которой может находиться монстр.
+	// Игнорируем ряд (или столбец) кирпичей, если монстр попал в ячейку но не попал в кирпич.
+	for (i = min_level_y; i <= max_level_y; i++)
+		for (j = min_level_x; j <= max_level_x; j++)
+		{
+			max_cell_x = j * y_step + level_x_offs;
+			max_cell_y = i * y_step + level_y_offs;
 
-	max_cell_y = min_level_y * y_step + level_y_offset;
-	max_cell_x = min_level_x * y_step + level_x_offset;
+			if (monster_rect.left > max_cell_x + AsConfig::Brick_Width * AsConfig::Global_Scale
+				&& monster_rect.left < max_cell_x + x_step)
+				continue;
 
-	max_brick_width = max_cell_x + AsConfig::Brick_Width * scale;
-	max_brick_height = max_cell_y + AsConfig::Brick_Height * scale;
+			if (monster_rect.top > max_cell_y + AsConfig::Brick_Height * AsConfig::Global_Scale
+				&& monster_rect.top < max_cell_y + y_step)
+				continue;
 
-	if (monster_rect.left > max_brick_width and monster_rect.left < max_cell_x + x_step)
-		--max_level_x; // исключить из проверки ряд кирпичей
-
-	if (monster_rect.top > max_brick_height and monster_rect.top < max_cell_y + y_step)
-		--min_level_y;
-
-	for (int i = min_level_y; i <= max_level_y; i++)
-		for (int j = min_level_x; j <= max_level_x; j++)
-			if (Has_Brick_At(j, i))
+			if (Has_Brick_At(j, i) )
 				return true;
+		}
 
 	return false;
 }
@@ -427,13 +421,14 @@ bool AsLevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool vertical
 {
 	EBrick_Type brick_type, new_brick;
 	bool can_reflect = true;
+	AMessage *message;
 
 	brick_type = (EBrick_Type)Current_Level[brick_y][brick_x];
 
 	if (ball == 0 and brick_type == EBrick_Type::Parachute)
 	{
 		brick_type = EBrick_Type::Red;
-		Current_Level[brick_y][brick_x] = (char)EBrick_Type::Red;
+		Current_Level[brick_y][brick_x] = (char)brick_type;
 	}
 
 	if (brick_type == EBrick_Type::Parachute)
@@ -448,14 +443,19 @@ bool AsLevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool vertical
 		can_reflect = Create_Active_Brick(brick_x, brick_y, brick_type, ball, vertical_hit);
 
 	Redraw_Brick(brick_x, brick_y);
+
 	AsInfo_Panel::Update_Score(EScore_Event_Type::Hit_Brick);
 
 	new_brick = (EBrick_Type)Current_Level[brick_y][brick_x];
+
 	if (new_brick == EBrick_Type::None)
 		--Available_Bricks_Count;
 
 	if (Available_Bricks_Count <= 0)
-		AsMessage_Manager::Add_Message(new AMessage(EMessage_Type::Level_Finished));
+	{
+		message = new AMessage(EMessage_Type::Level_Finished);
+		AsMessage_Manager::Add_Message(message);
+	}
 
 	return can_reflect;
 }
@@ -491,8 +491,6 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 
 	letter_x = (brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset) * AsConfig::Global_Scale;
 	letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
-
-	//letter_type = ELetter_Type::G;
 
 	switch(AsTools::Rand(8))
 	{
@@ -531,6 +529,7 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 
 	falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);
 	Falling_Letters.push_back(falling_letter);
+	
 	return true;
 
 }
@@ -566,7 +565,7 @@ bool AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_ty
 	case EBrick_Type::Multihit_2:
 	case EBrick_Type::Multihit_3:
 	case EBrick_Type::Multihit_4:
-		Current_Level[brick_y][brick_x] = (int)brick_type - 1;
+		Current_Level[brick_y][brick_x] = (char)brick_type - 1;
 		break;
 
 	case EBrick_Type::Parachute:
@@ -692,7 +691,7 @@ AActive_Brick_Teleport *AsLevel::Select_Destination_Teleport(int source_x, int s
 		return 0;
 	}
 
-	dest_index = AsTools::Rand((int)Teleport_Bricks_Pos.size() );
+	dest_index = AsTools::Rand(Teleport_Bricks_Pos.size() );
 
 	if (Teleport_Bricks_Pos[dest_index].X == source_x and Teleport_Bricks_Pos[dest_index].Y == source_y)
 	{// Если случайно выбрали текущий телепорт - переходим к следующему

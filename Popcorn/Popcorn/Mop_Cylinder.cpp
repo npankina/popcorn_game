@@ -24,7 +24,8 @@ void AMop_Cylinder::Draw(HDC hdc, RECT &paint_area)
 	RECT rect{};
 	RECT intersection_rect{};
 
-	if (!IntersectRect(&intersection_rect, &paint_area, &Cylinder_Rect));
+	if (!IntersectRect(&intersection_rect, &paint_area, &Cylinder_Rect))
+		return;
 
 	rect.left = X_Pos * scale_;
 	rect.top = Y_Pos * scale_;

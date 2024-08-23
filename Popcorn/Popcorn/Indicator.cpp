@@ -53,7 +53,7 @@ void AIndicator::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AIndicator::Is_Finished()
 {
-	AMessage *message;
+	//AMessage *message;
 
 	if (AsConfig::Current_Timer_Tick > End_Tick)
 	{

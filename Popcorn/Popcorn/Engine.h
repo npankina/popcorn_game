@@ -5,27 +5,24 @@
 #include "Ball_Set.h"
 #include "Monster_Set.h"
 #include "Info_Panel.h"
-#include <vector>
-#include <iterator>
 
-
-enum class EKey_Type : unsigned char
+//------------------------------------------------------------------------------------------------------------
+enum class EKey_Type: unsigned char
 {
 	Left,
 	Right,
 	Space
 };
 //------------------------------------------------------------------------------------------------------------
-enum class EGame_State : unsigned char
+enum class EGame_State: unsigned char
 {
 	Test_Ball,
 
 	Mop_Level,
-	Finish_Level,
-
 	Play_Level,
 	Lost_Ball,
-	Restart_Level
+	Restart_Level,
+	Finish_Level
 };
 //------------------------------------------------------------------------------------------------------------
 class AsEngine
@@ -34,24 +31,22 @@ public:
 	AsEngine();
 
 	void Init_Engine(HWND hwnd);
-	void Draw_Frame(HDC hdc, RECT& paint_area);
+	void Draw_Frame(HDC hdc, RECT &paint_area);
 	int On_Key(EKey_Type key_type, bool key_down);
 	int On_Timer();
 
 	const int Timer_ID;
 
-
 private:
-	bool Restart_Level();
+	void Restart_Level();
 	void Play_Level();
 	void Stop_Play();
 	void Game_Over();
 	void Game_Won();
 	void Advance_Movers();
 	void Act();
-	void On_Falling_Letter(AFalling_Letter* falling_letter);
 	void Handle_Message();
-	
+	void On_Falling_Letter(AFalling_Letter *falling_letter);
 
 	EGame_State Game_State;
 	double Rest_Distance;
@@ -66,3 +61,4 @@ private:
 
 	std::vector<AGame_Object *> Modules; // UNO; Главные графические объекты игры
 };
+//------------------------------------------------------------------------------------------------------------

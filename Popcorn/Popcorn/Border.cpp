@@ -43,7 +43,7 @@ void AsBorder::Open_Gate(int gate_index, bool short_open)
 	if (gate_index != Gates.size() - 1 and short_open)
 		AsConfig::Throw(); // самый последний гейт может открываться только short_open, т.е. мячик может выкатываться только из правого нижнего гейта
 	
-	if (gate_index >= 0 and gate_index < Gates.size() )
+	if (gate_index >= 0 and gate_index < (int)Gates.size() )
 		Gates[gate_index]->Open_Gate(short_open);
 	else
 		AsConfig::Throw();
@@ -57,12 +57,12 @@ int AsBorder::Long_Open_Gate()
 
 	gate_index = AsTools::Rand( (int)Gates.size() );
 
-	for (int i = 0; i < Gates.size(); i++)
+	for (int i = 0; i < (int)Gates.size(); i++)
 	{
-		if (gate_index != Gates.size() ) // Гейт, из которого выкатывается платформа не выпускает монстров!!
-		{
+		gate = Gates[gate_index];
 
-			gate = Gates[gate_index];
+		if (gate_index != Gates.size() - 1) // Гейт, из которого выкатывается платформа не выпускает монстров!!
+		{
 			if (gate->Is_Closed()) // проверяем доступность гейта для выхода монстра
 			{
 				if (gate->Level_X_Pos == -1)
@@ -89,6 +89,7 @@ int AsBorder::Long_Open_Gate()
 		AsConfig::Throw(); // гейт не был найден
 
 	Open_Gate(gate_index, false);
+
 	return gate_index;
 }
 //------------------------------------------------------------------------------------------------------------
@@ -166,7 +167,7 @@ void AsBorder::Clear(HDC hdc, RECT &paint_area)
 	RECT intersection_rect;
 
 	// 1. Стираем гейты
-	for (auto &gate : Gates)
+	for (auto *gate : Gates)
 		gate->Clear(hdc, paint_area);
 
 	// 2. Стираем пол (если надо)
@@ -201,7 +202,7 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 		Draw_Floor(hdc, paint_area);
 
 	// 5. Гейты
-	for (auto &gate : Gates)
+	for (auto *gate : Gates)
 		gate->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------

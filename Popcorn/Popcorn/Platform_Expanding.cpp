@@ -66,7 +66,7 @@ void AsPlatform_Expanding::Draw_State(HDC hdc, double x)
 	const double d_scale = AsConfig::D_Global_Scale;
 	RECT inner_rect{};
 
-	inner_rect.left = (int)( (x + (Expanding_Platform_Width - (double)Expanding_Platform_Inner_Width) / 2.0) * d_scale);
+	inner_rect.left = (int)((x + (Expanding_Platform_Width - (double)Expanding_Platform_Inner_Width) / 2.0) * d_scale);
 	inner_rect.top = (y + 1) * scale;
 	inner_rect.right = inner_rect.left + Expanding_Platform_Inner_Width * scale;
 	inner_rect.bottom = (y + 1 + 5) * scale;
@@ -121,7 +121,7 @@ void AsPlatform_Expanding::Draw_Expanding_Platform_Ball(HDC hdc, double x, bool 
 	if (is_left)
 		rect.left = (int)(x * d_scale);
 	else
-		rect.left = (int)( (x + Expanding_Platform_Width - (double)AsConfig::Platform_Circle_Size) * d_scale);
+		rect.left = (int)((x + Expanding_Platform_Width - (double)AsConfig::Platform_Circle_Size) * d_scale);
 
 	rect.top = y * scale;
 	rect.right = rect.left + AsConfig::Platform_Circle_Size * scale;
@@ -170,7 +170,7 @@ void AsPlatform_Expanding::Draw_Expanding_Platform_Ball(HDC hdc, double x, bool 
 
 	// 1.4.2. Сама дуга
 	AsConfig::Truss_Color.Select(hdc);
-	Arc(hdc, arc_rect.left, arc_rect.top, arc_rect.right - 1, arc_rect.bottom - 1,  arc_mid_x, arc_start_y, arc_mid_x, arc_end_y);
+	Arc(hdc, arc_rect.left, arc_rect.top, arc_rect.right - 1, arc_rect.bottom - 1, arc_mid_x, arc_start_y, arc_mid_x, arc_end_y);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform_Expanding::Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left)
