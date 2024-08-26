@@ -5,8 +5,17 @@ const double AsPlatform_Expanding::Min_Expanding_Platform_Width = (double)AsConf
 const double AsPlatform_Expanding::Expanding_Platform_Width_Step = 1.0;
 //------------------------------------------------------------------------------------------------------------
 AsPlatform_Expanding::AsPlatform_Expanding(AsPlatform_State &platform_state)
-	: Platform_State(&platform_state), Expanding_Platform_Width(0.0)
+: Platform_State(&platform_state), Expanding_Platform_Width(0.0)
 {}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform_Expanding::Init(AColor &highlight_color, AColor &circle_color, AColor &inner_color)
+{
+	Highlight_Color = &highlight_color;
+	Circle_Color = &circle_color;
+	Inner_Color = &inner_color;
+
+	Truss_Color = new AColor(inner_color, AsConfig::Global_Scale);
+}
 //------------------------------------------------------------------------------------------------------------
 bool AsPlatform_Expanding::Act(double &x_pos, EPlatform_State &next_state, bool &correct_pos)
 {

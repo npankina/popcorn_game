@@ -36,8 +36,6 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	AsPlatform::Hit_Checker_List.Add_Hit_Checker(&Monster_Set);
 
-	//Level.Set_Current_Level(1); // уровень игры
-
 	Platform.Redraw_Platform();
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
@@ -133,7 +131,7 @@ int AsEngine::On_Timer()
 
 
 	case EGame_State::Finish_Level:
-		if (Monster_Set.Are_All_Destroyed())
+		if (Monster_Set.Are_All_Destroyed() and Platform.Has_State(EPlatform_Substate_Regular::Missing) )
 		{
 			Level.Mop_Next_Level();
 			Game_State = EGame_State::Mop_Level;
@@ -150,6 +148,7 @@ int AsEngine::On_Timer()
 void AsEngine::Restart_Level()
 {
 	Game_State = EGame_State::Restart_Level;
+	Level.Show_Title();
 	Border.Open_Gate(7, true);
 }
 //------------------------------------------------------------------------------------------------------------

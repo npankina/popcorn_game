@@ -68,6 +68,7 @@ private:
 	int Meltdown_Platform_Y_Pos[AsConfig::Platform_Normal_Width * AsConfig::Global_Scale];
 
 	RECT Platform_Rect, Prev_Platform_Rect;
+	AColor Highlight_Color, Platform_Circle_Color, Platform_Inner_Color;
 
 	static const int Meltdown_Speed = 3;
 	static const int Max_Rolling_Step = 16;

@@ -111,8 +111,7 @@ bool AGate::Is_Closed()
 {
 	if (Gate_State == EGate_State::Closed)
 		return true;
-	else
-		return false;
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AGate::Get_Y_Size(int &gate_top_y, int &gate_low_y)

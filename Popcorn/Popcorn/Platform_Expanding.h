@@ -19,6 +19,8 @@ private:
 	void Draw_Expanding_Truss(HDC hdc, RECT &inner_rect, bool is_left);
 
 	AsPlatform_State *Platform_State;
+	AColor *Highlight_Color, *Circle_Color, *Inner_Color;  // UNO
+	AColor *Truss_Color;
 
 	static const int Expanding_Platform_Inner_Width = 12;
 	static const double Max_Expanding_Platform_Width, Min_Expanding_Platform_Width, Expanding_Platform_Width_Step;

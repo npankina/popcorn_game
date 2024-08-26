@@ -103,8 +103,6 @@ EPlatform_State AsPlatform_State::Set_State(EPlatform_Substate_Regular new_regul
 		{
 			if (*transformation_state == EPlatform_Transformation::Unknown)	
 				return Set_Next_Or_Regular_State(new_regular_state);
-			/*if (next_state != EPlatform_State::Unknown)
-			Set_State(next_state);*/
 			else
 				*transformation_state = EPlatform_Transformation::Finalize;
 

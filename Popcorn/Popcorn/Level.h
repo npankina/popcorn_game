@@ -16,6 +16,24 @@ public:
 	int X, Y;
 };
 //------------------------------------------------------------------------------------------------------------
+class AsLevel_Title : public AGraphics_Object
+{
+public:
+	AsLevel_Title();
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+	void Show(int level_number);
+	void Hide();
+
+private:
+	bool Is_Visible;
+	AString Level_Name, Level_Number;
+};
+//------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object
 {
 public:
@@ -43,6 +61,9 @@ public:
 	void Mop_Next_Level();
 	bool Can_Mop_Next_Level();
 	bool Is_Level_Mopping_Done();
+	void Show_Title();
+	void Hide_Title();
+
 
 	static bool Has_Brick_At(int x_pos, int y_pos);
 	static bool Has_Brick_At(RECT &monster_rect);
@@ -80,6 +101,7 @@ private:
 	std::vector<AGraphics_Object *> Falling_Letters;
 	std::vector<ALevel_Data *> Levels_Data;
 	AsMop Mop; // Швабра для очистки уровня
+	AsLevel_Title Level_Title; // табличка с номером уровня
 
 	static AsLevel *Level;
 	static const int scale_ = AsConfig::Global_Scale;
