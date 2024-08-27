@@ -1,7 +1,53 @@
 ﻿#include "Info_Panel.h"
 
+// class ALabel
 //------------------------------------------------------------------------------------------------------------
+ALabel::ALabel(int x, int y, int width, int height)
+: X_Pos(x), Y_Pos(y), Width(width), Height(height), Font(0), Content_Rect{}
+{
+	Content_Rect.left = X_Pos * scale_;
+	Content_Rect.top = Y_Pos * scale_;
+	Content_Rect.right = Content_Rect.left + Width * scale_;
+	Content_Rect.bottom = Content_Rect.top + Height * scale_;
+}
+//------------------------------------------------------------------------------------------------------------
+void ALabel::Draw(HDC hdc)
+{
+	int str_left_offset, str_top_offset;
+	const int scale = AsConfig::Global_Scale;
+	SIZE str_size;
+
+	// 1. Выводим строку
+	SelectObject(hdc, Font);
+
+	SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
+
+	GetTextExtentPoint32(hdc, Content.Get_Content(), Content.Get_Length(), &str_size);
+
+	str_left_offset = Content_Rect.left + (Content_Rect.right - Content_Rect.left) / 2 - str_size.cx / 2;
+	str_top_offset = Content_Rect.top + (Content_Rect.bottom - Content_Rect.top) / 2 - str_size.cy / 2 - scale;
+
+	// 2.1. Вывод тени
+	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
+	TextOut(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, Content.Get_Content(), Content.Get_Length());
+
+	// 2.2. Вывод строки
+	SetTextColor(hdc, AsConfig::Blue_Color.Get_RGB());
+
+	TextOut(hdc, str_left_offset, str_top_offset, Content.Get_Content(), Content.Get_Length());
+}
+//------------------------------------------------------------------------------------------------------------
+void ALabel::Set_Content(AString cont)
+{
+	Content = cont;
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
 // class AsInfo_Panel
+//------------------------------------------------------------------------------------------------------------
 int AsInfo_Panel::Current_Score = 0;
 RECT AsInfo_Panel::Logo_Rect;
 RECT AsInfo_Panel::Data_Rect;
@@ -29,7 +75,8 @@ AsInfo_Panel::AsInfo_Panel()
   Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 153 * AsConfig::Global_Scale),
   Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale), 
   Floor_Indicator(EMessage_Type::Floor_Is_Over, Score_X + 8, Score_Y + Indicator_Y_Offset), 
-  Monster_Indicator(EMessage_Type::Unfreeze_Monsters, Score_X + 90, Score_Y + Indicator_Y_Offset)
+  Monster_Indicator(EMessage_Type::Unfreeze_Monsters, Score_X + 90, Score_Y + Indicator_Y_Offset),
+  Player_Name_Label(Score_X + 5, Score_Y + 5, Score_Width - 2 * 5, 16)
 {
 	const int scale = AsConfig::Global_Scale;
 
@@ -47,6 +94,7 @@ AsInfo_Panel::AsInfo_Panel()
 	Letter_P.Show_Full_Size();
 	Letter_G.Show_Full_Size();
 	Letter_M.Show_Full_Size();
+	
 }
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Begin_Movement() // Заглушка, не используется.
@@ -136,8 +184,13 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		rect.right = rect.left + (Score_Width - 2 * 5) * scale;
 		rect.bottom = rect.top + 16 * scale;
 
-		Player_Name = L"Computer";
-		Draw_String(hdc, rect, Player_Name, true);
+		AsTools::Rect(hdc, rect, AsConfig::Red_Color);
+
+
+		Player_Name_Label.Set_Content(L"COMPUTER");
+		Player_Name_Label.Draw(hdc);
+		//Draw_String(hdc, rect, Player_Name, true);
+
 
 		// 3. Считаем очки
 		//AsTools::Rect(hdc, Score_X + 5, Score_Y + 27, Score_Width - 2 * 5, 16, AsConfig::Red_Color);
@@ -272,7 +325,7 @@ void AsInfo_Panel::Init()
 	wcscpy_s(log_font.lfFaceName, L"Consolas");
 
 	log_font.lfHeight = -46;
-	Player_Name_Font = CreateFontIndirect(&log_font);
+	Player_Name_Label.Font = CreateFontIndirect(&log_font);
 
 	// Установка шрифта для счета
 	log_font.lfHeight = -44;

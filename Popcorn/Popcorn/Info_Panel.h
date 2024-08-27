@@ -1,6 +1,25 @@
-﻿#pragma once
+﻿
+#pragma once
 #include "Indicator.h"
 
+//------------------------------------------------------------------------------------------------------------
+class ALabel
+{
+public:
+	ALabel(int x, int y, int width, int height);
+	void Draw(HDC hdc);
+	void Set_Content(AString cont);
+
+	HFONT Font;
+
+private:
+	int X_Pos, Y_Pos;
+	int Width, Height;
+	AString Content;
+	RECT Content_Rect;
+
+	static const int scale_ = AsConfig::Global_Scale;
+};
 //------------------------------------------------------------------------------------------------------------
 class AsInfo_Panel : public AGame_Object
 {
@@ -35,7 +54,8 @@ private:
 	HFONT Logo_Pop_Font, Logo_Corn_Font, Player_Name_Font, Score_Font;
 	AColor *Dark_Blue;
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
-	AString Player_Name;
+	//AString Player_Name;
+	ALabel Player_Name_Label;
 	int Extra_Lives_Count;
 
 	static RECT Logo_Rect, Data_Rect; // Область данных на инфо панели под логотипом, необходимы для перерисовки экрана
