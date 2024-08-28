@@ -6,17 +6,16 @@
 class ALabel
 {
 public:
-	ALabel(int x, int y, int width, int height);
+	ALabel(int x, int y, int width, int height, const AFont &font);
 	void Draw(HDC hdc);
 	void Set_Content(AString cont);
-
-	HFONT Font;
-
+	
 private:
 	int X_Pos, Y_Pos;
 	int Width, Height;
 	AString Content;
 	RECT Content_Rect;
+	const AFont &Font;
 
 	static const int scale_ = AsConfig::Global_Scale;
 };
@@ -70,5 +69,7 @@ private:
 	static const int Shadow_X_Offset = 5;
 	static const int Shadow_Y_Offset = 5;
 	static const int Indicator_Y_Offset = 55;
+
+	static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------

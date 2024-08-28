@@ -1,7 +1,44 @@
 ﻿#include "Config.h"
 
+// class AFont
+//------------------------------------------------------------------------------------------------------------
+AFont::~AFont()
+{
+	if (Font_Handle != 0)
+		DeleteObject(Font_Handle);
+}
+//------------------------------------------------------------------------------------------------------------
+AFont::AFont(int height, int weight, int family, const wchar_t *face_name)
+{
+	LOGFONT log_font{};
+
+	log_font.lfHeight = height;
+	log_font.lfWeight = weight;
+	log_font.lfOutPrecision = 3;
+	log_font.lfClipPrecision = 2;
+	log_font.lfQuality = 1;
+	log_font.lfPitchAndFamily = family;
+	wcscpy_s(log_font.lfFaceName, face_name);
+
+	Font_Handle = CreateFontIndirect(&log_font);
+}
+//------------------------------------------------------------------------------------------------------------
+void AFont::Select(HDC hdc) const
+{
+	SelectObject(hdc, Font_Handle);
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
+// class AsConfig
+//------------------------------------------------------------------------------------------------------------
 bool AsConfig::Level_Has_Floor = false; // включение - отключение пол в игре
 int AsConfig::Current_Timer_Tick = 0;
+HWND AsConfig::Hwnd;
+
+const AFont AsConfig::Name_Font(-48, 700, 49, L"Consolas");
 
 const AColor AsConfig::BG_Color(6, 30, 82);
 const AColor AsConfig::Red_Color(230, 25, 229);
@@ -29,9 +66,6 @@ const AColor AsConfig::Explosion_Blue_Color(White_Color, Blue_Color, 0);
 const AColor AsConfig::Monster_Comet_Tail(230, 25, 229, Global_Scale);
 const AColor AsConfig::Shadow_Color(BG_Color, Global_Scale);
 const AColor AsConfig::Highlight_Panel_Color(White_Color, Global_Scale);
-
-
-HWND AsConfig::Hwnd;
 
 const double AsConfig::D_Global_Scale = (double)Global_Scale;
 const double AsConfig::Moving_Step_Size = 1.0 / Global_Scale;

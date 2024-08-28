@@ -2,8 +2,8 @@
 
 // class ALabel
 //------------------------------------------------------------------------------------------------------------
-ALabel::ALabel(int x, int y, int width, int height)
-: X_Pos(x), Y_Pos(y), Width(width), Height(height), Font(0), Content_Rect{}
+ALabel::ALabel(int x, int y, int width, int height, const AFont &font)
+: X_Pos(x), Y_Pos(y), Width(width), Height(height), Font(font), Content_Rect{}
 {
 	Content_Rect.left = X_Pos * scale_;
 	Content_Rect.top = Y_Pos * scale_;
@@ -18,7 +18,7 @@ void ALabel::Draw(HDC hdc)
 	SIZE str_size;
 
 	// 1. Выводим строку
-	SelectObject(hdc, Font);
+	Font.Select(hdc);
 
 	SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
 
@@ -46,6 +46,7 @@ void ALabel::Set_Content(AString cont)
 
 
 
+
 // class AsInfo_Panel
 //------------------------------------------------------------------------------------------------------------
 int AsInfo_Panel::Current_Score = 0;
@@ -62,9 +63,6 @@ AsInfo_Panel::~AsInfo_Panel()
 	if (Logo_Corn_Font != 0)
 		DeleteObject(Logo_Corn_Font);
 
-	if (Player_Name_Font != 0)
-		DeleteObject(Player_Name_Font);
-
 	if (Score_Font != 0)
 		DeleteObject(Score_Font);
 }
@@ -76,7 +74,7 @@ AsInfo_Panel::AsInfo_Panel()
   Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale), 
   Floor_Indicator(EMessage_Type::Floor_Is_Over, Score_X + 8, Score_Y + Indicator_Y_Offset), 
   Monster_Indicator(EMessage_Type::Unfreeze_Monsters, Score_X + 90, Score_Y + Indicator_Y_Offset),
-  Player_Name_Label(Score_X + 5, Score_Y + 5, Score_Width - 2 * 5, 16)
+  Player_Name_Label(Score_X + 5, Score_Y + 5, Score_Width - 2 * 5, 16, AsConfig::Name_Font)
 {
 	const int scale = AsConfig::Global_Scale;
 
@@ -127,7 +125,6 @@ void AsInfo_Panel::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 {
-	const int scale = AsConfig::Global_Scale;
 	const wchar_t *pop_str = L"POP"; // задаем строку в 2 байта
 	const wchar_t *corn_str = L"CORN";
 	AString score_str = L"SCORE:";
@@ -144,16 +141,16 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		// 1.1. "POP"
 		SelectObject(hdc, Logo_Pop_Font);
 		SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
-		TextOut(hdc, (Logo_X_Pos + Shadow_X_Offset) * scale, (Logo_Y_Pos + Shadow_Y_Offset) * scale, pop_str, wcslen(pop_str)); // shadow
+		TextOut(hdc, (Logo_X_Pos + Shadow_X_Offset) * scale_, (Logo_Y_Pos + Shadow_Y_Offset) * scale_, pop_str, wcslen(pop_str)); // shadow
 		SetTextColor(hdc, AsConfig::Red_Color.Get_RGB());
-		TextOut(hdc, Logo_X_Pos * scale, Logo_Y_Pos * scale, pop_str, 3); // main letters
+		TextOut(hdc, Logo_X_Pos * scale_, Logo_Y_Pos * scale_, pop_str, 3); // main letters
 
 		// 1.2. "CORN"
 		SelectObject(hdc, Logo_Corn_Font);
 		SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
-		TextOut(hdc, (Logo_X_Pos + Shadow_X_Offset - 5) * scale, (Logo_Y_Pos + Shadow_Y_Offset + 44) * scale, corn_str, 4); // shadow
+		TextOut(hdc, (Logo_X_Pos + Shadow_X_Offset - 5) * scale_, (Logo_Y_Pos + Shadow_Y_Offset + 44) * scale_, corn_str, 4); // shadow
 		SetTextColor(hdc, AsConfig::Red_Color.Get_RGB());
-		TextOut(hdc, (Logo_X_Pos - 5) * scale, (Logo_Y_Pos + 44) * scale, corn_str, wcslen(corn_str)); // main letters
+		TextOut(hdc, (Logo_X_Pos - 5) * scale_, (Logo_Y_Pos + 44) * scale_, corn_str, wcslen(corn_str)); // main letters
 	}
 
 	// 2. Таблица счета
@@ -169,20 +166,20 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 
 		// 2.2. Бордюр
 		AsConfig::Highlight_Panel_Color.Select_Pen(hdc);
-		MoveToEx(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale, 0);
-		LineTo(hdc, (Score_X + 2) * scale, (Score_Y + 2) * scale);
-		LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale);
+		MoveToEx(hdc, (Score_X + 2) * scale_, (Score_Y + Score_Height - 2) * scale_, 0);
+		LineTo(hdc, (Score_X + 2) * scale_, (Score_Y + 2) * scale_);
+		LineTo(hdc, (Score_X + Score_Width - 2) * scale_, (Score_Y + 2) * scale_);
 
 		AsConfig::Shadow_Color.Select_Pen(hdc);
-		MoveToEx(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale, 0);
-		LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + Score_Height - 2) * scale);
-		LineTo(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale);
+		MoveToEx(hdc, (Score_X + Score_Width - 2) * scale_, (Score_Y + 2) * scale_, 0);
+		LineTo(hdc, (Score_X + Score_Width - 2) * scale_, (Score_Y + Score_Height - 2) * scale_);
+		LineTo(hdc, (Score_X + 2) * scale_, (Score_Y + Score_Height - 2) * scale_);
 
 		// 2.3. Имя игрока
-		rect.left = (Score_X + 5) * scale;
-		rect.top = (Score_Y + 5) * scale;
-		rect.right = rect.left + (Score_Width - 2 * 5) * scale;
-		rect.bottom = rect.top + 16 * scale;
+		rect.left = (Score_X + 5) * scale_;
+		rect.top = (Score_Y + 5) * scale_;
+		rect.right = rect.left + (Score_Width - 2 * 5) * scale_;
+		rect.bottom = rect.top + 16 * scale_;
 
 		AsTools::Rect(hdc, rect, AsConfig::Red_Color);
 
@@ -194,8 +191,8 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 
 		// 3. Считаем очки
 		//AsTools::Rect(hdc, Score_X + 5, Score_Y + 27, Score_Width - 2 * 5, 16, AsConfig::Red_Color);
-		rect.top += Score_Value_Offset * scale;
-		rect.bottom += Score_Value_Offset * scale;
+		rect.top += Score_Value_Offset * scale_;
+		rect.bottom += Score_Value_Offset * scale_;
 
 		score_str.Append(Current_Score);
 		Draw_String(hdc, rect, score_str, false);
@@ -269,7 +266,7 @@ void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw
 
 	// 2. Выводим строку
 	if (draw_name)
-		SelectObject(hdc, Player_Name_Font);
+		AsConfig::Name_Font.Select(hdc);
 	else
 		SelectObject(hdc, Score_Font);
 
@@ -316,16 +313,16 @@ void AsInfo_Panel::Init()
 
 	// Установка шрифта для имени Игрока
 
-	log_font.lfHeight = -48;
-	log_font.lfWeight = 700;
-	log_font.lfOutPrecision = 3;
-	log_font.lfClipPrecision = 2;
-	log_font.lfQuality = 1;
-	log_font.lfPitchAndFamily = 49;
-	wcscpy_s(log_font.lfFaceName, L"Consolas");
+	//log_font.lfHeight = -48;
+	//log_font.lfWeight = 700;
+	//log_font.lfOutPrecision = 3;
+	//log_font.lfClipPrecision = 2;
+	//log_font.lfQuality = 1;
+	//log_font.lfPitchAndFamily = 49;
+	//wcscpy_s(log_font.lfFaceName, L"Consolas");
 
-	log_font.lfHeight = -46;
-	Player_Name_Label.Font = CreateFontIndirect(&log_font);
+	//log_font.lfHeight = -46;
+	//Player_Name_Label.Set_Font(CreateFontIndirect(&log_font) );
 
 	// Установка шрифта для счета
 	log_font.lfHeight = -44;
