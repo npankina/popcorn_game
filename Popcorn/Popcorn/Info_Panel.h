@@ -9,7 +9,11 @@ public:
 	ALabel(int x, int y, int width, int height, const AFont &font);
 	void Draw(HDC hdc);
 	void Set_Content(AString cont);
+	void Set_Append(int score);
 	
+	AString& const Get_Content();
+	RECT& const Get_Content_Rect();
+
 private:
 	int X_Pos, Y_Pos;
 	int Width, Height;
@@ -48,17 +52,17 @@ private:
 	void Choose_Font();
 	void Draw_Extra_Life(HDC hdc, int x_pos, int y_pos);
 	void Show_Extra_Lifes(HDC hdc);
-	void Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw_name);
+	//void Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw_name);
 
-	HFONT Logo_Pop_Font, Logo_Corn_Font, Player_Name_Font, Score_Font;
+	HFONT Logo_Pop_Font, Logo_Corn_Font; //, Player_Name_Font, Score_Font;
 	AColor *Dark_Blue;
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
 	//AString Player_Name;
-	ALabel Player_Name_Label;
+	ALabel Player_Name_Label, Score_Label;
 	int Extra_Lives_Count;
 
 	static RECT Logo_Rect, Data_Rect; // Область данных на инфо панели под логотипом, необходимы для перерисовки экрана
-	static int Current_Score;
+	static int Score;
 	static const int Score_X = 208;
 	static const int Score_Y = 108;
 	static const int Score_Width = 110;

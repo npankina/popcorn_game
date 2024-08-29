@@ -39,6 +39,8 @@ int AsConfig::Current_Timer_Tick = 0;
 HWND AsConfig::Hwnd;
 
 const AFont AsConfig::Name_Font(-48, 700, 49, L"Consolas");
+const AFont AsConfig::Score_Font(-44, 700, 49, L"Consolas");
+
 
 const AColor AsConfig::BG_Color(6, 30, 82);
 const AColor AsConfig::Red_Color(230, 25, 229);

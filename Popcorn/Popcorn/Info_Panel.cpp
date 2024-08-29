@@ -42,6 +42,21 @@ void ALabel::Set_Content(AString cont)
 	Content = cont;
 }
 //------------------------------------------------------------------------------------------------------------
+void ALabel::Set_Append(int score)
+{
+	Content.Append(score);
+}
+//------------------------------------------------------------------------------------------------------------
+AString& const ALabel::Get_Content()
+{
+	return Content;
+}
+//------------------------------------------------------------------------------------------------------------
+RECT& const ALabel::Get_Content_Rect()
+{
+	return Content_Rect;
+}
+//------------------------------------------------------------------------------------------------------------
 
 
 
@@ -49,7 +64,7 @@ void ALabel::Set_Content(AString cont)
 
 // class AsInfo_Panel
 //------------------------------------------------------------------------------------------------------------
-int AsInfo_Panel::Current_Score = 0;
+int AsInfo_Panel::Score = 0;
 RECT AsInfo_Panel::Logo_Rect;
 RECT AsInfo_Panel::Data_Rect;
 //------------------------------------------------------------------------------------------------------------
@@ -62,19 +77,17 @@ AsInfo_Panel::~AsInfo_Panel()
 
 	if (Logo_Corn_Font != 0)
 		DeleteObject(Logo_Corn_Font);
-
-	if (Score_Font != 0)
-		DeleteObject(Score_Font);
 }
 //------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::AsInfo_Panel()
-: Logo_Pop_Font{}, Logo_Corn_Font{}, Player_Name_Font{}, Score_Font{}, Dark_Blue(nullptr), Extra_Lives_Count(AsConfig::Initial_Life_Count),
+: Logo_Pop_Font{}, Logo_Corn_Font{}, Dark_Blue(nullptr), Extra_Lives_Count(AsConfig::Initial_Life_Count),
   Letter_P(EBrick_Type::Blue, ELetter_Type::P, 214 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale),
   Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 153 * AsConfig::Global_Scale),
   Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale), 
   Floor_Indicator(EMessage_Type::Floor_Is_Over, Score_X + 8, Score_Y + Indicator_Y_Offset), 
   Monster_Indicator(EMessage_Type::Unfreeze_Monsters, Score_X + 90, Score_Y + Indicator_Y_Offset),
-  Player_Name_Label(Score_X + 5, Score_Y + 5, Score_Width - 2 * 5, 16, AsConfig::Name_Font)
+  Player_Name_Label(Score_X + 5, Score_Y + 5, Score_Width - 2 * 5, 16, AsConfig::Name_Font),
+  Score_Label(Score_X + 5, Score_Y + 5 + Score_Value_Offset, Score_Width - 2 * 5, 16, AsConfig::Score_Font)
 {
 	const int scale = AsConfig::Global_Scale;
 
@@ -128,7 +141,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 	const wchar_t *pop_str = L"POP"; // задаем строку в 2 байта
 	const wchar_t *corn_str = L"CORN";
 	AString score_str = L"SCORE:";
-	RECT rect{}, intersection_rect{};
+	RECT intersection_rect{};
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Logo_Rect) )
 	{
@@ -176,12 +189,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		LineTo(hdc, (Score_X + 2) * scale_, (Score_Y + Score_Height - 2) * scale_);
 
 		// 2.3. Имя игрока
-		rect.left = (Score_X + 5) * scale_;
-		rect.top = (Score_Y + 5) * scale_;
-		rect.right = rect.left + (Score_Width - 2 * 5) * scale_;
-		rect.bottom = rect.top + 16 * scale_;
-
-		AsTools::Rect(hdc, rect, AsConfig::Red_Color);
+		AsTools::Rect(hdc, Player_Name_Label.Get_Content_Rect(), AsConfig::Red_Color);
 
 
 		Player_Name_Label.Set_Content(L"COMPUTER");
@@ -190,12 +198,11 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 
 
 		// 3. Считаем очки
-		//AsTools::Rect(hdc, Score_X + 5, Score_Y + 27, Score_Width - 2 * 5, 16, AsConfig::Red_Color);
-		rect.top += Score_Value_Offset * scale_;
-		rect.bottom += Score_Value_Offset * scale_;
+		AsTools::Rect(hdc, Score_Label.Get_Content_Rect(), AsConfig::Red_Color);
 
-		score_str.Append(Current_Score);
-		Draw_String(hdc, rect, score_str, false);
+		Score_Label.Set_Content(L"SCORE:");
+		Score_Label.Set_Append(Score);
+		Score_Label.Draw(hdc);
 
 		// 4. Буквы индикаторы
 		Letter_P.Draw(hdc, paint_area);
@@ -255,40 +262,40 @@ void AsInfo_Panel::Draw_Extra_Life(HDC hdc, int x_pos, int y_pos)
 	AsTools::Round_Rect(hdc, rect);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw_name)
-{
-	int str_left_offset, str_top_offset;
-	const int scale = AsConfig::Global_Scale;
-	SIZE str_size;
-
-	// 1. Выводим прямоугольник фона
-	AsTools::Rect(hdc, rect, AsConfig::Red_Color);
-
-	// 2. Выводим строку
-	if (draw_name)
-		AsConfig::Name_Font.Select(hdc);
-	else
-		SelectObject(hdc, Score_Font);
-
-	SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
-
-	GetTextExtentPoint32(hdc, name_str.Get_Content(), name_str.Get_Length(), &str_size);
-
-	str_left_offset = rect.left + (rect.right - rect.left) / 2 - str_size.cx / 2;
-	str_top_offset = rect.top + (rect.bottom - rect.top) / 2 - str_size.cy / 2 - scale;
-
-	// 2.1. Вывод тени
-	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
-	TextOut(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, name_str.Get_Content(), name_str.Get_Length() );
-
-	// 2.2. Вывод строки
-	if (draw_name)
-		SetTextColor(hdc, AsConfig::Blue_Color.Get_RGB());
-	else
-		SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
-
-	TextOut(hdc, str_left_offset, str_top_offset, name_str.Get_Content(), name_str.Get_Length() );
-}
+//void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw_name)
+//{
+//	int str_left_offset, str_top_offset;
+//	const int scale = AsConfig::Global_Scale;
+//	SIZE str_size;
+//
+//	// 1. Выводим прямоугольник фона
+//	AsTools::Rect(hdc, rect, AsConfig::Red_Color);
+//
+//	// 2. Выводим строку
+//	if (draw_name)
+//		AsConfig::Name_Font.Select(hdc);
+//	else
+//		SelectObject(hdc, Score_Font);
+//
+//	SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
+//
+//	GetTextExtentPoint32(hdc, name_str.Get_Content(), name_str.Get_Length(), &str_size);
+//
+//	str_left_offset = rect.left + (rect.right - rect.left) / 2 - str_size.cx / 2;
+//	str_top_offset = rect.top + (rect.bottom - rect.top) / 2 - str_size.cy / 2 - scale;
+//
+//	// 2.1. Вывод тени
+//	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
+//	TextOut(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, name_str.Get_Content(), name_str.Get_Length() );
+//
+//	// 2.2. Вывод строки
+//	if (draw_name)
+//		SetTextColor(hdc, AsConfig::Blue_Color.Get_RGB());
+//	else
+//		SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
+//
+//	TextOut(hdc, str_left_offset, str_top_offset, name_str.Get_Content(), name_str.Get_Length() );
+//}
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Init()
 {
@@ -325,8 +332,8 @@ void AsInfo_Panel::Init()
 	//Player_Name_Label.Set_Font(CreateFontIndirect(&log_font) );
 
 	// Установка шрифта для счета
-	log_font.lfHeight = -44;
-	Score_Font = CreateFontIndirect(&log_font);
+	//log_font.lfHeight = -44;
+	//Score_Font = CreateFontIndirect(&log_font);
 
 }
 //------------------------------------------------------------------------------------------------------------
@@ -348,15 +355,15 @@ void AsInfo_Panel::Update_Score(EScore_Event_Type event_type)
 	switch (event_type)
 	{
 	case EScore_Event_Type::Hit_Brick:
-		Current_Score += 20;
+		Score += 20;
 		break;
 
 	case EScore_Event_Type::Hit_Monster:
-		Current_Score += 37;
+		Score += 37;
 		break;
 
 	case EScore_Event_Type::Catch_Letter:
-		Current_Score += 23;
+		Score += 23;
 		break;
 
 	default:
