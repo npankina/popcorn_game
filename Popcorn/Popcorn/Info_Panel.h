@@ -6,7 +6,7 @@
 class ALabel
 {
 public:
-	ALabel(int x, int y, int width, int height, const AFont &font);
+	ALabel(int x, int y, int width, int height, const AFont &font, const AColor &color);
 	void Draw(HDC hdc);
 	void Set_Content(AString cont);
 	void Set_Append(int score);
@@ -20,6 +20,7 @@ private:
 	AString Content;
 	RECT Content_Rect;
 	const AFont &Font;
+	const AColor &Color;
 
 	static const int scale_ = AsConfig::Global_Scale;
 };
@@ -27,7 +28,6 @@ private:
 class AsInfo_Panel : public AGame_Object
 {
 public:
-	~AsInfo_Panel();
 	AsInfo_Panel();
 
 	virtual void Begin_Movement();
@@ -40,7 +40,7 @@ public:
 	virtual void Draw(HDC hdc, RECT& paint_area);
 	virtual bool Is_Finished();
 
-	void Init();
+	//void Init();
 
 	static void Update_Score(EScore_Event_Type event_type);
 	void Increase_Life_Count();
@@ -52,12 +52,10 @@ private:
 	void Choose_Font();
 	void Draw_Extra_Life(HDC hdc, int x_pos, int y_pos);
 	void Show_Extra_Lifes(HDC hdc);
-	//void Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw_name);
 
-	HFONT Logo_Pop_Font, Logo_Corn_Font; //, Player_Name_Font, Score_Font;
-	AColor *Dark_Blue;
+	//HFONT Logo_Pop_Font, Logo_Corn_Font;
+	AColor Dark_Blue;
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
-	//AString Player_Name;
 	ALabel Player_Name_Label, Score_Label;
 	int Extra_Lives_Count;
 

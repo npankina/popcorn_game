@@ -61,6 +61,8 @@ public:
 
 	static const AFont Name_Font;
 	static const AFont Score_Font;
+	static const AFont Logo_Pop_Font;
+	static const AFont Logo_Corn_Font;
 
 	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color, Laser_Color, Gate_Color;
 	static const AColor Unbreakable_Blue_Highlight, Unbreakable_Red_Highlight, Teleport_Portal_Color;

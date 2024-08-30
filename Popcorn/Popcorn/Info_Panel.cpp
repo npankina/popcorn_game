@@ -2,8 +2,8 @@
 
 // class ALabel
 //------------------------------------------------------------------------------------------------------------
-ALabel::ALabel(int x, int y, int width, int height, const AFont &font)
-: X_Pos(x), Y_Pos(y), Width(width), Height(height), Font(font), Content_Rect{}
+ALabel::ALabel(int x, int y, int width, int height, const AFont &font, const AColor &color)
+: X_Pos(x), Y_Pos(y), Width(width), Height(height), Font(font), Color(color), Content_Rect{}
 {
 	Content_Rect.left = X_Pos * scale_;
 	Content_Rect.top = Y_Pos * scale_;
@@ -32,7 +32,7 @@ void ALabel::Draw(HDC hdc)
 	TextOut(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, Content.Get_Content(), Content.Get_Length());
 
 	// 2.2. Вывод строки
-	SetTextColor(hdc, AsConfig::Blue_Color.Get_RGB());
+	SetTextColor(hdc, Color.Get_RGB());
 
 	TextOut(hdc, str_left_offset, str_top_offset, Content.Get_Content(), Content.Get_Length());
 }
@@ -68,26 +68,15 @@ int AsInfo_Panel::Score = 0;
 RECT AsInfo_Panel::Logo_Rect;
 RECT AsInfo_Panel::Data_Rect;
 //------------------------------------------------------------------------------------------------------------
-AsInfo_Panel::~AsInfo_Panel()
-{
-	delete Dark_Blue;
-
-	if (Logo_Pop_Font != 0)
-		DeleteObject(Logo_Pop_Font);
-
-	if (Logo_Corn_Font != 0)
-		DeleteObject(Logo_Corn_Font);
-}
-//------------------------------------------------------------------------------------------------------------
 AsInfo_Panel::AsInfo_Panel()
-: Logo_Pop_Font{}, Logo_Corn_Font{}, Dark_Blue(nullptr), Extra_Lives_Count(AsConfig::Initial_Life_Count),
+: Dark_Blue(0, 170, 170), Extra_Lives_Count(AsConfig::Initial_Life_Count),
   Letter_P(EBrick_Type::Blue, ELetter_Type::P, 214 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale),
   Letter_G(EBrick_Type::Blue, ELetter_Type::G, 256 * AsConfig::Global_Scale, 153 * AsConfig::Global_Scale),
   Letter_M(EBrick_Type::Blue, ELetter_Type::M, 297 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale), 
   Floor_Indicator(EMessage_Type::Floor_Is_Over, Score_X + 8, Score_Y + Indicator_Y_Offset), 
   Monster_Indicator(EMessage_Type::Unfreeze_Monsters, Score_X + 90, Score_Y + Indicator_Y_Offset),
-  Player_Name_Label(Score_X + 5, Score_Y + 5, Score_Width - 2 * 5, 16, AsConfig::Name_Font),
-  Score_Label(Score_X + 5, Score_Y + 5 + Score_Value_Offset, Score_Width - 2 * 5, 16, AsConfig::Score_Font)
+  Player_Name_Label(Score_X + 5, Score_Y + 5, Score_Width - 2 * 5, 16, AsConfig::Name_Font, AsConfig::Blue_Color),
+  Score_Label(Score_X + 5, Score_Y + 5 + Score_Value_Offset, Score_Width - 2 * 5, 16, AsConfig::Score_Font, AsConfig::White_Color)
 {
 	const int scale = AsConfig::Global_Scale;
 
@@ -148,18 +137,17 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		// 1. Logo
 		AsTools::Rect(hdc, 211, 5, 104, 100, AsConfig::Blue_Color);
 
-		SelectObject(hdc, Logo_Corn_Font);
+		AsConfig::Logo_Corn_Font.Select(hdc);
 		SetBkMode(hdc, TRANSPARENT);
 
 		// 1.1. "POP"
-		SelectObject(hdc, Logo_Pop_Font);
+		AsConfig::Logo_Pop_Font.Select(hdc);
 		SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
 		TextOut(hdc, (Logo_X_Pos + Shadow_X_Offset) * scale_, (Logo_Y_Pos + Shadow_Y_Offset) * scale_, pop_str, wcslen(pop_str)); // shadow
 		SetTextColor(hdc, AsConfig::Red_Color.Get_RGB());
 		TextOut(hdc, Logo_X_Pos * scale_, Logo_Y_Pos * scale_, pop_str, 3); // main letters
 
 		// 1.2. "CORN"
-		SelectObject(hdc, Logo_Corn_Font);
 		SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
 		TextOut(hdc, (Logo_X_Pos + Shadow_X_Offset - 5) * scale_, (Logo_Y_Pos + Shadow_Y_Offset + 44) * scale_, corn_str, 4); // shadow
 		SetTextColor(hdc, AsConfig::Red_Color.Get_RGB());
@@ -175,7 +163,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		AsTools::Rect(hdc, Score_X, Score_Y, 2, Score_Height, AsConfig::Red_Color);
 		AsTools::Rect(hdc, Score_X + Score_Width - 2, Score_Y, 2, Score_Height, AsConfig::Red_Color);
 
-		AsTools::Rect(hdc, Score_X + 2, Score_Y + 2, Score_Width - 4, Score_Height - 4, *Dark_Blue);
+		AsTools::Rect(hdc, Score_X + 2, Score_Y + 2, Score_Width - 4, Score_Height - 4, Dark_Blue);
 
 		// 2.2. Бордюр
 		AsConfig::Highlight_Panel_Color.Select_Pen(hdc);
@@ -260,81 +248,6 @@ void AsInfo_Panel::Draw_Extra_Life(HDC hdc, int x_pos, int y_pos)
 
 	AsConfig::Blue_Color.Select(hdc);
 	AsTools::Round_Rect(hdc, rect);
-}
-//------------------------------------------------------------------------------------------------------------
-//void AsInfo_Panel::Draw_String(HDC hdc, RECT &rect, AString &name_str, bool draw_name)
-//{
-//	int str_left_offset, str_top_offset;
-//	const int scale = AsConfig::Global_Scale;
-//	SIZE str_size;
-//
-//	// 1. Выводим прямоугольник фона
-//	AsTools::Rect(hdc, rect, AsConfig::Red_Color);
-//
-//	// 2. Выводим строку
-//	if (draw_name)
-//		AsConfig::Name_Font.Select(hdc);
-//	else
-//		SelectObject(hdc, Score_Font);
-//
-//	SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
-//
-//	GetTextExtentPoint32(hdc, name_str.Get_Content(), name_str.Get_Length(), &str_size);
-//
-//	str_left_offset = rect.left + (rect.right - rect.left) / 2 - str_size.cx / 2;
-//	str_top_offset = rect.top + (rect.bottom - rect.top) / 2 - str_size.cy / 2 - scale;
-//
-//	// 2.1. Вывод тени
-//	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
-//	TextOut(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, name_str.Get_Content(), name_str.Get_Length() );
-//
-//	// 2.2. Вывод строки
-//	if (draw_name)
-//		SetTextColor(hdc, AsConfig::Blue_Color.Get_RGB());
-//	else
-//		SetTextColor(hdc, AsConfig::White_Color.Get_RGB());
-//
-//	TextOut(hdc, str_left_offset, str_top_offset, name_str.Get_Content(), name_str.Get_Length() );
-//}
-//------------------------------------------------------------------------------------------------------------
-void AsInfo_Panel::Init()
-{
-	Dark_Blue = new AColor(0, 170, 170);
-
-	// Установка шрифта для Лого
-	LOGFONT log_font{};
-
-	log_font.lfHeight = -128;
-	log_font.lfWeight = 900;
-	log_font.lfOutPrecision = 3;
-	log_font.lfClipPrecision = 2;
-	log_font.lfQuality = 1;
-	log_font.lfPitchAndFamily = 34;
-	wcscpy_s(log_font.lfFaceName, L"Arial Black");
-
-	Logo_Pop_Font = CreateFontIndirect(&log_font);
-
-	log_font.lfHeight = -96;
-	Logo_Corn_Font = CreateFontIndirect(&log_font);
-
-
-	// Установка шрифта для имени Игрока
-
-	//log_font.lfHeight = -48;
-	//log_font.lfWeight = 700;
-	//log_font.lfOutPrecision = 3;
-	//log_font.lfClipPrecision = 2;
-	//log_font.lfQuality = 1;
-	//log_font.lfPitchAndFamily = 49;
-	//wcscpy_s(log_font.lfFaceName, L"Consolas");
-
-	//log_font.lfHeight = -46;
-	//Player_Name_Label.Set_Font(CreateFontIndirect(&log_font) );
-
-	// Установка шрифта для счета
-	//log_font.lfHeight = -44;
-	//Score_Font = CreateFontIndirect(&log_font);
-
 }
 //------------------------------------------------------------------------------------------------------------
 void AsInfo_Panel::Choose_Font()
