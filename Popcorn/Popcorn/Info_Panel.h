@@ -11,14 +11,15 @@ public:
 	void Set_Content(AString cont);
 	void Set_Append(int score);
 	
-	AString& const Get_Content();
-	RECT& const Get_Content_Rect();
+	//AString& const Get_Content();
+	//RECT& const Get_Content_Rect();
+
+	AString Content;
+	RECT Content_Rect;
 
 private:
 	int X_Pos, Y_Pos;
 	int Width, Height;
-	AString Content;
-	RECT Content_Rect;
 	const AFont &Font;
 	const AColor &Color;
 

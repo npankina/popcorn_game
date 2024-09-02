@@ -47,15 +47,15 @@ void ALabel::Set_Append(int score)
 	Content.Append(score);
 }
 //------------------------------------------------------------------------------------------------------------
-AString& const ALabel::Get_Content()
-{
-	return Content;
-}
-//------------------------------------------------------------------------------------------------------------
-RECT& const ALabel::Get_Content_Rect()
-{
-	return Content_Rect;
-}
+//AString& const ALabel::Get_Content()
+//{
+//	return Content;
+//}
+////------------------------------------------------------------------------------------------------------------
+//RECT& const ALabel::Get_Content_Rect()
+//{
+//	return Content_Rect;
+//}
 //------------------------------------------------------------------------------------------------------------
 
 
@@ -177,7 +177,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		LineTo(hdc, (Score_X + 2) * scale_, (Score_Y + Score_Height - 2) * scale_);
 
 		// 2.3. Имя игрока
-		AsTools::Rect(hdc, Player_Name_Label.Get_Content_Rect(), AsConfig::Red_Color);
+		AsTools::Rect(hdc, Player_Name_Label.Content_Rect, AsConfig::Red_Color);
 
 
 		Player_Name_Label.Set_Content(L"COMPUTER");
@@ -186,7 +186,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 
 
 		// 3. Считаем очки
-		AsTools::Rect(hdc, Score_Label.Get_Content_Rect(), AsConfig::Red_Color);
+		AsTools::Rect(hdc, Score_Label.Content_Rect, AsConfig::Red_Color);
 
 		Score_Label.Set_Content(L"SCORE:");
 		Score_Label.Set_Append(Score);
