@@ -32,11 +32,13 @@ public:
 private:
 	bool Is_Visible;
 	ALabel Level_Name, Level_Number;
+	RECT Title_Rect;
 
 	static const int Width = 96;
 	static const int Height = 14;
 	static const int X_Pos = AsConfig::Max_X_Pos / 2 - Width / 2;
 	static const int Y_Pos = 150;
+	static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object

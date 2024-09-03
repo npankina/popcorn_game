@@ -8,6 +8,11 @@ AsLevel_Title::AsLevel_Title()
   Level_Number(X_Pos + Width - 32, Y_Pos, 32, Height, AsConfig::Name_Font, AsConfig::White_Color)
 {
 	Level_Name.Set_Content(L"Уровень");
+
+	Title_Rect.left = X_Pos * scale_;
+	Title_Rect.top = Y_Pos * scale_;
+	Title_Rect.right = Title_Rect.left + Width * scale_;
+	Title_Rect.bottom = Title_Rect.top + Height * scale_;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel_Title::Act()
@@ -18,8 +23,15 @@ void AsLevel_Title::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 void AsLevel_Title::Draw(HDC hdc, RECT &paint_area)
 {
+	RECT intersection_rect{};
+
 	if (!Is_Visible)
 		return;
+
+	if (!IntersectRect(&intersection_rect, &paint_area, &Title_Rect))
+		return;
+
+	AsTools::Rect(hdc, Title_Rect, AsConfig::Red_Color);
 
 	Level_Name.Draw(hdc);
 	Level_Number.Draw(hdc);
@@ -229,7 +241,7 @@ void AsLevel::Clear(HDC hdc, RECT &paint_area)
 	}
 
 	Mop.Clear(hdc, paint_area);
-
+	Level_Title.Clear(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Draw(HDC hdc, RECT &paint_area)
@@ -267,6 +279,7 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 		item->Draw(hdc, paint_area);
 
 	Mop.Draw(hdc, paint_area);
+	Level_Title.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Is_Finished()
