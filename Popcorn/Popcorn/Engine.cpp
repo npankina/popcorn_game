@@ -125,12 +125,13 @@ int AsEngine::On_Timer()
 			Game_State = EGame_State::Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos() );
 			Monster_Set.Activate(5);
+			Level.Hide_Title();
 		}
 		break;
 
 
 	case EGame_State::Finish_Level:
-		if (Monster_Set.Are_All_Destroyed() and Platform.Has_State(EPlatform_Substate_Regular::Missing) )
+		if (Monster_Set.Are_All_Destroyed()  ) // and Platform.Has_State(EPlatform_Substate_Regular::Missing)
 		{
 			Level.Mop_Next_Level();
 			Game_State = EGame_State::Mop_Level;

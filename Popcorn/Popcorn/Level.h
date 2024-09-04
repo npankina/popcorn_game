@@ -16,6 +16,13 @@ public:
 	int X, Y;
 };
 //------------------------------------------------------------------------------------------------------------
+enum class ELevel_Title_State : unsigned char
+{
+	Missing,
+	Showing,
+	Hiding
+};
+//------------------------------------------------------------------------------------------------------------
 class AsLevel_Title : public AGraphics_Object
 {
 public:
@@ -30,7 +37,8 @@ public:
 	void Hide();
 
 private:
-	bool Is_Visible;
+	//bool Is_Visible;
+	ELevel_Title_State Level_Title_State;
 	ALabel Level_Name, Level_Number;
 	RECT Title_Rect;
 
