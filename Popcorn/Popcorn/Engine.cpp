@@ -131,7 +131,7 @@ int AsEngine::On_Timer()
 
 
 	case EGame_State::Finish_Level:
-		if (Monster_Set.Are_All_Destroyed()  ) // and Platform.Has_State(EPlatform_Substate_Regular::Missing)
+		if (Monster_Set.Are_All_Destroyed() and Platform.Has_State(EPlatform_Substate_Regular::Missing) )
 		{
 			Level.Mop_Next_Level();
 			Game_State = EGame_State::Mop_Level;

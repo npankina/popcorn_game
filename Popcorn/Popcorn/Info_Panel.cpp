@@ -42,9 +42,9 @@ void ALabel::Set_Content(AString cont)
 	Content = cont;
 }
 //------------------------------------------------------------------------------------------------------------
-void ALabel::Set_Append(int score)
+void ALabel::Set_Append(int score, int digits)
 {
-	Content.Append(score);
+	Content.Append(score, digits);
 }
 //------------------------------------------------------------------------------------------------------------
 //AString& const ALabel::Get_Content()
@@ -189,7 +189,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		AsTools::Rect(hdc, Score_Label.Content_Rect, AsConfig::Red_Color);
 
 		Score_Label.Set_Content(L"SCORE:");
-		Score_Label.Set_Append(Score);
+		Score_Label.Set_Append(Score, 6);
 		Score_Label.Draw(hdc);
 
 		// 4. Буквы индикаторы

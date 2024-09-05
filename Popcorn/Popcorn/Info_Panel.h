@@ -9,7 +9,7 @@ public:
 	ALabel(int x, int y, int width, int height, const AFont &font, const AColor &color);
 	void Draw(HDC hdc);
 	void Set_Content(AString cont);
-	void Set_Append(int score);
+	void Set_Append(int score, int digits);
 	
 	//AString& const Get_Content();
 	//RECT& const Get_Content_Rect();

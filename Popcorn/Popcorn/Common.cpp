@@ -107,13 +107,15 @@ AString::AString()
 AString::AString(const wchar_t *str) : Content(str)
 {}
 //------------------------------------------------------------------------------------------------------------
-void AString::Append(int value)
+void AString::Append(int value, int digits)
 {
 	const int size = 32;
+	wchar_t format[size];
 	wchar_t buf[size];
 
-	//_itow_s(value, buf, size, 10);
-	swprintf(buf, size, L"%.6i", value);
+	swprintf(format, size, L"%%.%ii", digits);
+
+	swprintf(buf, size, format, value);
 	Content += buf;
 }
 //------------------------------------------------------------------------------------------------------------
