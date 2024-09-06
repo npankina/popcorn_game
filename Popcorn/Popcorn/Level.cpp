@@ -1,14 +1,28 @@
 ﻿#include "Level.h"
 
+// APoint
+//------------------------------------------------------------------------------------------------------------
+APoint::APoint()
+: X(0), Y(0)
+{
+}
+//------------------------------------------------------------------------------------------------------------
+APoint::APoint(int x, int y)
+: X(x), Y(y)
+{
+}
+//------------------------------------------------------------------------------------------------------------
+
+
+
 
 // class AsLevel_Title
 //------------------------------------------------------------------------------------------------------------
-AsLevel_Title::AsLevel_Title() 
-: Level_Name(X_Pos, Y_Pos, 702, Height, AsConfig::Name_Font, AsConfig::Blue_Color),
-  Level_Number(X_Pos + Width - 32, Y_Pos, 32, Height, AsConfig::Name_Font, AsConfig::White_Color),
-  Level_Title_State(ELevel_Title_State::Missing)
+AsLevel_Title::AsLevel_Title()
+: Level_Title_State(ELevel_Title_State::Missing), Level_Name(X_Pos, Y_Pos, 72, Height, AsConfig::Name_Font, AsConfig::Blue_Color),
+  Level_Number(X_Pos + Width - 32, Y_Pos, 32, Height, AsConfig::Name_Font, AsConfig::White_Color)
 {
-	Level_Name.Set_Content(L"Уровень");
+	Level_Name.Content = L"Уровень";
 
 	Title_Rect.left = X_Pos * scale_;
 	Title_Rect.top = Y_Pos * scale_;
@@ -17,7 +31,9 @@ AsLevel_Title::AsLevel_Title()
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel_Title::Act()
-{}
+{
+	//!!! Надо сделать!
+}
 //------------------------------------------------------------------------------------------------------------
 void AsLevel_Title::Clear(HDC hdc, RECT &paint_area)
 {
@@ -34,7 +50,7 @@ void AsLevel_Title::Draw(HDC hdc, RECT &paint_area)
 	if (Level_Title_State != ELevel_Title_State::Showing)
 		return;
 
-	if (!IntersectRect(&intersection_rect, &paint_area, &Title_Rect))
+	if (! IntersectRect(&intersection_rect, &paint_area, &Title_Rect) )
 		return;
 
 	AsTools::Rect(hdc, Title_Rect, AsConfig::Red_Color);
@@ -45,7 +61,7 @@ void AsLevel_Title::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel_Title::Is_Finished()
 {
-	return false;
+	return false;  //!!! Надо сделать!
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel_Title::Show(int level_number)
@@ -69,7 +85,8 @@ void AsLevel_Title::Hide()
 
 
 
-// class AsLevel
+// AsLevel
+//------------------------------------------------------------------------------------------------------------
 AsLevel *AsLevel::Level = 0;
 //------------------------------------------------------------------------------------------------------------
 AsLevel::~AsLevel()
@@ -78,9 +95,8 @@ AsLevel::~AsLevel()
 }
 //------------------------------------------------------------------------------------------------------------
 AsLevel::AsLevel()
-: Next_Level_Number(0), Current_Level_Number(0), Available_Bricks_Count(0), Level_Rect{}, Current_Level{}, Need_To_Cancel_All(false),
+: Level_Rect{}, Need_To_Cancel_All(false), Next_Level_Number(0), Current_Level_Number(0), Available_Bricks_Count(0),
   Parachute_Color(AsConfig::Red_Color, AsConfig::Blue_Color, AsConfig::Global_Scale), Advertisement(0)
- // Current_Brick_Left_X(0.0), Current_Brick_Right_X(0.0), Current_Brick_Top_Y(0.0), Current_Brick_Low_Y(0.0)
 {
 	Level = this;
 }
@@ -181,7 +197,8 @@ bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos)
-{// Возврат true, если в позиции (х, у) луч коснется кирпича
+{// Возврат: true, если в позиции (next_x_pos, next_y_pos) луч коснётся кирпича
+
 	int level_x_index, level_y_index;
 
 	level_x_index = (int)( (next_x_pos - AsConfig::Level_X_Offset) / (double)(AsConfig::Cell_Width) );
@@ -235,8 +252,8 @@ void AsLevel::Act()
 void AsLevel::Clear(HDC hdc, RECT &paint_area)
 {// Стираем движущиеся объекты
 
-	for (auto &item : Falling_Letters)
-		item->Clear(hdc, paint_area);
+	for (auto *letter : Falling_Letters)
+		letter->Clear(hdc, paint_area);
 
 	if (Advertisement != 0)
 		Advertisement->Clear(hdc, paint_area);
@@ -273,17 +290,14 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 					Draw_Brick(hdc, brick_rect, j, i);
 			}
 
-		for (auto &item : Active_Bricks)
-			item->Draw(hdc, paint_area);
+		for (auto *brick : Active_Bricks)
+			brick->Draw(hdc, paint_area);
 
-		Mop.Clear_Area(hdc); // очищаем часть стертую шваброй, если надо
+		Mop.Clean_Area(hdc); // очищаем часть стертую шваброй, если надо
 	}
 
-	
-
-	// Рисование падающих букв
-	for (auto &item : Falling_Letters)
-		item->Draw(hdc, paint_area);
+	for (auto *letter : Falling_Letters)
+		letter->Draw(hdc, paint_area);
 
 	Mop.Draw(hdc, paint_area);
 	Level_Title.Draw(hdc, paint_area);
@@ -335,8 +349,9 @@ void AsLevel::Set_Current_Level(int level_number)
 
 	Advertisement = level_data->Advertisement;
 
-	// Считаем телепорты
-	Teleport_Bricks_Pos.erase(Teleport_Bricks_Pos.begin(), Teleport_Bricks_Pos.end());
+	// 1. Считаем телепорты
+	Teleport_Bricks_Pos.erase(Teleport_Bricks_Pos.begin(), Teleport_Bricks_Pos.end() );
+
 	for (i = 0; i < AsConfig::Level_Height; i++)
 	{
 		for (j = 0; j < AsConfig::Level_Width; j++)
@@ -349,14 +364,14 @@ void AsLevel::Set_Current_Level(int level_number)
 	}
 
 	if (Teleport_Bricks_Pos.size() == 1)
-		AsConfig::Throw(); // телепорт не может быть один, 0 or > 1
+		AsConfig::Throw();  // Телепортов должно быть 0 либо больше 1!
 
 	Available_Bricks_Count = level_data->Get_Available_Bricks_Count();
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_letter)
 {
-	if (index < Falling_Letters.size())
+	if (index < (int)Falling_Letters.size() )
 	{
 		*falling_letter = (AFalling_Letter *)Falling_Letters[index++];
 		return true;
@@ -553,7 +568,7 @@ void AsLevel::Redraw_Brick(int brick_x, int brick_y)
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type)
 {// Создаём падающую букву, если можем
-	
+
 	int letter_x, letter_y;
 	ELetter_Type letter_type{};
 	AFalling_Letter *falling_letter = nullptr;
@@ -605,12 +620,12 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 		letter_type = ELetter_Type::M; // монстры
 		break;
 	}
+	//letter_type = ELetter_Type::G;
 
 	falling_letter = new AFalling_Letter(brick_type, letter_type, letter_x, letter_y);
 	Falling_Letters.push_back(falling_letter);
-	
-	return true;
 
+	return true;
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall_Object *ball, bool vertical_hit)
@@ -745,10 +760,10 @@ void AsLevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall_Object *
 		if (got_direction)
 			break;
 
-		direction = (EDirection_Type)((int)direction - 1);
+		direction = (EDirection_Type)( (int)direction - 1);
 		ball->Set_Direction(ball->Get_Direction() + M_PI_2);
 
-		if ((int)direction < 0)
+		if ( (int)direction < 0)
 			direction = EDirection_Type::Down;
 	}
 
@@ -770,7 +785,7 @@ AActive_Brick_Teleport *AsLevel::Select_Destination_Teleport(int source_x, int s
 		return 0;
 	}
 
-	dest_index = AsTools::Rand(Teleport_Bricks_Pos.size() );
+	dest_index = AsTools::Rand((int)Teleport_Bricks_Pos.size() );
 
 	if (Teleport_Bricks_Pos[dest_index].X == source_x and Teleport_Bricks_Pos[dest_index].Y == source_y)
 	{// Если случайно выбрали текущий телепорт - переходим к следующему
@@ -927,32 +942,26 @@ void AsLevel::Draw_Parachute_Part(HDC hdc, RECT &brick_rect, int offset, int wid
 	AsTools::Round_Rect(hdc, rect);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsLevel::Delete_Objects(std::vector<AGraphics_Object *> &obj)
+void AsLevel::Delete_Objects(std::vector<AGraphics_Object *> &falling_letters)
 {
-	for (auto it = obj.begin(), end = obj.end(); it != end; it++)
-		delete *it; // удаляем объект из кучи
-	
-	obj.erase(obj.begin(), obj.end() ); // очищен вектор от инвалидированных указателей
-}
-//------------------------------------------------------------------------------------------------------------
-void AsLevel::Draw_Objects(HDC hdc, RECT &paint_area, std::vector<AGraphics_Object *> &obj, int objects_max_count)
-{
-	for (auto *obj : obj)
-		obj->Draw(hdc, paint_area);
-}
-//------------------------------------------------------------------------------------------------------------
-void AsLevel::Act_Objects(std::vector<AGraphics_Object *> &obj)
-{
-	auto it = obj.begin();
+	for (auto it = falling_letters.begin(); it != falling_letters.end(); it++)
+		delete *it;
 
-	while (it != obj.end())
+	falling_letters.erase(falling_letters.begin(), falling_letters.end() );
+}
+//------------------------------------------------------------------------------------------------------------
+void AsLevel::Act_Objects(std::vector<AGraphics_Object *> &falling_letters)
+{
+	auto it = falling_letters.begin();
+
+	while (it != falling_letters.end() )
 	{
 		(*it)->Act();
 
-		if ((*it)->Is_Finished())
+		if ( (*it)->Is_Finished() )
 		{
 			delete *it;
-			it = obj.erase(it);
+			it = falling_letters.erase(it);
 		}
 		else
 			it++;

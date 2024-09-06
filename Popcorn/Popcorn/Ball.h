@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Config.h"
 
+#include "Config.h"
 
 //------------------------------------------------------------------------------------------------------------
 class ABall: public AGame_Object, public ABall_Object
@@ -25,10 +25,9 @@ public:
 	virtual void Reflect(bool from_horizontal);
 	virtual void Draw_Teleporting(HDC hdc, int step);
 	virtual void Set_On_Parachute(int brick_x, int brick_y);
+	virtual void Get_Center(double &x_pos, double &y_pos);
 	virtual bool Is_Moving_Up();
 	virtual bool Is_Moving_Left();
-	virtual void Get_Center(double &x_pos, double &y_pos);
-
 
 	void Set_Speed(double new_speed);
 	void Set_For_Test();
@@ -50,7 +49,6 @@ private:
 	double Ball_Direction, Prev_Ball_Direction;
 	double Ball_Speed, Prev_Ball_Speed;
 
-
 	bool Testing_Is_Active;
 	int Test_Iteration;
 	double Rest_Test_Distance;
@@ -63,3 +61,4 @@ private:
 	static const int Parachute_Size = 15;
 	static const int On_Platform_Timeout = 10 * AsConfig::FPS;  // Время нахождения на платформе
 };
+//------------------------------------------------------------------------------------------------------------

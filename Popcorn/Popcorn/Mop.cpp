@@ -7,29 +7,24 @@ AsMop::~AsMop()
 	for (auto *indicator : Mop_Indicators)
 		delete indicator;
 
+	Mop_Indicators.erase(Mop_Indicators.begin(), Mop_Indicators.end() );
+
 	for (auto *cylinder : Mop_Cylinders)
 		delete cylinder;
 
-	Mop_Indicators.erase(Mop_Indicators.begin(), Mop_Indicators.end());
-	Mop_Cylinders.erase(Mop_Cylinders.begin(), Mop_Cylinders.end());
+	Mop_Cylinders.erase(Mop_Cylinders.begin(), Mop_Cylinders.end() );
 }
 //------------------------------------------------------------------------------------------------------------
 AsMop::AsMop()
-: Y_Pos(0), Max_Y_Pos(0), Lifting_Height(0), Start_Tick(0), Mopping_Is_Done(false), 
-  Mop_State(EMop_State::Idle), Mop_Rect{}, Prev_Mop_Rect{}
+: Mop_State(EMop_State::Idle), Mopping_Is_Done(false), Y_Pos(0), Max_Y_Pos(0), Lifting_Height(0), Start_Tick(0)
 {
-	AMop_Indicator *indicator = nullptr;
-	AMop_Cylinder *cylinder = nullptr;
+	int x_pos, y_pos;
+	AMop_Indicator *indicator;
+	AMop_Cylinder *cylinder;
 
-	int x_pos;
-	int y_pos;
-	int height, max_height;
-
-	for (int i = 0; i < Indicator_Count; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		x_pos = AsConfig::Level_X_Offset + 1 + i * 19;
-
-		indicator = new AMop_Indicator(x_pos, AsConfig::Level_Y_Offset + 1, i * 80);
+		indicator = new AMop_Indicator(AsConfig::Level_X_Offset + 1 + i * 19, AsConfig::Level_Y_Offset + 1, i * 80);
 		Mop_Indicators.push_back(indicator);
 	}
 
@@ -37,32 +32,36 @@ AsMop::AsMop()
 	{
 		x_pos = AsConfig::Level_X_Offset + Width / 2 - 6 - i;
 		y_pos = AsConfig::Level_Y_Offset + 7 + i * 5;
-		height = 13 + i * 2;
-		max_height = AMop_Cylinder::Max_Cylinders_Height[i];
 
-		cylinder = new AMop_Cylinder(x_pos, y_pos, height, max_height);
+		cylinder = new AMop_Cylinder(x_pos, y_pos, 13 + i * 2, AMop_Cylinder::Max_Cylinder_Height[i]);
 		Mop_Cylinders.push_back(cylinder);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Begin_Movement()
-{}
+{
+	//!!! Надо сделать!
+}
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Finish_Movement()
-{}
+{
+	//!!! Надо сделать!
+}
 //------------------------------------------------------------------------------------------------------------
 void AsMop::Advance(double max_speed)
-{}
+{
+	//!!! Надо сделать!
+}
 //------------------------------------------------------------------------------------------------------------
 double AsMop::Get_Speed()
 {
-	return 0.0;
+	return 0.0;  //!!! Надо сделать!
 }
 //------------------------------------------------------------------------------------------------------------
-void AsMop::Act_Lifting(bool is_lift_up)
+void AsMop::Act_Lifting(bool lift_up)
 {
-	double ratio;
 	int time_offset;
+	double ratio;
 
 	time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
 
@@ -70,17 +69,17 @@ void AsMop::Act_Lifting(bool is_lift_up)
 	{
 		ratio = (double)time_offset / (double)Lifting_Timeout;
 
-		if (is_lift_up)
+		if (lift_up)
 			ratio = 1.0 - ratio;
-		
-		Max_Y_Pos = AsConfig::Max_Y_Pos + (int)((double)Lifting_Height * ratio);
+
+		Max_Y_Pos = AsConfig::Max_Y_Pos + (int)( (double)Lifting_Height * ratio);
 		Set_Mop();
 	}
 	else
 	{
-		if (is_lift_up)
+		if (lift_up)
 		{
-			Mop_State = EMop_State::Clearing;
+			Mop_State = EMop_State::Cleaning;
 			Start_Tick = AsConfig::Current_Timer_Tick;
 		}
 		else
@@ -93,23 +92,23 @@ void AsMop::Act()
 	int time_offset;
 	double ratio;
 
-	if (Mop_State == EMop_State::Idle or Mop_State == EMop_State::Descend_Done or Mop_State == EMop_State::Clear_Done)
+	if (Mop_State == EMop_State::Idle or Mop_State == EMop_State::Clean_Done)
 		return;
 
 	Prev_Mop_Rect = Mop_Rect;
+
 	time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
 
 	switch (Mop_State)
 	{
-	case EMop_State::Ascending: // Поднимаем сложенную швабру
-		Act_Lifting(true);
+	case EMop_State::Ascending:
+		Act_Lifting(true);  // Поднимаем сложенную швабру
 		break;
 
 
-
-	case EMop_State::Clearing:
+	case EMop_State::Cleaning:
 		if (time_offset > Expansion_Timeout)
-			Mop_State = EMop_State::Clear_Done;
+			Mop_State = EMop_State::Clean_Done;
 		break;
 
 
@@ -137,7 +136,7 @@ void AsMop::Act()
 		AsConfig::Throw();
 	}
 
-	if (Mop_State == EMop_State::Clearing or Mop_State == EMop_State::Showing)
+	if (Mop_State == EMop_State::Cleaning or Mop_State == EMop_State::Showing)
 	{
 		time_offset = AsConfig::Current_Timer_Tick - Start_Tick;
 
@@ -170,7 +169,7 @@ void AsMop::Clear(HDC hdc, RECT &paint_area)
 	if (Mop_State == EMop_State::Idle)
 		return;
 
-	if (! IntersectRect(&intersection_rect, &paint_area, &Prev_Mop_Rect))
+	if (! IntersectRect(&intersection_rect, &paint_area, &Prev_Mop_Rect) )
 		return;
 
 	AsTools::Rect(hdc, Prev_Mop_Rect, AsConfig::BG_Color);
@@ -195,12 +194,12 @@ void AsMop::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AsMop::Is_Finished()
 {
-	return false;
+	return false;  //!!! Надо сделать!
 }
 //------------------------------------------------------------------------------------------------------------
-void AsMop::Activate(bool is_cleaning)
+void AsMop::Activate(bool cleaning)
 {
-	if (is_cleaning)
+	if (cleaning)
 	{
 		Y_Pos = 172;
 		Mop_State = EMop_State::Ascending;
@@ -213,38 +212,18 @@ void AsMop::Activate(bool is_cleaning)
 		Mop_State = EMop_State::Showing;
 
 	Start_Tick = AsConfig::Current_Timer_Tick;
-
 	Set_Mop();
 }
 //------------------------------------------------------------------------------------------------------------
-void AsMop::Set_Mop()
+void AsMop::Clean_Area(HDC hdc)
 {
-	int current_y_pos = 0;
-
-	Y_Pos = Max_Y_Pos - Get_Cylinders_Height() - Height + 1;
-
-	for (auto *indicator : Mop_Indicators)
-		indicator->Set_Y_Pos(Y_Pos + 1);
-
-	for (int i = 0; i < (int)Mop_Cylinders.size(); i++)
-	{
-		Mop_Cylinders[i]->Set_Y_Pos(Y_Pos + Height + current_y_pos);
-		current_y_pos += Mop_Cylinders[i]->Get_Height();
-	}
-
-	Mop_Rect.left = AsConfig::Level_X_Offset * scale_;
-	Mop_Rect.top = Y_Pos * scale_;
-	Mop_Rect.right = Mop_Rect.left + Width * scale_;
-	Mop_Rect.bottom = Mop_Rect.top + Height * scale_;
-}
-//------------------------------------------------------------------------------------------------------------
-void AsMop::Clear_Area(HDC hdc)
-{
-	RECT rect = Mop_Rect;
-	rect.bottom = AsConfig::Max_Y_Pos * scale_;
+	RECT rect;
 
 	if (Mop_State == EMop_State::Idle)
 		return;
+
+	rect = Mop_Rect;
+	rect.bottom = AsConfig::Max_Y_Pos * AsConfig::Global_Scale;
 
 	AsTools::Rect(hdc, rect, AsConfig::BG_Color);
 }
@@ -256,18 +235,43 @@ bool AsMop::Is_Mopping_Done()
 //------------------------------------------------------------------------------------------------------------
 bool AsMop::Is_Cleaning_Done()
 {
-	if (Mop_State == EMop_State::Clear_Done)
+	if (Mop_State == EMop_State::Clean_Done)
 		return true;
-	return false;
+	else
+		return false;
 }
 //------------------------------------------------------------------------------------------------------------
 int AsMop::Get_Cylinders_Height()
 {
-	int total_cylinders_height = 0;
+	int total_cylinder_height = 0;
 
 	for (auto *cylinder : Mop_Cylinders)
-		total_cylinders_height += cylinder->Get_Height();
+		total_cylinder_height += cylinder->Get_Height();
 
-	return total_cylinders_height;
+	return total_cylinder_height;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsMop::Set_Mop()
+{
+	int i;
+	int curr_y_pos = 0;
+	const int scale = AsConfig::Global_Scale;
+
+	Y_Pos = Max_Y_Pos - Get_Cylinders_Height() - Height + 1;
+
+	for (auto *indicator : Mop_Indicators)
+		indicator->Set_Y_Pos(Y_Pos + 1);
+
+	for (i = 0; i < (int)Mop_Cylinders.size(); i++)
+	{
+		Mop_Cylinders[i]->Set_Y_Pos(Y_Pos + Height + curr_y_pos);
+
+		curr_y_pos += Mop_Cylinders[i]->Get_Height();
+	}
+
+	Mop_Rect.left = AsConfig::Level_X_Offset * scale;
+	Mop_Rect.top = Y_Pos * scale;
+	Mop_Rect.right = Mop_Rect.left + Width * scale;
+	Mop_Rect.bottom = Mop_Rect.top + Height * scale;
 }
 //------------------------------------------------------------------------------------------------------------

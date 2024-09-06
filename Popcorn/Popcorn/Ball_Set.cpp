@@ -37,15 +37,29 @@ bool AsBall_Set::Release_Next_Ball()
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Set_On_Platform(double platform_x_pos)
 {
-	for (int i = 0; i < 1; i++)
+	int i;
+
+	for (i = 0; i < 1; i++)
 	{
 		Balls[i].Set_State(EBall_State::Normal);
 		Balls[i].Set_State(EBall_State::On_Platform, platform_x_pos, AsConfig::Start_Ball_Y_Pos);
-		//Balls[i].Release_Timer_Tick = 0; // чтобы мячик не стартовал сам
+		Balls[i].Release_Timer_Tick = 0;
 	}
 
+	for (; i < (int)Balls.size(); i++)
+		Balls[i].Set_State(EBall_State::Disabled);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBall_Set::Disable_All_Balls()
+{
 	for (auto &ball : Balls)
-		ball.Set_State(EBall_State::Disabled);
+	{
+		if (ball.Get_State() != EBall_State::Disabled)
+		{
+			ball.Set_State(EBall_State::Lost);
+			ball.Set_State(EBall_State::Disabled);
+		}
+	}
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsBall_Set::All_Balls_Are_Lost()
@@ -84,18 +98,6 @@ bool AsBall_Set::Is_Test_Finished()
 	return Balls[0].Is_Test_Finished();  // В повторяющихся тестах участвует только 0-й мячик
 }
 //------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Disable_All_Balls()
-{
-	for (auto &ball : Balls)
-	{
-		if (ball.Get_State() != EBall_State::Disabled)
-		{
-			ball.Set_State(EBall_State::Lost);
-			ball.Set_State(EBall_State::Disabled);
-		}
-	}
-}
-//------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Triple_Balls()
 {// "Растроить" самый дальний летящий от платформы мячик
 
@@ -103,9 +105,6 @@ void AsBall_Set::Triple_Balls()
 	ABall *left_candidate = 0, *right_candidate = 0;
 	double curr_ball_x, curr_ball_y;
 	double further_ball_x, further_ball_y;
-	/*double prev_direction, direction_delta;
-	const double min_angle = AsConfig::Min_Ball_Angle / 2.0;*/
-
 
 	// 1. Выбираем самый дальний по Y мячик
 	for (auto &ball : Balls)
@@ -143,7 +142,6 @@ void AsBall_Set::Triple_Balls()
 					right_candidate = &ball;
 					break;  // Оба кандидата найдены
 				}
-
 		}
 	}
 
@@ -151,14 +149,35 @@ void AsBall_Set::Triple_Balls()
 	if (left_candidate != 0)
 	{
 		*left_candidate = *further_ball;
-		Rotate_Triple_Ball(left_candidate, true);
+		Turn_Tripled_Ball(left_candidate, true);
 	}
 
 	if (right_candidate != 0)
 	{
 		*right_candidate = *further_ball;
-		Rotate_Triple_Ball(right_candidate, false);
+		Turn_Tripled_Ball(right_candidate, false);
 	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBall_Set::Turn_Tripled_Ball(ABall *ball, bool add_min_angle)
+{// Корректируем направление растроившегося мячика
+
+	double prev_direction, direction_delta;
+	double correction_angle;
+
+	prev_direction = ball->Get_Direction();
+
+	if (add_min_angle)
+		correction_angle = AsConfig::Min_Ball_Angle;
+	else
+		correction_angle = -AsConfig::Min_Ball_Angle;
+
+	ball->Set_Direction(prev_direction + correction_angle);
+
+	direction_delta = fabs(ball->Get_Direction() - prev_direction);
+
+	if (direction_delta < AsConfig::Min_Ball_Angle / 2.0)
+		ball->Set_Direction(prev_direction - correction_angle / 2.0);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Inverse_Balls()
@@ -190,34 +209,13 @@ void AsBall_Set::On_Platform_Advance(double direction, double platform_speed, do
 			ball.Forced_Advance(direction, platform_speed, max_speed);
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsBall_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj) // **game_obj указатель на указатель
+bool AsBall_Set::Get_Next_Game_Object(int &index, AGame_Object **game_obj)
 {
-	if (index < 0 or index >= Balls.size() )
+	if (index < 0 || index >= (int)Balls.size() )
 		return false;
 
-	*game_obj = &Balls[index++]; //  в указатель помещается адрес объекта, index по ссылке инкрементируется
+	*game_obj = &Balls[index++];
+
 	return true;
-}
-//------------------------------------------------------------------------------------------------------------
-void AsBall_Set::Rotate_Triple_Ball(ABall *ball, bool is_add_angle)
-{
-	double prev_direction, direction_delta;
-	const double min_angle = AsConfig::Min_Ball_Angle / 2.0;
-	double correction_angle;
-
-	prev_direction = ball->Get_Direction();
-
-	if (is_add_angle)
-		correction_angle = AsConfig::Min_Ball_Angle;
-	else
-		correction_angle = -AsConfig::Min_Ball_Angle;
-
-	ball->Set_Direction(prev_direction + correction_angle);
-
-	// проверка диапазона значений
-	direction_delta = fabs(ball->Get_Direction() - prev_direction);
-
-	if (direction_delta < min_angle)
-		ball->Set_Direction(prev_direction - min_angle);
 }
 //------------------------------------------------------------------------------------------------------------

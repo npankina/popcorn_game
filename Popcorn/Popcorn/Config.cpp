@@ -101,42 +101,38 @@ AColor::~AColor()
 //------------------------------------------------------------------------------------------------------------
 AColor::AColor()
 	: R(0), G(0), B(0), Pen(0), Brush(0)
-{}
+{
+}
 //------------------------------------------------------------------------------------------------------------
 AColor::AColor(unsigned char r, unsigned char g, unsigned char b)
 	: R(r), G(g), B(b), Pen(0), Brush(0)
 {
-	Pen = CreatePen(PS_SOLID, 0, RGB(r, g, b));
-	Brush = CreateSolidBrush(RGB(r, g, b));
+	Pen = CreatePen(PS_SOLID, 0, RGB(r, g, b) );
+	Brush = CreateSolidBrush(RGB(r, g, b) );
 }
 //------------------------------------------------------------------------------------------------------------
 AColor::AColor(const AColor &color, int pen_size)
 	: R(color.R), G(color.G), B(color.B), Pen(0), Brush(0)
 {
-	Pen = CreatePen(PS_SOLID, pen_size, color.Get_RGB());
+	Pen = CreatePen(PS_SOLID, pen_size, color.Get_RGB() );
 }
 //------------------------------------------------------------------------------------------------------------
 AColor::AColor(unsigned char r, unsigned char g, unsigned char b, int pen_size)
 	: R(r), G(g), B(b), Pen(0), Brush(0)
 {
-	Pen = CreatePen(PS_SOLID, pen_size, RGB(r, g, b));
+	Pen = CreatePen(PS_SOLID, pen_size, RGB(r, g, b) );
 }
 //------------------------------------------------------------------------------------------------------------
 AColor::AColor(const AColor &pen_color, const AColor &brush_color, int pen_size)
 	: R(0), G(0), B(0), Pen(0), Brush(0)
 {
-	Pen = CreatePen(PS_SOLID, pen_size, pen_color.Get_RGB());
-	Brush = CreateSolidBrush(brush_color.Get_RGB());
+	Pen = CreatePen(PS_SOLID, pen_size, pen_color.Get_RGB() );
+	Brush = CreateSolidBrush(brush_color.Get_RGB() );
 }
 //------------------------------------------------------------------------------------------------------------
-void AColor::operator=(const AColor &another)
+void AColor::operator = (const AColor &another)
 {
-	AsConfig::Throw(); // Присваивание должно создавать копии карандаша и кисти. Вместо = следует пользоваться методом Set_As
-}
-//------------------------------------------------------------------------------------------------------------
-int AColor::Get_RGB() const
-{
-	return RGB(R, G, B);
+	AsConfig::Throw();  // При присваивании нужно создать копии карандаша и кисти. Вместо этого следует их пересоздать методом Set_As().
 }
 //------------------------------------------------------------------------------------------------------------
 void AColor::Set_As(unsigned char r, unsigned char g, unsigned char b)
@@ -151,8 +147,13 @@ void AColor::Set_As(unsigned char r, unsigned char g, unsigned char b)
 	if (Brush != 0)
 		DeleteObject(Brush);
 
-	Pen = CreatePen(PS_SOLID, 0, RGB(R, G, B));
-	Brush = CreateSolidBrush(RGB(R, G, B));
+	Pen = CreatePen(PS_SOLID, 0, RGB(R, G, B) );
+	Brush = CreateSolidBrush(RGB(R, G, B) );
+}
+//------------------------------------------------------------------------------------------------------------
+int AColor::Get_RGB() const
+{
+	return RGB(R, G, B);
 }
 //------------------------------------------------------------------------------------------------------------
 void AColor::Select(HDC hdc) const
@@ -179,35 +180,35 @@ HBRUSH AColor::Get_Brush() const
 //------------------------------------------------------------------------------------------------------------
 AColor_Fade::~AColor_Fade()
 {
-	for (auto *item : Fading_Colors)
-		delete item;
+	for (auto *color: Fading_Colors)
+		delete color;
 
-	Fading_Colors.erase(Fading_Colors.begin(), Fading_Colors.end());
+	Fading_Colors.erase(Fading_Colors.begin(), Fading_Colors.end() );
 }
 //------------------------------------------------------------------------------------------------------------
 AColor_Fade::AColor_Fade(const AColor &color, int max_fade_step)
 {
-	AColor *current_color;
+	AColor *curr_color;
 
 	for (int i = 0; i < max_fade_step; i++)
 	{
-		current_color = AsTools::Get_Fading_Color(color, i, max_fade_step);
-		Fading_Colors.push_back(std::move(current_color));
+		curr_color = AsTools::Get_Fading_Color(color, i, max_fade_step);
+		Fading_Colors.push_back(curr_color);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-AColor_Fade::AColor_Fade(const AColor &color, const AColor &base_color, int max_fade_step)
+AColor_Fade::AColor_Fade(const AColor &origin_color, const AColor &base_color, int max_fade_step)
 {
-	AColor *current_color;
+	AColor *curr_color;
 
 	for (int i = 0; i < max_fade_step; i++)
 	{
-		current_color = AsTools::Get_Fading_Color(color, base_color, i, max_fade_step);
-		Fading_Colors.push_back(std::move(current_color));
+		curr_color = AsTools::Get_Fading_Color(origin_color, base_color, i, max_fade_step);
+		Fading_Colors.push_back(curr_color);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-AColor* AColor_Fade::Get_Color(int fade_step)
+AColor *AColor_Fade::Get_Color(int fade_step)
 {
 	if (fade_step < 0 or fade_step >= (int)Fading_Colors.size())
 		AsConfig::Throw();
@@ -233,11 +234,6 @@ void AsTools::Round_Rect(HDC hdc, RECT &rect, int corner_radius)
 	RoundRect(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1, radius, radius);
 }
 //------------------------------------------------------------------------------------------------------------
-void AsTools::Invalidate_Rect(RECT &rect)
-{
-	InvalidateRect(AsConfig::Hwnd, &rect, FALSE);
-}
-//------------------------------------------------------------------------------------------------------------
 void AsTools::Rect(HDC hdc, RECT &rect, const AColor &color)
 {
 	color.Select(hdc);
@@ -246,17 +242,10 @@ void AsTools::Rect(HDC hdc, RECT &rect, const AColor &color)
 //------------------------------------------------------------------------------------------------------------
 void AsTools::Rect(HDC hdc, int x, int y, int width, int height, const AColor &color)
 {
-	RECT rect{};
-
 	const int scale = AsConfig::Global_Scale;
 
-	rect.left = x * scale;
-	rect.top = y * scale;
-	rect.right = rect.left + width * scale;
-	rect.bottom = rect.top + height * scale;
-
 	color.Select(hdc);
-	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
+	Rectangle(hdc, x * scale, y * scale, (x + width) * scale - 1, (y + height) * scale - 1);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsTools::Ellipse(HDC hdc, RECT &rect, const AColor &color)
@@ -265,17 +254,22 @@ void AsTools::Ellipse(HDC hdc, RECT &rect, const AColor &color)
 	::Ellipse(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
 //------------------------------------------------------------------------------------------------------------
+void AsTools::Invalidate_Rect(RECT &rect)
+{
+	InvalidateRect(AsConfig::Hwnd, &rect, FALSE);
+}
+//------------------------------------------------------------------------------------------------------------
 unsigned char AsTools::Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step, int max_step)
 {
 	return color - step * (color - bg_color) / (max_step - 1);
 }
 //------------------------------------------------------------------------------------------------------------
-AColor* AsTools::Get_Fading_Color(const AColor &origin_color, int step, int max_step)
+AColor *AsTools::Get_Fading_Color(const AColor &origin_color, int step, int max_step)
 {
 	return Get_Fading_Color(origin_color, AsConfig::BG_Color, step, max_step);
 }
 //------------------------------------------------------------------------------------------------------------
-AColor* AsTools::Get_Fading_Color(const AColor &origin_color, const AColor &base_color, int step, int max_step)
+AColor *AsTools::Get_Fading_Color(const AColor &origin_color, const AColor &base_color, int step, int max_step)
 {
 	unsigned char r, g, b;
 	AColor *result_color;
@@ -388,8 +382,8 @@ void AHit_Checker_List::Add_Hit_Checker(AHit_Checker *hit_checker)
 //------------------------------------------------------------------------------------------------------------
 bool AHit_Checker_List::Check_Hit(double x_pos, double y_pos, ABall_Object *ball)
 {
-	for (auto &item : Hit_Checkers)
-		if (item->Check_Hit(x_pos, y_pos, ball))
+	for (auto *hit_checker : Hit_Checkers)
+		if (hit_checker->Check_Hit(x_pos, y_pos, ball) )
 			return true;
 
 	return false;
@@ -397,8 +391,8 @@ bool AHit_Checker_List::Check_Hit(double x_pos, double y_pos, ABall_Object *ball
 //------------------------------------------------------------------------------------------------------------
 bool AHit_Checker_List::Check_Hit(double x_pos, double y_pos)
 {
-	for (auto &item : Hit_Checkers)
-		if (item->Check_Hit(x_pos, y_pos))
+	for (auto *hit_checker : Hit_Checkers)
+		if (hit_checker->Check_Hit(x_pos, y_pos) )
 			return true;
 
 	return false;
@@ -406,8 +400,8 @@ bool AHit_Checker_List::Check_Hit(double x_pos, double y_pos)
 //------------------------------------------------------------------------------------------------------------
 bool AHit_Checker_List::Check_Hit(RECT &rect)
 {
-	for (auto &item : Hit_Checkers)
-		if (item->Check_Hit(rect))
+	for (auto *hit_checker : Hit_Checkers)
+		if (hit_checker->Check_Hit(rect) )
 			return true;
 
 	return false;

@@ -1,5 +1,6 @@
 #include "Platform_Glue.h"
 
+// class AsPlatform_Glue
 const double AsPlatform_Glue::Max_Glue_Spot_Height_Ratio = 1.0;
 const double AsPlatform_Glue::Min_Glue_Spot_Height_Ratio = 0.4;
 const double AsPlatform_Glue::Glue_Spot_Height_Ratio_Step = 0.05;
@@ -50,7 +51,7 @@ bool AsPlatform_Glue::Act(AsBall_Set *ball_set, EPlatform_State &next_state)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsPlatform_Glue::Draw(HDC hdc, double x_pos)
+void AsPlatform_Glue::Draw_State(HDC hdc, double x_pos)
 {// Рисуем платформу с растекающимся клеем
 
 	HRGN region;
@@ -98,3 +99,4 @@ void AsPlatform_Glue::Draw_Glue_Spot(HDC hdc, double x_pos, int x_offset, int wi
 
 	Chord(hdc, spot_rect.left, spot_rect.top, spot_rect.right - 1, spot_rect.bottom - 1,  spot_rect.left, platform_top - 1, spot_rect.right - 1, platform_top - 1);
 }
+//------------------------------------------------------------------------------------------------------------

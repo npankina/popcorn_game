@@ -93,7 +93,7 @@ void AGame_Objects_Set::Draw(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 bool AGame_Objects_Set::Is_Finished()
 {
-	return false;  // Заглушка, т.к. этот метод не используется (мы можем проверить это состояние разве что у элементарного объекта, но не у всей коллекции)
+	return false;  // Заглушка, т.к. этот метод не используется
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -114,7 +114,6 @@ void AString::Append(int value, int digits)
 	wchar_t buf[size];
 
 	swprintf(format, size, L"%%.%ii", digits);
-
 	swprintf(buf, size, format, value);
 	Content += buf;
 }
@@ -126,7 +125,7 @@ const wchar_t *AString::Get_Content()
 //------------------------------------------------------------------------------------------------------------
 int AString::Get_Length()
 {
-	return (int)Content.length();
+	return Content.length();
 }
 //------------------------------------------------------------------------------------------------------------
 void AString::Clear()
@@ -140,7 +139,7 @@ void AString::Clear()
 
 // class AMessage
 //------------------------------------------------------------------------------------------------------------
-AMessage::AMessage(const EMessage_Type message_type) : Message_Type(message_type)
+AMessage::AMessage(EMessage_Type message_type) : Message_Type(message_type)
 {}
 //------------------------------------------------------------------------------------------------------------
 
@@ -148,20 +147,21 @@ AMessage::AMessage(const EMessage_Type message_type) : Message_Type(message_type
 
 
 // class AsMessage_Manager
-std::queue<AMessage *> AsMessage_Manager::Message_Queue;
+std::queue<AMessage *> AsMessage_Manager::Messages_Queue;
 //------------------------------------------------------------------------------------------------------------
 void AsMessage_Manager::Add_Message(AMessage *message)
 {
-	Message_Queue.push(message);
+	Messages_Queue.push(message);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsMessage_Manager::Get_Message(AMessage **message)
 {
-	if (Message_Queue.size() == 0)
+	if (Messages_Queue.size() == 0)
 		return false;
 
-	*message = Message_Queue.front();
-	Message_Queue.pop();
+	*message = Messages_Queue.front();
+
+	Messages_Queue.pop();
 
 	return true;
 }

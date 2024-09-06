@@ -119,6 +119,6 @@ public:
 	static bool Get_Message(AMessage **message);
 
 private:
-	static std::queue<AMessage *> Message_Queue;
+	static std::queue<AMessage *> Messages_Queue;
 };
 //------------------------------------------------------------------------------------------------------------

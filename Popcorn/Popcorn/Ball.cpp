@@ -5,8 +5,9 @@ AHit_Checker_List ABall::Hit_Checker_List;
 ABall::ABall()
 : Ball_State(EBall_State::Disabled), Prev_Ball_State(EBall_State::Disabled), Release_Timer_Tick(0), Center_X_Pos(0.0), Center_Y_Pos(0.0),
   Ball_Speed(0.0), Prev_Ball_Speed(0.0), Ball_Direction(0.0), Prev_Ball_Direction(0.0), Testing_Is_Active(false),
-	Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}, Parachute_Rect{}, Prev_Parachute_Rect{}
-{}
+  Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}
+{
+}
 //------------------------------------------------------------------------------------------------------------
 void ABall::Begin_Movement()
 {
@@ -346,6 +347,12 @@ void ABall::Set_On_Parachute(int brick_x, int brick_y)
 	Redraw_Parachute();
 }
 //------------------------------------------------------------------------------------------------------------
+void ABall::Get_Center(double &x_pos, double &y_pos)
+{
+	x_pos = Center_X_Pos;
+	y_pos = Center_Y_Pos;
+}
+//------------------------------------------------------------------------------------------------------------
 bool ABall::Is_Moving_Up()
 {
 	if (Ball_Direction >= 0.0 and Ball_Direction < M_PI)
@@ -362,12 +369,6 @@ bool ABall::Is_Moving_Left()
 		return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Get_Center(double &x_pos, double &y_pos)
-{
-	x_pos = Center_X_Pos;
-	y_pos = Center_Y_Pos;
-}
-//------------------------------------------------------------------------------------------------------------
 void ABall::Set_Speed(double new_speed)
 {
 	Ball_Speed = new_speed;
@@ -380,7 +381,6 @@ void ABall::Set_For_Test()
 
 	Set_State(EBall_State::Normal, 130 + Test_Iteration, 90);
 	Ball_Direction = M_PI_4;
-
 	Ball_Speed = AsConfig::Normal_Ball_Speed;
 
 	++Test_Iteration;
@@ -468,7 +468,6 @@ void ABall::Draw_Parachute(HDC hdc, RECT &paint_area)
 		Parachute_Rect.right, Parachute_Rect.top + dome_height - 1, Parachute_Rect.left, Parachute_Rect.top + dome_height - 1);
 
 	// 2. Арки
-
 	AsConfig::BG_Color.Select(hdc);
 	arc_x = Parachute_Rect.left + 1;
 
@@ -514,7 +513,6 @@ void ABall::Draw_Parachute(HDC hdc, RECT &paint_area)
 
 	MoveToEx(hdc, Parachute_Rect.right, line_y - 1, 0);
 	LineTo(hdc, ball_center_x, ball_center_y);
-
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Clear_Parachute(HDC hdc)

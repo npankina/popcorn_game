@@ -1,6 +1,8 @@
 #pragma once
+
 #include "Config.h"
 
+//------------------------------------------------------------------------------------------------------------
 enum class EPlatform_State: unsigned char
 {
 	Unknown,
@@ -9,8 +11,8 @@ enum class EPlatform_State: unsigned char
 	Meltdown,
 	Rolling,
 	Glue,
-	Laser,
-	Expanding
+	Expanding,
+	Laser
 };
 //------------------------------------------------------------------------------------------------------------
 enum class EPlatform_Substate_Regular: unsigned char
@@ -55,20 +57,27 @@ enum class EPlatform_Moving_State: unsigned char
 	Moving_Right
 };
 //------------------------------------------------------------------------------------------------------------
+enum class EFigure_Type: unsigned char
+{
+	Ellipse,
+	Rectangle,
+	Round_Rect_3x
+};
+//------------------------------------------------------------------------------------------------------------
 class AsPlatform_State
-{// Инкапсулирует все состояния платформы
+{
 public:
 	AsPlatform_State();
 
 	operator EPlatform_State() const;
 	void operator = (EPlatform_State new_state);
+
 	void Set_Next_State(EPlatform_State next_state);
 	EPlatform_State Get_Next_State();
-	EPlatform_State Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state);
 	EPlatform_State Set_State(EPlatform_Substate_Regular new_regular_state);
+	EPlatform_State Set_Next_Or_Regular_State(EPlatform_Substate_Regular new_regular_state);
 
 	EPlatform_Substate_Regular Regular;
-
 	EPlatform_Substate_Meltdown Meltdown;
 	EPlatform_Substate_Rolling Rolling;
 	EPlatform_Transformation Glue;
@@ -79,5 +88,6 @@ public:
 
 private:
 	EPlatform_State Current_State;
-	EPlatform_State Next_State; // Переходим в это состояние из AsPlatform::Set_State
+	EPlatform_State Next_State;  // В это состояние переходим из AsPlatform::Set_State(EPlatform_Substate_Regular new_regular_state)
 };
+//------------------------------------------------------------------------------------------------------------

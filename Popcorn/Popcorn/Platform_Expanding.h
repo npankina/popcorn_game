@@ -1,9 +1,12 @@
-﻿#pragma once
+#pragma once
+
 #include "Platform_State.h"
 
+//------------------------------------------------------------------------------------------------------------
 class AsPlatform_Expanding
 {
 public:
+	~AsPlatform_Expanding();
 	AsPlatform_Expanding(AsPlatform_State &platform_state);
 
 	void Init(AColor &highlight_color, AColor &circle_color, AColor &inner_color);
@@ -22,6 +25,6 @@ private:
 	AColor *Highlight_Color, *Circle_Color, *Inner_Color;  // UNO
 	AColor *Truss_Color;
 
-	static const int Expanding_Platform_Inner_Width = 12;
 	static const double Max_Expanding_Platform_Width, Min_Expanding_Platform_Width, Expanding_Platform_Width_Step;
 };
+//------------------------------------------------------------------------------------------------------------

@@ -8,6 +8,7 @@ AsBorder::AsBorder()
 	Floor_Rect.right = (AsConfig::Max_X_Pos - 1) * AsConfig::Global_Scale;
 	Floor_Rect.bottom = AsConfig::Max_Y_Pos * AsConfig::Global_Scale;
 
+	// Гейты
 	Gates.push_back(new AGate(1, 28, 0, 3) );
 	Gates.push_back(new AGate(AsConfig::Max_X_Pos, 28, AsConfig::Level_Width - 1, 3) );
 
@@ -158,7 +159,7 @@ double AsBorder::Get_Speed()
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Act()
 {
-		for (auto &gate : Gates)
+		for (auto *gate : Gates)
 			gate->Act();
 }
 //------------------------------------------------------------------------------------------------------------
@@ -238,28 +239,22 @@ void AsBorder::Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_bo
 		return;
 
 	// Основная линия
-	AsConfig::Blue_Color.Select(hdc);
-
 	if (top_border)
-		Rectangle(hdc, x * scale, (y + 1) * scale, (x + 4) * scale - 1, (y + 4) * scale - 1);
+		AsTools::Rect(hdc, x, y + 1, 4, 3, AsConfig::Blue_Color);
 	else
-		Rectangle(hdc, (x + 1) * scale, y * scale, (x + 4) * scale - 1, (y + 4) * scale - 1);
+		AsTools::Rect(hdc, x + 1, y, 3, 4, AsConfig::Blue_Color);
 
 	// Белая кайма
-	AsConfig::White_Color.Select(hdc);
-
 	if (top_border)
-		Rectangle(hdc, x * scale, y * scale, (x + 4) * scale - 1, (y + 1) * scale - 1);
+		AsTools::Rect(hdc, x, y, 4, 1, AsConfig::White_Color);
 	else
-		Rectangle(hdc, x * scale, y * scale, (x + 1) * scale - 1, (y + 4) * scale - 1);
+		AsTools::Rect(hdc, x, y, 1, 4, AsConfig::White_Color);
 
 	// Перфорация
-	AsConfig::BG_Color.Select(hdc);
-
 	if (top_border)
-		Rectangle(hdc, (x + 2) * scale, (y + 2) * scale, (x + 3) * scale - 1, (y + 3) * scale - 1);
+		AsTools::Rect(hdc, x + 2, y + 2, 1, 1, AsConfig::BG_Color);
 	else
-		Rectangle(hdc, (x + 2) * scale, (y + 1) * scale, (x + 3) * scale - 1, (y + 2) * scale - 1);
+		AsTools::Rect(hdc, x + 2, y + 1, 1, 1, AsConfig::BG_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw_Floor(HDC hdc, RECT &paint_area)
@@ -267,8 +262,6 @@ void AsBorder::Draw_Floor(HDC hdc, RECT &paint_area)
 	int strokes_count;
 	int x_pos, y_pos;
 	const int scale = AsConfig::Global_Scale;
-
-
 	int line_len = 4 * scale;
 	int gap_len = 2 * scale;
 	int stroke_len = line_len + gap_len;

@@ -22,7 +22,8 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Level.Init();
 	Platform.Init(&Ball_Set, &Laser_Beam_Set);
 	Monster_Set.Init(&Border);
-	
+	Info_Panel.Init();
+
 	AFalling_Letter::Init();
 
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
@@ -111,11 +112,11 @@ int AsEngine::On_Timer()
 	case EGame_State::Lost_Ball:
 		if (Platform.Has_State(EPlatform_Substate_Regular::Missing) )
 		{
-			if (!Info_Panel.Decrease_Life_Count()) // false - no restart
+			if (! Info_Panel.Decrease_Life_Count() )
 				Game_Over();
 
 			Restart_Level();
-		}		
+		}
 		break;
 
 
@@ -124,7 +125,7 @@ int AsEngine::On_Timer()
 		{
 			Game_State = EGame_State::Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos() );
-			Monster_Set.Activate(5);
+			Monster_Set.Activate(7);
 			Level.Hide_Title();
 		}
 		break;
@@ -137,10 +138,9 @@ int AsEngine::On_Timer()
 			Game_State = EGame_State::Mop_Level;
 		}
 		break;
-
 	}
 
-	Act(); 
+	Act();
 
 	return 0;
 }
@@ -150,18 +150,6 @@ void AsEngine::Restart_Level()
 	Game_State = EGame_State::Restart_Level;
 	Level.Show_Title();
 	Border.Open_Gate(7, true);
-}
-//------------------------------------------------------------------------------------------------------------
-void AsEngine::Game_Over()
-{
-	// !!! Надо сделать
-	AsConfig::Throw();
-}
-//------------------------------------------------------------------------------------------------------------
-void AsEngine::Game_Won()
-{
-	// !!! Надо сделать
-	AsConfig::Throw();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Play_Level()
@@ -191,9 +179,18 @@ void AsEngine::Stop_Play()
 	Info_Panel.Monster_Indicator.Reset();
 }
 //------------------------------------------------------------------------------------------------------------
+void AsEngine::Game_Over()
+{
+	AsConfig::Throw();  //!!! Надо сделать!
+}
+//------------------------------------------------------------------------------------------------------------
+void AsEngine::Game_Won()
+{
+	AsConfig::Throw();  //!!! Надо сделать!
+}
+//------------------------------------------------------------------------------------------------------------
 void AsEngine::Advance_Movers()
-{// смещает в течение текущего кадра все двигающиеся объекты на несколько элементарных шагов
-	
+{
 	double curr_speed, max_speed = 0.0;
 
 	// 1. Получаем максимальную скорость движущихся объектов
@@ -270,7 +267,7 @@ void AsEngine::Handle_Message()
 
 
 		case EMessage_Type::Level_Finished:
-			if (!Level.Can_Mop_Next_Level())
+			if (! Level.Can_Mop_Next_Level() )
 				Game_Won();
 			else
 			{
