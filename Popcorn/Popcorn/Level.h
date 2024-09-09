@@ -49,6 +49,21 @@ private:
 	static const int scale_ = AsConfig::Global_Scale;
 };
 //------------------------------------------------------------------------------------------------------------
+class AFinal_Letter : public AGraphics_Object
+{
+public:
+	AFinal_Letter();
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+private:
+	ALabel Letter;
+
+};
+//------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object
 {
 public:
