@@ -52,7 +52,7 @@ private:
 class AFinal_Letter : public AGraphics_Object
 {
 public:
-	AFinal_Letter();
+	AFinal_Letter(const wchar_t *letter);
 
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT &paint_area);
@@ -131,6 +131,7 @@ private:
 	std::vector<ALevel_Data *> Levels_Data;
 	AsMop Mop;  // "Швабра", очищающая уровень
 	AsLevel_Title Level_Title;  // Табличка с номером уровня
+	AFinal_Letter Final_Letter;
 
 	static AsLevel *Level;
 	static const int scale_ = AsConfig::Global_Scale;
