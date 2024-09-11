@@ -97,7 +97,9 @@ void AFinal_Letter::Clear(HDC hdc, RECT &paint_area)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AFinal_Letter::Draw(HDC hdc, RECT &paint_area)
-{}
+{
+	Letter.Draw(hdc);
+}
 //------------------------------------------------------------------------------------------------------------
 bool AFinal_Letter::Is_Finished()
 {
