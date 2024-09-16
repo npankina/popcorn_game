@@ -4,13 +4,11 @@
 //------------------------------------------------------------------------------------------------------------
 APoint::APoint()
 : X(0), Y(0)
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 APoint::APoint(int x, int y)
 : X(x), Y(y)
-{
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 
 
@@ -20,7 +18,7 @@ APoint::APoint(int x, int y)
 //------------------------------------------------------------------------------------------------------------
 AsLevel_Title::AsLevel_Title()
 : Level_Title_State(ELevel_Title_State::Missing), Level_Name(X_Pos, Y_Pos, 72, Height, AsConfig::Name_Font, AsConfig::Blue_Color),
-  Level_Number(X_Pos + Width - 32, Y_Pos, 32, Height, AsConfig::Name_Font, AsConfig::White_Color)
+  Level_Number(X_Pos + Width - 32, Y_Pos, 32, Height, AsConfig::Game_Over_Font, AsConfig::White_Color)
 {
 	Level_Name.Content = L"Уровень";
 

@@ -44,7 +44,7 @@ class AFont
 {
 public:
 	~AFont();
-	AFont(int height, int weight, int family, const wchar_t *face_name);
+	AFont(int height, int weight, int family, const wchar_t *face_name, bool is_italic);
 
 	void Select(HDC hdc) const;
 
@@ -68,7 +68,7 @@ public:
 	static const AColor Monster_Dark_Red_Color, Monster_Cornea_Color, Monster_Iris_Color, Monster_Comet_Tail;
 	static const AColor BG_Outline_Color, Explosion_Red_Color, Explosion_Blue_Color, Truss_Color;
 	static const AColor Shadow_Color, Highlight_Panel_Color, BG_Outcome_Color, Highlight_Color, Gun_Color;
-	static const AFont Name_Font, Score_Font, Logo_Pop_Font, Logo_Corn_Font;
+	static const AFont Name_Font, Score_Font, Logo_Pop_Font, Logo_Corn_Font, Game_Over_Font;
 
 	static const double D_Global_Scale;
 	static const double Moving_Step_Size;

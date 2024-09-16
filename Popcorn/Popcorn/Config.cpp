@@ -8,7 +8,7 @@ AFont::~AFont()
 		DeleteObject(Font_Handle);
 }
 //------------------------------------------------------------------------------------------------------------
-AFont::AFont(int height, int weight, int family, const wchar_t *face_name)
+AFont::AFont(int height, int weight, int family, const wchar_t *face_name, bool is_italic = false)
 {
 	LOGFONT log_font{};
 
@@ -19,6 +19,9 @@ AFont::AFont(int height, int weight, int family, const wchar_t *face_name)
 	log_font.lfQuality = 1;
 	log_font.lfPitchAndFamily = family;
 	wcscpy_s(log_font.lfFaceName, face_name);
+
+	if (is_italic)
+		log_font.lfItalic = 255;
 
 	Font_Handle = CreateFontIndirect(&log_font);
 }
@@ -42,6 +45,7 @@ const AFont AsConfig::Name_Font(-48, 700, 49, L"Consolas");
 const AFont AsConfig::Score_Font(-44, 700, 49, L"Consolas");
 const AFont AsConfig::Logo_Pop_Font(-128, 900, 34, L"Arial Black");
 const AFont AsConfig::Logo_Corn_Font(-96, 900, 34, L"Arial Black");
+const AFont AsConfig::Game_Over_Font(-60, 700, 66, L"Comic Sans MS", true); // MV Boli
 
 
 const AColor AsConfig::BG_Color(6, 30, 82);
