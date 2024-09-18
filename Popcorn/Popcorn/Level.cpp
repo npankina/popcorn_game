@@ -82,11 +82,9 @@ void AsLevel_Title::Hide()
 
 
 
-////------------------------------------------------------------------------------------------------------------
-//AFinal_Letter::AFinal_Letter(const wchar_t *letter) : Letter(32, 135, 15, 15, AsConfig::Game_Over_Font, AsConfig::White_Color)
-//{
-//	Letter.Content = letter;
-//}
+//------------------------------------------------------------------------------------------------------------
+AFinal_Letter::AFinal_Letter(const wchar_t letter) : Letter(letter)
+{}
 //------------------------------------------------------------------------------------------------------------
 void AFinal_Letter::Act()
 {}
@@ -100,9 +98,8 @@ void AFinal_Letter::Draw(HDC hdc, RECT &paint_area)
 
 	SetBkMode(hdc, TRANSPARENT);
 	AsConfig::Game_Over_Font.Select(hdc);
-
-	SetTextColor(hdc, Color.Get_RGB());
-	TextOut(hdc, str_left_offset, str_top_offset, Content.Get_Content(), Content.Get_Length());
+	SetTextColor(hdc, AsConfig::White_Color.Get_RGB() );
+	TextOut(hdc, 32 * AsConfig::Global_Scale, 135 * AsConfig::Global_Scale, &Letter, 1);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AFinal_Letter::Is_Finished()
