@@ -52,7 +52,7 @@ private:
 class AFinal_Letter : public AGraphics_Object
 {
 public:
-	AFinal_Letter(const wchar_t letter);
+	AFinal_Letter(double x_pos, double y_pos, const wchar_t letter);
 
 	virtual void Act();
 	virtual void Clear(HDC hdc, RECT &paint_area);
@@ -61,6 +61,7 @@ public:
 
 private:
 	wchar_t Letter;
+	double X_Pos, Y_Pos;
 };
 //------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object
@@ -112,7 +113,6 @@ private:
 	void Act_Objects(std::vector<AGraphics_Object *> &falling_letters);
 	void Cancel_All_Activity();
 
-	RECT Level_Rect;
 	bool Need_To_Cancel_All;
 	int Next_Level_Number, Current_Level_Number;
 	int Available_Bricks_Count;
@@ -121,16 +121,18 @@ private:
 	double Current_Brick_Top_Y, Current_Brick_Low_Y;
 
 	AColor Parachute_Color;
+	RECT Level_Rect;
 
 	char Current_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 	std::vector<AGraphics_Object *> Active_Bricks;
 	std::vector<AGraphics_Object *> Falling_Letters;
 	std::vector<APoint> Teleport_Bricks_Pos;
+	std::vector<AFinal_Letter *> Game_Over_Title;
 	AAdvertisement *Advertisement;
 	std::vector<ALevel_Data *> Levels_Data;
 	AsMop Mop;  // "Швабра", очищающая уровень
 	AsLevel_Title Level_Title;  // Табличка с номером уровня
-	AFinal_Letter Final_Letter;
+	
 
 	static AsLevel *Level;
 	static const int scale_ = AsConfig::Global_Scale;
