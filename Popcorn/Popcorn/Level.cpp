@@ -341,6 +341,7 @@ bool AsLevel::Is_Finished()
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Init()
 {
+    double title_x, title_y;
 	ALevel_Data *level_data = nullptr;
 
 	Level_Rect.left = AsConfig::Level_X_Offset * scale_;
@@ -362,14 +363,17 @@ void AsLevel::Init()
 			level_data->Advertisement = new AAdvertisement(1, 9, 2, 3);
 	}
 
-	Game_Over_Title.push_back(new AFinal_Letter( 32.0, 135.0, L'G'));
-	Game_Over_Title.push_back(new AFinal_Letter( 48.0, 135.0, L'A'));
-	Game_Over_Title.push_back(new AFinal_Letter( 64.0, 135.0, L'M'));
-	Game_Over_Title.push_back(new AFinal_Letter( 80.0, 135.0, L'E'));
-	Game_Over_Title.push_back(new AFinal_Letter( 96.0, 135.0, L'O'));
-	Game_Over_Title.push_back(new AFinal_Letter(112.0, 135.0, L'V'));
-	Game_Over_Title.push_back(new AFinal_Letter(128.0, 135.0, L'E'));
-	Game_Over_Title.push_back(new AFinal_Letter(144.0, 135.0, L'R'));
+    title_x = 32.0;
+    title_y = 135.0;
+
+	Game_Over_Title.push_back(new AFinal_Letter( title_x, title_y, L'G'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 16.0, title_y, L'A'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 32.0, title_y, L'M'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 48.0, title_y, L'E'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 64.0, title_y, L'O'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 80.0, title_y, L'V'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 96.0, title_y, L'E'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 112.0, title_y, L'R'));
 
 }
 //------------------------------------------------------------------------------------------------------------
