@@ -64,6 +64,20 @@ private:
 	double X_Pos, Y_Pos;
 };
 //------------------------------------------------------------------------------------------------------------
+class AsGame_Title : public AGraphics_Object
+{
+public:
+	AsGame_Title();
+
+	virtual void Act();
+	virtual void Clear(HDC hdc, RECT &paint_area);
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual bool Is_Finished();
+
+private:
+	std::vector<AFinal_Letter *> Game_Over_Title;
+};
+//------------------------------------------------------------------------------------------------------------
 class AsLevel: public AHit_Checker, public AGame_Object
 {
 public:
@@ -127,12 +141,11 @@ private:
 	std::vector<AGraphics_Object *> Active_Bricks;
 	std::vector<AGraphics_Object *> Falling_Letters;
 	std::vector<APoint> Teleport_Bricks_Pos;
-	std::vector<AFinal_Letter *> Game_Over_Title;
 	AAdvertisement *Advertisement;
 	std::vector<ALevel_Data *> Levels_Data;
 	AsMop Mop;  // "Швабра", очищающая уровень
 	AsLevel_Title Level_Title;  // Табличка с номером уровня
-	
+	AsGame_Title Game_Title; // Табличка финальных титров
 
 	static AsLevel *Level;
 	static const int scale_ = AsConfig::Global_Scale;

@@ -110,6 +110,40 @@ bool AFinal_Letter::Is_Finished()
 
 
 
+//------------------------------------------------------------------------------------------------------------
+AsGame_Title::~AsGame_Title()
+{
+
+}
+//------------------------------------------------------------------------------------------------------------
+AsGame_Title::AsGame_Title()
+{
+	Game_Over_Title.push_back(new AFinal_Letter(title_x, title_y, L'G'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 14.0, title_y, L'A'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 30.0, title_y, L'M'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 48.0, title_y, L'E'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 65.0, title_y, L'O'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 80.0, title_y, L'V'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 94.0, title_y, L'E'));
+	Game_Over_Title.push_back(new AFinal_Letter(title_x + 108.0, title_y, L'R'));
+}
+//------------------------------------------------------------------------------------------------------------
+void AsGame_Title::Act()
+{ }
+//------------------------------------------------------------------------------------------------------------
+void AsGame_Title::Clear(HDC hdc, RECT &paint_area)
+{ }
+//------------------------------------------------------------------------------------------------------------
+void AsGame_Title::Draw(HDC hdc, RECT &paint_area)
+{ }
+//------------------------------------------------------------------------------------------------------------
+bool AsGame_Title::Is_Finished()
+{ }
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
 // AsLevel
 //------------------------------------------------------------------------------------------------------------
 AsLevel *AsLevel::Level = 0;
@@ -366,14 +400,7 @@ void AsLevel::Init()
     title_x = 32.0;
     title_y = 135.0;
 
-	Game_Over_Title.push_back(new AFinal_Letter( title_x, title_y, L'G'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 14.0, title_y, L'A'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 30.0, title_y, L'M'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 48.0, title_y, L'E'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 65.0, title_y, L'O'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 80.0, title_y, L'V'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 94.0, title_y, L'E'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 108.0, title_y, L'R'));
+	// &&&
 
 }
 //------------------------------------------------------------------------------------------------------------
