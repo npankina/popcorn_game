@@ -118,6 +118,9 @@ AsGame_Title::~AsGame_Title()
 //------------------------------------------------------------------------------------------------------------
 AsGame_Title::AsGame_Title()
 {
+	double title_y = 135.0;
+	double title_x = 32.0;
+
 	Game_Over_Title.push_back(new AFinal_Letter(title_x, title_y, L'G'));
 	Game_Over_Title.push_back(new AFinal_Letter(title_x + 14.0, title_y, L'A'));
 	Game_Over_Title.push_back(new AFinal_Letter(title_x + 30.0, title_y, L'M'));
@@ -132,10 +135,16 @@ void AsGame_Title::Act()
 { }
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Clear(HDC hdc, RECT &paint_area)
-{ }
+{
+	for (auto *letter : Game_Over_Title)
+		letter->Clear(hdc, paint_area);
+}
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Draw(HDC hdc, RECT &paint_area)
-{ }
+{
+	for (auto *letter : Game_Over_Title)
+		letter->Draw(hdc, paint_area);
+}
 //------------------------------------------------------------------------------------------------------------
 bool AsGame_Title::Is_Finished()
 { }
@@ -326,8 +335,7 @@ void AsLevel::Clear(HDC hdc, RECT &paint_area)
 	Mop.Clear(hdc, paint_area);
 	Level_Title.Clear(hdc, paint_area);
 
-	for (auto *letter : Game_Over_Title)
-		letter->Clear(hdc, paint_area);
+	Game_Title.Clear(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Draw(HDC hdc, RECT &paint_area)
@@ -363,9 +371,8 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 
 	Mop.Draw(hdc, paint_area);
 	Level_Title.Draw(hdc, paint_area);
-	
-	for (auto *letter : Game_Over_Title)
-		letter->Draw(hdc, paint_area);
+
+	Game_Title.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Is_Finished()
@@ -375,7 +382,6 @@ bool AsLevel::Is_Finished()
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Init()
 {
-    double title_x, title_y;
 	ALevel_Data *level_data = nullptr;
 
 	Level_Rect.left = AsConfig::Level_X_Offset * scale_;
@@ -397,8 +403,6 @@ void AsLevel::Init()
 			level_data->Advertisement = new AAdvertisement(1, 9, 2, 3);
 	}
 
-    title_x = 32.0;
-    title_y = 135.0;
 
 	// &&&
 
