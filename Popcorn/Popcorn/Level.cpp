@@ -117,37 +117,56 @@ AsGame_Title::~AsGame_Title()
 }
 //------------------------------------------------------------------------------------------------------------
 AsGame_Title::AsGame_Title()
-{
-	double title_y = 135.0;
-	double title_x = 32.0;
-
-	Game_Over_Title.push_back(new AFinal_Letter(title_x, title_y, L'G'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 14.0, title_y, L'A'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 30.0, title_y, L'M'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 48.0, title_y, L'E'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 65.0, title_y, L'O'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 80.0, title_y, L'V'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 94.0, title_y, L'E'));
-	Game_Over_Title.push_back(new AFinal_Letter(title_x + 108.0, title_y, L'R'));
-}
+{}
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Act()
-{ }
+{}
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Clear(HDC hdc, RECT &paint_area)
 {
-	for (auto *letter : Game_Over_Title)
+	for (auto *letter : Title_Letters)
 		letter->Clear(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Draw(HDC hdc, RECT &paint_area)
 {
-	for (auto *letter : Game_Over_Title)
+	for (auto *letter : Title_Letters)
 		letter->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsGame_Title::Is_Finished()
-{ }
+{
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsGame_Title::Show(bool is_over)
+{
+	double title_y = 135.0;
+	double title_x = 32.0;
+
+	if (is_over)
+	{
+		Title_Letters.push_back(new AFinal_Letter(title_x, title_y, L'G'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 14.0, title_y, L'A'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 30.0, title_y, L'M'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 48.0, title_y, L'E'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 65.0, title_y, L'O'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 80.0, title_y, L'V'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 94.0, title_y, L'E'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 108.0, title_y, L'R'));
+	}
+	else 
+	{
+		Title_Letters.push_back(new AFinal_Letter(title_x + 14.0, title_y, L'Y'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 30.0, title_y, L'O'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 48.0, title_y, L'U'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 65.0, title_y, L'W'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 86.0, title_y, L'I'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 98.0, title_y, L'N'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 118.0, title_y, L'!'));
+		Title_Letters.push_back(new AFinal_Letter(title_x + 122.0, title_y, L'!'));
+	}
+}
 //------------------------------------------------------------------------------------------------------------
 
 
@@ -403,9 +422,7 @@ void AsLevel::Init()
 			level_data->Advertisement = new AAdvertisement(1, 9, 2, 3);
 	}
 
-
-	// &&&
-
+	Game_Title.Show(false);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsLevel::Set_Current_Level(int level_number)
