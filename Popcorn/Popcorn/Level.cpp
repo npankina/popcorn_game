@@ -113,7 +113,10 @@ bool AFinal_Letter::Is_Finished()
 //------------------------------------------------------------------------------------------------------------
 AsGame_Title::~AsGame_Title()
 {
+	for (auto *letter : Title_Letters)
+		delete letter;
 
+	Title_Letters.erase(Title_Letters.begin(), Title_Letters.end() );
 }
 //------------------------------------------------------------------------------------------------------------
 AsGame_Title::AsGame_Title()
