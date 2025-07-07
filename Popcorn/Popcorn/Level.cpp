@@ -119,7 +119,7 @@ AsGame_Title::~AsGame_Title()
 	Title_Letters.erase(Title_Letters.begin(), Title_Letters.end() );
 }
 //------------------------------------------------------------------------------------------------------------
-AsGame_Title::AsGame_Title()
+AsGame_Title::AsGame_Title() : Game_Title_State(EGame_Title_State::Idle)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Act()

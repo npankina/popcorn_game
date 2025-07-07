@@ -62,7 +62,7 @@ public:
 	static HWND Hwnd;
 
 	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color, Laser_Color, Gate_Color;
-	static const AColor Platform_Circle_Color, Platform_Inner_Color, Platform_Circle_Color;
+	static const AColor Platform_Circle_Color, Platform_Inner_Color;
 	static const AColor Unbreakable_Blue_Highlight, Unbreakable_Red_Highlight, Teleport_Portal_Color;
 	static const AColor Advertisement_Blue_Table, Advertisement_Red_Table;
 	static const AColor Monster_Dark_Red_Color, Monster_Cornea_Color, Monster_Iris_Color, Monster_Comet_Tail;

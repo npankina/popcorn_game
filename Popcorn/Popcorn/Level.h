@@ -64,6 +64,19 @@ private:
 	double X_Pos, Y_Pos;
 };
 //------------------------------------------------------------------------------------------------------------
+enum class EGame_Title_State: unsigned char
+{
+	Idle,
+
+	Game_Over_Descent,
+	Game_Over_Destroy,
+
+	Game_Won_Descent,
+	Game_Won_Animate,
+
+	Finished
+};
+//------------------------------------------------------------------------------------------------------------
 class AsGame_Title : public AGraphics_Object
 {
 public:
@@ -78,6 +91,7 @@ public:
 	void Show(bool is_over);
 
 private:
+	EGame_Title_State Game_Title_State;
 	std::vector<AFinal_Letter *> Title_Letters;
 };
 //------------------------------------------------------------------------------------------------------------
