@@ -59,9 +59,10 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
+	double X_Pos, Y_Pos;
+
 private:
 	wchar_t Letter;
-	double X_Pos, Y_Pos;
 };
 //------------------------------------------------------------------------------------------------------------
 enum class EGame_Title_State: unsigned char
@@ -91,6 +92,7 @@ public:
 	void Show(bool is_over);
 
 private:
+	RECT Title_Rect;
 	EGame_Title_State Game_Title_State;
 	std::vector<AFinal_Letter *> Title_Letters;
 };

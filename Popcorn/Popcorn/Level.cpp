@@ -119,20 +119,40 @@ AsGame_Title::~AsGame_Title()
 	Title_Letters.erase(Title_Letters.begin(), Title_Letters.end() );
 }
 //------------------------------------------------------------------------------------------------------------
-AsGame_Title::AsGame_Title() : Game_Title_State(EGame_Title_State::Idle)
+AsGame_Title::AsGame_Title() 
+: Game_Title_State(EGame_Title_State::Idle), Title_Rect{}
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Act()
-{}
+{
+	if (Game_Title_State == EGame_Title_State::Idle or Game_Title_State == EGame_Title_State::Finished)
+		return;
+}
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Clear(HDC hdc, RECT &paint_area)
 {
-	for (auto *letter : Title_Letters)
-		letter->Clear(hdc, paint_area);
+	RECT intersection_rect{};
+
+	if (Game_Title_State == EGame_Title_State::Idle or Game_Title_State == EGame_Title_State::Finished)
+		return;
+
+	if (!IntersectRect(&intersection_rect, &paint_area, &Title_Rect))
+		return;
+
+	AsTools::Rect(hdc, Title_Rect, AsConfig::BG_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Draw(HDC hdc, RECT &paint_area)
 {
+	RECT intersection_rect{};
+
+	if (Game_Title_State == EGame_Title_State::Idle or Game_Title_State == EGame_Title_State::Finished)
+		return;
+
+	if (!IntersectRect(&intersection_rect, &paint_area, &Title_Rect))
+		return;
+
+
 	for (auto *letter : Title_Letters)
 		letter->Draw(hdc, paint_area);
 }
@@ -146,6 +166,7 @@ void AsGame_Title::Show(bool is_over)
 {
 	double title_y = 135.0;
 	double title_x = 32.0;
+	double title_end_x;
 
 	if (is_over)
 	{
@@ -169,6 +190,14 @@ void AsGame_Title::Show(bool is_over)
 		Title_Letters.push_back(new AFinal_Letter(title_x + 118.0, title_y, L'!'));
 		Title_Letters.push_back(new AFinal_Letter(title_x + 122.0, title_y, L'!'));
 	}
+
+	title_end_x = Title_Letters[Title_Letters.size() - 1]->X_Pos + 16.0;
+
+	Title_Rect.left = (int)(title_x * AsConfig::D_Global_Scale);
+	Title_Rect.top = (int)(title_y * AsConfig::D_Global_Scale);
+	Title_Rect.right = Title_Rect.left + (int)(title_end_x * AsConfig::D_Global_Scale);
+	Title_Rect.bottom = Title_Rect.top + 16 * AsConfig::Global_Scale;
+
 }
 //------------------------------------------------------------------------------------------------------------
 
