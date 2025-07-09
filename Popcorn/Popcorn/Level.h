@@ -90,6 +90,7 @@ public:
 	virtual bool Is_Finished();
 
 	void Show(bool is_over);
+	bool Is_Visible();
 
 private:
 	RECT Title_Rect;

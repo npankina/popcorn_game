@@ -162,9 +162,16 @@ bool AsGame_Title::Is_Finished()
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
+bool AsGame_Title::Is_Visible()
+{
+	if (Game_Title_State != EGame_Title_State::Idle)
+		return true;
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Show(bool is_over)
 {
-	double title_y = 135.0;
+	double title_y = 0.0;
 	double title_x = 32.0;
 	double title_end_x;
 
@@ -178,6 +185,8 @@ void AsGame_Title::Show(bool is_over)
 		Title_Letters.push_back(new AFinal_Letter(title_x + 80.0, title_y, L'V'));
 		Title_Letters.push_back(new AFinal_Letter(title_x + 94.0, title_y, L'E'));
 		Title_Letters.push_back(new AFinal_Letter(title_x + 108.0, title_y, L'R'));
+
+		Game_Title_State = EGame_Title_State::Game_Over_Descent;
 	}
 	else 
 	{
@@ -189,6 +198,9 @@ void AsGame_Title::Show(bool is_over)
 		Title_Letters.push_back(new AFinal_Letter(title_x + 98.0, title_y, L'N'));
 		Title_Letters.push_back(new AFinal_Letter(title_x + 118.0, title_y, L'!'));
 		Title_Letters.push_back(new AFinal_Letter(title_x + 122.0, title_y, L'!'));
+
+		Game_Title_State = EGame_Title_State::Game_Won_Descent;
+
 	}
 
 	title_end_x = Title_Letters[Title_Letters.size() - 1]->X_Pos + 16.0;
@@ -196,7 +208,9 @@ void AsGame_Title::Show(bool is_over)
 	Title_Rect.left = (int)(title_x * AsConfig::D_Global_Scale);
 	Title_Rect.top = (int)(title_y * AsConfig::D_Global_Scale);
 	Title_Rect.right = Title_Rect.left + (int)(title_end_x * AsConfig::D_Global_Scale);
-	Title_Rect.bottom = Title_Rect.top + 16 * AsConfig::Global_Scale;
+	Title_Rect.bottom = Title_Rect.top + 32 * AsConfig::Global_Scale;
+
+	AsTools::Invalidate_Rect(Title_Rect);
 
 }
 //------------------------------------------------------------------------------------------------------------
@@ -397,6 +411,9 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 	if (Advertisement != 0)
 		Advertisement->Draw(hdc, paint_area);
 
+	Game_Title.Draw(hdc, paint_area);
+
+
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect) )
 	{
 		for (int i = 0; i < AsConfig::Level_Height; i++)
@@ -423,7 +440,6 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 	Mop.Draw(hdc, paint_area);
 	Level_Title.Draw(hdc, paint_area);
 
-	Game_Title.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsLevel::Is_Finished()
@@ -999,7 +1015,7 @@ void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, int level_x, int level_y)
 	switch (brick_type)
 	{
 	case EBrick_Type::None:
-		if (Advertisement != 0 and Advertisement->Has_Brick_At(level_x, level_y) )
+		if ((Advertisement != 0 and Advertisement->Has_Brick_At(level_x, level_y) ) or Game_Title.Is_Visible() )
 			break;
 		// else - No break!
 
