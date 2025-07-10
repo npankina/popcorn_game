@@ -47,6 +47,7 @@ private:
 	void Act();
 	void Handle_Message();
 	void On_Falling_Letter(AFalling_Letter *falling_letter);
+	bool Is_Destroying_Complete();
 
 	EGame_State Game_State;
 	double Rest_Distance;

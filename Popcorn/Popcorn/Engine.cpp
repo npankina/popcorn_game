@@ -110,12 +110,12 @@ int AsEngine::On_Timer()
 
 
 	case EGame_State::Lost_Ball:
-		if (Platform.Has_State(EPlatform_Substate_Regular::Missing) )
+		if (Is_Destroying_Complete() )
 		{
-			if (! Info_Panel.Decrease_Life_Count() )
+			if (Info_Panel.Decrease_Life_Count() )
 				Game_Over();
-
-			Restart_Level();
+			else
+				Restart_Level();
 		}
 		break;
 
@@ -132,7 +132,7 @@ int AsEngine::On_Timer()
 
 
 	case EGame_State::Finish_Level:
-		if (Monster_Set.Are_All_Destroyed() and Platform.Has_State(EPlatform_Substate_Regular::Missing) )
+		if (Is_Destroying_Complete() )
 		{
 			Level.Mop_Next_Level();
 			Game_State = EGame_State::Mop_Level;
@@ -143,6 +143,13 @@ int AsEngine::On_Timer()
 	Act();
 
 	return 0;
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsEngine::Is_Destroying_Complete()
+{
+	if (Monster_Set.Are_All_Destroyed() and Platform.Has_State(EPlatform_Substate_Regular::Missing))
+		return true;
+	return false;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Restart_Level()
