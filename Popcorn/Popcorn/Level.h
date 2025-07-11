@@ -95,6 +95,7 @@ public:
 private:
 	RECT Title_Rect;
 	EGame_Title_State Game_Title_State;
+	int Start_Tick;
 	std::vector<AFinal_Letter *> Title_Letters;
 };
 //------------------------------------------------------------------------------------------------------------

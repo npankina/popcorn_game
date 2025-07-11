@@ -120,13 +120,17 @@ AsGame_Title::~AsGame_Title()
 }
 //------------------------------------------------------------------------------------------------------------
 AsGame_Title::AsGame_Title() 
-: Game_Title_State(EGame_Title_State::Idle), Title_Rect{}
+: Game_Title_State(EGame_Title_State::Idle), Title_Rect{}, Start_Tick(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Act()
 {
+	int curr_tick;
+
 	if (Game_Title_State == EGame_Title_State::Idle or Game_Title_State == EGame_Title_State::Finished)
 		return;
+
+	curr_tick = AsConfig::Current_Timer_Tick - Start_Tick;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Clear(HDC hdc, RECT &paint_area)
@@ -210,6 +214,7 @@ void AsGame_Title::Show(bool is_over)
 	Title_Rect.right = Title_Rect.left + (int)(title_end_x * AsConfig::D_Global_Scale);
 	Title_Rect.bottom = Title_Rect.top + 32 * AsConfig::Global_Scale;
 
+	Start_Tick = AsConfig::Current_Timer_Tick;
 	AsTools::Invalidate_Rect(Title_Rect);
 
 }
