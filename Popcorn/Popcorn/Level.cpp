@@ -110,6 +110,7 @@ bool AFinal_Letter::Is_Finished()
 
 
 
+const double AsGame_Title::Low_Y_Pos = 135.0;
 //------------------------------------------------------------------------------------------------------------
 AsGame_Title::~AsGame_Title()
 {
@@ -120,17 +121,47 @@ AsGame_Title::~AsGame_Title()
 }
 //------------------------------------------------------------------------------------------------------------
 AsGame_Title::AsGame_Title() 
-: Game_Title_State(EGame_Title_State::Idle), Title_Rect{}, Start_Tick(0)
+	: Game_Title_State(EGame_Title_State::Idle), Title_Rect{}, Prev_Title_Rect{}, Start_Tick(0)
 {}
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Act()
 {
 	int curr_tick;
+	double ratio;
+	double y_pos;
 
 	if (Game_Title_State == EGame_Title_State::Idle or Game_Title_State == EGame_Title_State::Finished)
 		return;
 
 	curr_tick = AsConfig::Current_Timer_Tick - Start_Tick;
+
+	switch (Game_Title_State)
+	{
+	case EGame_Title_State::Game_Over_Descent:
+	case EGame_Title_State::Game_Won_Descent:
+		if (curr_tick < Descent_Timeout)
+			ratio = (double)curr_tick / (double)Descent_Timeout;
+		else
+			ratio = 1.0;
+
+		y_pos = Low_Y_Pos * ratio;
+
+		for (auto* letter : Title_Letters)
+			letter->Y_Pos = y_pos;
+
+		Prev_Title_Rect = Title_Rect;
+
+		Title_Rect.top = (int)(y_pos * AsConfig::D_Global_Scale);
+		Title_Rect.bottom = Title_Rect.top + Height * AsConfig::Global_Scale;
+
+		AsTools::Invalidate_Rect(Title_Rect);
+		AsTools::Invalidate_Rect(Prev_Title_Rect);
+		break;
+
+	case EGame_Title_State::Game_Won_Animate:
+		break;
+	}
+
 }
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Clear(HDC hdc, RECT &paint_area)
@@ -140,10 +171,10 @@ void AsGame_Title::Clear(HDC hdc, RECT &paint_area)
 	if (Game_Title_State == EGame_Title_State::Idle or Game_Title_State == EGame_Title_State::Finished)
 		return;
 
-	if (!IntersectRect(&intersection_rect, &paint_area, &Title_Rect))
+	if (!IntersectRect(&intersection_rect, &paint_area, &Prev_Title_Rect))
 		return;
 
-	AsTools::Rect(hdc, Title_Rect, AsConfig::BG_Color);
+	AsTools::Rect(hdc, Prev_Title_Rect, AsConfig::BG_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsGame_Title::Draw(HDC hdc, RECT &paint_area)
@@ -212,11 +243,10 @@ void AsGame_Title::Show(bool is_over)
 	Title_Rect.left = (int)(title_x * AsConfig::D_Global_Scale);
 	Title_Rect.top = (int)(title_y * AsConfig::D_Global_Scale);
 	Title_Rect.right = Title_Rect.left + (int)(title_end_x * AsConfig::D_Global_Scale);
-	Title_Rect.bottom = Title_Rect.top + 32 * AsConfig::Global_Scale;
+	Title_Rect.bottom = Title_Rect.top + Height * AsConfig::Global_Scale;
 
 	Start_Tick = AsConfig::Current_Timer_Tick;
 	AsTools::Invalidate_Rect(Title_Rect);
-
 }
 //------------------------------------------------------------------------------------------------------------
 
