@@ -113,9 +113,9 @@ int AsEngine::On_Timer()
 		if (Is_Destroying_Complete() )
 		{
 			if (Info_Panel.Decrease_Life_Count() )
-				Game_Over();
-			else
 				Restart_Level();
+			else
+				Game_Over();
 		}
 		break;
 

@@ -1,11 +1,7 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "\\\\Mac\\iCloud\\Code\\popcorn_game\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|\\\\Mac\\iCloud\\Code\\popcorn_game\\Popcorn\\Popcorn\\Monster.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    }
-  ],
+  "WorkspaceRootPath": "Y:\\Code\\popcorn_game\\",
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -13,21 +9,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": -1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Monster.cpp",
-              "DocumentMoniker": "\\\\Mac\\iCloud\\Code\\popcorn_game\\Popcorn\\Popcorn\\Monster.cpp",
-              "RelativeDocumentMoniker": "Popcorn\\Popcorn\\Monster.cpp",
-              "ToolTip": "\\\\Mac\\iCloud\\Code\\popcorn_game\\Popcorn\\Popcorn\\Monster.cpp",
-              "RelativeToolTip": "Popcorn\\Popcorn\\Monster.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-05-02T09:05:52.943Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"

@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Popcorn",
+    "\\Popcorn\\Popcorn"
   ],
-  "SelectedNode": "\\Popcorn.sln",
+  "SelectedNode": "\\Popcorn\\Popcorn",
   "PreviewInSolutionExplorer": false
 }
